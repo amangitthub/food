@@ -7,107 +7,161 @@
 @endsection
 
 @section('content')
-
 <style>
-    .food-cart-page{padding:70px 0;background:#f8f9fb}
-    .food-cart-header{display:flex;align-items:center;justify-content:space-between;gap:25px;margin-bottom:32px}
-    .food-cart-header-left{display:flex;align-items:center;gap:16px}
-    .food-cart-header-icon{width:60px;height:60px;display:flex;align-items:center;justify-content:center;border-radius:15px;background:#ff8c1a;color:#fff;font-size:25px}
-    .food-cart-label{display:block;color:#ff8c1a;font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
-    .food-cart-header h1{margin:4px 0;color:#071b2c;font-size:32px;font-weight:800}
-    .food-cart-header p{margin:0;color:#7b8490;font-size:14px}
-    .food-continue-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border:1px solid #e4e7eb;border-radius:10px;background:#fff;color:#071b2c;text-decoration:none;font-weight:700}
-    .food-continue-btn:hover{background:#ff8c1a;color:#fff}
-    .food-empty-cart{text-align:center;background:#fff;border:1px solid #eaecf0;border-radius:18px;padding:60px 25px}
-    .food-empty-icon{width:80px;height:80px;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#fff3e5;color:#ff8c1a;font-size:32px}
-    .food-empty-cart h2{color:#071b2c;font-weight:800}
-    .food-empty-cart p{color:#7b8490;margin-bottom:22px}
-    .food-shop-btn{display:inline-flex;gap:8px;padding:13px 22px;border-radius:10px;background:#ff8c1a;color:#fff;text-decoration:none;font-weight:700}
-    .food-cart-items-card,.food-checkout-card,.food-cart-summary{background:#fff;border:1px solid #eaecf0;border-radius:16px;box-shadow:0 8px 30px rgba(7,27,44,.05);margin-bottom:20px;overflow:hidden}
-    .food-cart-items-header{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:20px 22px;border-bottom:1px solid #f0f1f3}
-    .food-cart-items-title,.food-checkout-card-header,.food-summary-title{display:flex;align-items:center;gap:12px}
-    .food-cart-items-title-icon,.food-checkout-icon,.food-summary-title-icon{width:43px;height:43px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:#fff3e5;color:#ff8c1a;flex-shrink:0}
-    .food-cart-items-header h3,.food-checkout-card-header h3,.food-summary-title h3{margin:0;color:#071b2c;font-size:18px;font-weight:800}
-    .food-cart-items-header span,.food-checkout-card-header p{color:#8b929b;font-size:13px}
-    .food-checkout-card-header{margin-bottom:22px}
-    .food-checkout-card-header p{margin:3px 0 0}
-    .food-clear-cart{border:0;background:none;color:#e74c3c;font-size:13px;font-weight:700;cursor:pointer}
-    .food-cart-item{display:grid;grid-template-columns:minmax(180px,1fr) auto auto 36px;align-items:center;gap:16px;padding:20px 22px;border-bottom:1px solid #f0f1f3}
-    .food-cart-item:last-child{border-bottom:0}
-    .food-cart-product{display:flex;align-items:center;gap:13px;min-width:0}
-    .food-cart-image{width:70px;height:70px;flex:0 0 70px;overflow:hidden;border-radius:11px;background:#f4f5f7}
-    .food-cart-image img{width:100%;height:100%;object-fit:cover}
-    .food-cart-no-image{height:100%;display:flex;align-items:center;justify-content:center;color:#ff8c1a;font-size:22px}
-    .food-cart-product-info{min-width:0}
-    .food-cart-product-info h4{margin:0 0 6px;color:#071b2c;font-size:15px;font-weight:800;overflow-wrap:anywhere}
-    .food-cart-product-info span{color:#8b929b;font-size:13px}
-    .food-cart-quantity{display:flex;align-items:center;gap:10px;padding:5px;border:1px solid #e7e9ed;border-radius:9px}
-    .cart-qty-btn{width:29px;height:29px;border:0;border-radius:7px;background:#f5f6f8;color:#071b2c;font-size:17px;cursor:pointer}
-    .cart-qty-btn:hover{background:#ff8c1a;color:#fff}
-    .food-cart-item-total{text-align:right;white-space:nowrap}
-    .food-cart-item-total strong{color:#071b2c;font-size:15px}
-    .food-remove-item{width:34px;height:34px;border:0;border-radius:9px;background:#fff1f0;color:#e74c3c;cursor:pointer}
-    .food-remove-item:hover{background:#e74c3c;color:#fff}
-    .food-checkout-card{padding:23px}
-    .food-form-label{display:block;margin-bottom:8px;color:#071b2c;font-size:13px;font-weight:700}
-    .food-form-label span{color:#e74c3c}
-    .food-form-input{width:100%;min-height:46px;padding:11px 13px;border:1px solid #e2e5e9;border-radius:9px;outline:none;background:#fff;color:#071b2c;font-size:14px;box-sizing:border-box}
-    .food-form-input:focus{border-color:#ff8c1a;box-shadow:0 0 0 3px rgba(255,140,26,.1)}
-    textarea.food-form-input{min-height:75px;resize:vertical}
-    .food-address-select{padding-left:13px!important}
-    .food-saved-address-list{display:grid;gap:12px;margin:16px 0 20px}
-    .food-saved-address-card{display:flex;align-items:flex-start;gap:12px;padding:15px;border:1px solid #e5e8ed;border-radius:12px;background:#fff;transition:border-color .2s}
-    .food-saved-address-card.is-default{border-color:#ffb45f;background:#fffaf4}
-    .food-saved-address-card.is-selected{border:2px solid #ff8c1a;background:#fffaf4}
-    .food-saved-address-details{flex:1;min-width:0;overflow-wrap:anywhere}
-    .food-saved-address-details strong{display:block;color:#071b2c;margin-bottom:5px;font-size:14px}
-    .food-saved-address-details p{margin:0;color:#727b86;font-size:13px;line-height:1.7}
-    .food-address-badge{display:inline-block;margin-top:7px;padding:4px 9px;border-radius:20px;background:#fff0dc;color:#c96b00;font-size:11px;font-weight:700}
-    .food-no-saved-addresses{padding:16px;border:1px dashed #d9dde3;border-radius:10px;color:#7b8490;font-size:13px;text-align:center}
-    .food-use-address{flex-shrink:0;border:1px solid #ff8c1a;border-radius:8px;background:#fff;color:#d97500;padding:8px 12px;font-size:12px;font-weight:800;cursor:pointer}
-    .food-use-address:hover,.food-use-address.active{background:#ff8c1a;color:#fff}
-    .food-new-address-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 14px;border:1px solid #ff8c1a;border-radius:9px;background:#fff;color:#d97500;font-size:13px;font-weight:700;cursor:pointer}
-    .food-new-address-btn:hover{background:#ff8c1a;color:#fff}
-    #newAddressForm[hidden]{display:none!important}
-    .food-payment-methods{display:grid;gap:12px}
-    .food-payment-option{display:flex;align-items:center;gap:13px;padding:15px;border:1px solid #e3e6ea;border-radius:11px;cursor:pointer}
-    .food-payment-option input{accent-color:#ff8c1a}
-    .food-payment-content{flex:1}
-    .food-payment-content strong{display:block;color:#071b2c;font-size:14px}
-    .food-payment-content small{color:#8b929b;font-size:12px}
-    .food-payment-option>i{color:#ff8c1a}
-    .food-cart-summary{position:sticky;top:95px}
-    .food-summary-top{padding:20px 22px;border-bottom:1px solid #f0f1f3}
-    .food-summary-body{padding:22px}
-    .food-summary-row{display:flex;justify-content:space-between;gap:12px;margin-bottom:14px;color:#7c858f;font-size:14px}
-    .food-summary-row strong{color:#071b2c}
-    .food-free{color:#21a366!important}
-    .food-summary-divider{height:1px;margin:20px 0;background:#eceef1}
-    .food-summary-total{display:flex;justify-content:space-between;gap:12px;margin-bottom:20px}
-    .food-summary-total span{color:#071b2c;font-weight:800}
-    .food-summary-total strong{color:#ff8c1a;font-size:23px}
-    .food-mini-checkout-info{padding:15px;margin-bottom:18px;border-radius:11px;background:#f8f9fb}
-    .food-mini-info-title{margin-bottom:12px;color:#071b2c;font-size:13px;font-weight:800}
-    .food-mini-info-title i{margin-right:6px;color:#ff8c1a}
-    .food-mini-info-row{display:flex;justify-content:space-between;gap:12px;margin-top:8px;color:#8b929b;font-size:12px}
-    .food-mini-info-row strong{max-width:65%;overflow:hidden;color:#071b2c;text-align:right;text-overflow:ellipsis;white-space:nowrap}
-    .food-checkout-btn{width:100%;min-height:51px;display:flex;align-items:center;justify-content:center;gap:10px;border:0;border-radius:10px;background:#ff8c1a;color:#fff;font-weight:800;cursor:pointer}
-    .food-checkout-btn:hover{background:#071b2c}
-    .food-checkout-btn:disabled{opacity:.6;cursor:not-allowed}
-    .food-secure-text{margin-top:12px;color:#8b929b;text-align:center;font-size:11px}
-    .food-secure-text i{color:#21a366}
-    @media(max-width:991px){.food-cart-header{align-items:flex-start;flex-direction:column}.food-cart-summary{position:static}}
-    @media(max-width:767px){.food-cart-page{padding:45px 0}.food-cart-header h1{font-size:27px}.food-cart-item{grid-template-columns:1fr auto;gap:12px;padding:17px}.food-cart-product{grid-column:1/-1}.food-cart-item-total{text-align:left}.food-checkout-card{padding:18px}}
-    @media(max-width:480px){.food-cart-header-left{align-items:flex-start}.food-cart-header-icon{width:48px;height:48px;flex:0 0 48px}.food-cart-header h1{font-size:23px}.food-cart-image{width:58px;height:58px;flex-basis:58px}.food-cart-items-header{padding:17px}.food-saved-address-card{flex-wrap:wrap}.food-use-address{margin-left:auto}.food-summary-body{padding:18px}}
+/* Uses your website variables (--theme, --theme2, --bg ...) with safe fallbacks */
+.food-cart-page{--g:var(--theme,#00813d);--r:var(--theme2,#d12525);--dark:var(--header,#212121);--txt:var(--text,#5c5c5b);--ln:var(--border,#d9d9d9);--cream:var(--bg,#f4f1ea);--soft:#e6f4ec;--sh:0 8px 30px rgba(33,33,33,.07);padding:70px 0;background:var(--cream)}
+.food-cart-page *{box-sizing:border-box}
 
-.food-form-input,
-.food-form-input:focus {
-    color: #071b2c !important;
-    background: #fff !important;
-    -webkit-text-fill-color: #071b2c !important;
-    opacity: 1 !important;
-    visibility: visible !important;
+/* ---------- Header ---------- */
+.food-cart-header{display:flex;align-items:center;justify-content:space-between;gap:25px;margin-bottom:30px}
+.food-cart-header-left{display:flex;align-items:center;gap:16px}
+.food-cart-header-icon{width:60px;height:60px;flex:none;display:flex;align-items:center;justify-content:center;border-radius:18px;background:var(--g);color:#fff;font-size:24px;box-shadow:0 10px 22px rgba(0,129,61,.25)}
+.food-cart-label{display:block;color:var(--g);font-size:12px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase}
+.food-cart-header h1{margin:2px 0 4px;color:var(--dark);font-size:clamp(26px,4vw,34px);font-weight:800}
+.food-cart-header p{margin:0;color:var(--txt);font-size:14px}
+.food-continue-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;background:#fff;border-radius:99px;box-shadow:0 2px 10px rgba(33,33,33,.06);color:var(--dark);text-decoration:none;font-size:14px;font-weight:700;transition:.25s}
+.food-continue-btn:hover{background:var(--g);color:#fff}
+
+/* ---------- Empty cart ---------- */
+.food-empty-cart{padding:60px 25px;text-align:center;background:#fff;border-radius:22px;box-shadow:var(--sh)}
+.food-empty-icon{width:84px;height:84px;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--soft);color:var(--g);font-size:32px}
+.food-empty-cart h2{color:var(--dark);font-weight:800}
+.food-empty-cart p{margin-bottom:22px;color:var(--txt)}
+.food-shop-btn{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border-radius:12px;background:var(--g);color:#fff;text-decoration:none;font-weight:700;transition:.25s}
+.food-shop-btn:hover{background:var(--dark);color:#fff}
+
+/* ---------- Cards ---------- */
+.food-cart-items-card,.food-checkout-card,.food-cart-summary{margin-bottom:20px;overflow:hidden;background:#fff;border-radius:20px;box-shadow:var(--sh)}
+.food-cart-items-header{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:20px 22px;border-bottom:1px dashed var(--ln)}
+.food-cart-items-title,.food-checkout-card-header,.food-summary-title{display:flex;align-items:center;gap:12px}
+.food-cart-items-title-icon,.food-checkout-icon,.food-summary-title-icon{width:44px;height:44px;flex:none;display:flex;align-items:center;justify-content:center;border-radius:12px;background:var(--soft);color:var(--g)}
+.food-cart-items-header h3,.food-checkout-card-header h3,.food-summary-title h3{margin:0;color:var(--dark);font-size:18px;font-weight:800}
+.food-cart-items-header span,.food-checkout-card-header p{color:var(--txt);font-size:13px}
+.food-checkout-card{padding:24px}
+.food-checkout-card-header{margin-bottom:22px}
+.food-checkout-card-header p{margin:3px 0 0}
+.food-clear-cart{border:0;background:none;color:var(--r);font-size:13px;font-weight:700;cursor:pointer}
+.food-clear-cart:hover{text-decoration:underline}
+
+/* ---------- Cart items ---------- */
+.food-cart-item{display:grid;grid-template-columns:minmax(180px,1fr) auto auto 36px;align-items:center;gap:16px;padding:18px 22px;border-bottom:1px dashed var(--ln)}
+.food-cart-item:last-child{border-bottom:0}
+.food-cart-product{display:flex;align-items:center;gap:14px;min-width:0}
+.food-cart-image{width:72px;height:72px;flex:0 0 72px;overflow:hidden;border-radius:14px;background:var(--cream)}
+.food-cart-image img{width:100%;height:100%;object-fit:cover}
+.food-cart-no-image{height:100%;display:flex;align-items:center;justify-content:center;color:var(--g);font-size:22px}
+.food-cart-product-info{min-width:0}
+.food-cart-product-info h4{margin:0 0 5px;color:var(--dark);font-size:15.5px;font-weight:700;overflow-wrap:anywhere}
+.food-cart-product-info span{color:var(--txt);font-size:13px}
+.food-cart-quantity{display:flex;align-items:center;gap:12px;padding:4px;background:var(--cream);border-radius:12px;font-weight:700;color:var(--dark)}
+.cart-qty-btn{width:32px;height:32px;border:0;border-radius:9px;background:#fff;color:var(--dark);font-size:18px;cursor:pointer;box-shadow:0 1px 4px rgba(33,33,33,.1);transition:.2s}
+.cart-qty-btn:hover{background:var(--g);color:#fff}
+.cart-qty-btn:disabled{opacity:.5;cursor:not-allowed}
+.food-cart-item-total{text-align:right;white-space:nowrap}
+.food-cart-item-total strong{color:var(--dark);font-size:16px;font-weight:800}
+.food-remove-item{width:36px;height:36px;border:0;border-radius:10px;background:#fbe7e7;color:var(--r);cursor:pointer;transition:.2s}
+.food-remove-item:hover{background:var(--r);color:#fff}
+
+/* ---------- Forms ---------- */
+.food-form-label{display:block;margin-bottom:7px;color:var(--dark);font-size:13px;font-weight:700}
+.food-form-label span{color:var(--r)}
+.food-form-input,.food-address-select{width:100%;min-height:48px;padding:11px 14px;border:1px solid var(--ln);border-radius:12px;outline:none;background:#fff;color:var(--dark);font-size:14px;transition:.25s}
+.food-form-input:focus,.food-address-select:focus{border-color:var(--g);box-shadow:0 0 0 4px rgba(0,129,61,.12)}
+textarea.food-form-input{min-height:78px;resize:vertical}
+/* keeps typed text always visible */
+.food-form-input,.food-form-input:focus{color:var(--dark)!important;background:#fff!important;-webkit-text-fill-color:var(--dark)!important;opacity:1!important;visibility:visible!important}
+
+/* ---------- Saved addresses ---------- */
+.food-saved-address-list{display:grid;gap:12px;margin:16px 0 20px}
+.food-saved-address-card{display:flex;align-items:flex-start;gap:12px;padding:16px;background:#fff;border:2px solid var(--cream);border-radius:14px;transition:.2s}
+.food-saved-address-card.is-default{border-color:#cfe8d9;background:#f7fbf8}
+.food-saved-address-card.is-selected{border-color:var(--g);background:#f1f9f4}
+.food-saved-address-card>div:first-child{color:var(--g)!important}  /* overrides the old inline orange icon color */
+.food-saved-address-details{flex:1;min-width:0;overflow-wrap:anywhere}
+.food-saved-address-details strong{display:block;margin-bottom:5px;color:var(--dark);font-size:14.5px}
+.food-saved-address-details p{margin:0;color:var(--txt);font-size:13px;line-height:1.7}
+.food-address-badge{display:inline-block;margin-top:8px;padding:3px 11px;border-radius:99px;background:var(--soft);color:var(--g);font-size:11px;font-weight:700}
+.food-no-saved-addresses{padding:18px;border:1px dashed var(--ln);border-radius:12px;color:var(--txt);font-size:13px;text-align:center}
+.food-use-address,.food-new-address-btn{border:2px solid var(--g);background:#fff;color:var(--g);font-weight:700;cursor:pointer;transition:.2s}
+.food-use-address{flex:none;padding:7px 14px;border-radius:9px;font-size:12px}
+.food-new-address-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 16px;border-radius:10px;font-size:13px}
+.food-use-address:hover,.food-use-address.active,.food-new-address-btn:hover{background:var(--g);color:#fff}
+#newAddressForm[hidden]{display:none!important}
+.food-checkout-card a.d-inline-block{color:var(--g)!important}  /* overrides the old inline orange link */
+
+/* ---------- Payment ---------- */
+.food-payment-methods{display:grid;gap:12px}
+.food-payment-option{display:flex;align-items:center;gap:13px;padding:16px;border:2px solid var(--g);background:#f7fbf8;border-radius:14px;cursor:pointer}
+.food-payment-option input{accent-color:var(--g);width:18px;height:18px}
+.food-payment-content{flex:1}
+.food-payment-content strong{display:block;color:var(--dark);font-size:14.5px}
+.food-payment-content small{color:var(--txt);font-size:12.5px}
+.food-payment-option>i{color:var(--g);font-size:20px}
+
+/* ---------- Order summary ---------- */
+.food-cart-summary{position:sticky;top:95px}
+.food-summary-top{padding:20px 22px;border-bottom:1px dashed var(--ln)}
+.food-summary-body{padding:22px}
+.food-summary-row{display:flex;justify-content:space-between;gap:12px;margin-bottom:14px;color:var(--txt);font-size:14px}
+.food-summary-row strong{color:var(--dark)}
+.food-free{color:var(--g)!important}
+.food-summary-divider{height:0;margin:18px 0;border-top:1px dashed var(--ln)}
+.food-summary-total{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}
+.food-summary-total span{color:var(--dark);font-weight:800}
+.food-summary-total strong{color:var(--g);font-size:26px;font-weight:800}
+.food-mini-checkout-info{margin-bottom:18px;padding:15px;background:var(--cream);border-radius:14px}
+.food-mini-info-title{margin-bottom:10px;color:var(--dark);font-size:13px;font-weight:800}
+.food-mini-info-title i{margin-right:6px;color:var(--g)}
+.food-mini-info-row{display:flex;justify-content:space-between;gap:12px;margin-top:8px;color:var(--txt);font-size:12.5px}
+.food-mini-info-row strong{max-width:65%;overflow:hidden;color:var(--dark);text-align:right;text-overflow:ellipsis;white-space:nowrap}
+.food-checkout-btn{width:100%;min-height:54px;display:flex;align-items:center;justify-content:center;gap:10px;border:0;border-radius:12px;background:var(--g);color:#fff;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 10px 22px rgba(0,129,61,.25);transition:.25s}
+.food-checkout-btn:hover{background:var(--dark)}
+.food-checkout-btn:disabled{opacity:.6;cursor:not-allowed}
+.food-secure-text{margin-top:12px;color:var(--txt);text-align:center;font-size:12px}
+.food-secure-text i{color:var(--g)}
+
+/* ---------- Responsive ---------- */
+@media(max-width:991px){
+    .food-cart-header{align-items:flex-start;flex-direction:column}
+    .food-cart-summary{position:static}
 }
+@media(max-width:767px){
+    .food-cart-page{padding:40px 0}
+    .food-cart-item{grid-template-columns:1fr auto;gap:12px;padding:16px}
+    .food-cart-product{grid-column:1/-1}
+    .food-cart-item-total{text-align:left}
+    .food-checkout-card{padding:18px}
+    .food-cart-items-header{padding:16px}
+}
+@media(max-width:480px){
+    .food-cart-header-left{align-items:flex-start}
+    .food-cart-header-icon{width:48px;height:48px;flex-basis:48px;font-size:20px}
+    .food-cart-image{width:60px;height:60px;flex-basis:60px}
+    .food-saved-address-card{flex-wrap:wrap}
+    .food-use-address{margin-left:auto}
+    .food-summary-body{padding:18px}
+}
+
+/* ---------- Recommended products ---------- */
+.food-recommendations{padding:42px 0 8px}
+.food-recommendations-header{display:flex;align-items:end;justify-content:space-between;gap:15px;margin-bottom:22px}
+.food-recommendations-kicker{display:block;color:var(--theme,#00813d);font-size:12px;font-weight:800;letter-spacing:1.1px;text-transform:uppercase;margin-bottom:5px}
+.food-recommendations-header h2{margin:0;color:var(--header,#212121);font-size:clamp(23px,3vw,30px);font-weight:800}
+.food-recommendations-header p{margin:6px 0 0;color:var(--text,#5c5c5b);font-size:14px}
+.food-recommendation-card{height:100%;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 8px 28px rgba(33,33,33,.07);transition:transform .25s,box-shadow .25s}
+.food-recommendation-card:hover{transform:translateY(-5px);box-shadow:0 14px 32px rgba(33,33,33,.12)}
+.food-recommendation-image{display:block;aspect-ratio:4/3;background:#f4f1ea;overflow:hidden}
+.food-recommendation-image img{width:100%;height:100%;object-fit:cover;transition:transform .35s}
+.food-recommendation-card:hover .food-recommendation-image img{transform:scale(1.05)}
+.food-recommendation-body{padding:16px}
+.food-recommendation-body h3{font-size:16px;font-weight:800;margin:0 0 8px;line-height:1.4}
+.food-recommendation-body h3 a{color:#212121;text-decoration:none}
+.food-recommendation-price{font-size:17px;font-weight:800;color:var(--theme,#00813d);margin-bottom:13px}
+.food-recommendation-add{width:100%;border:0;border-radius:10px;padding:11px 12px;background:var(--theme,#00813d);color:#fff;font-weight:700;cursor:pointer;transition:.2s}
+.food-recommendation-add:hover{background:#212121;color:#fff}
+.food-recommendation-add:disabled{opacity:.65;cursor:wait}
+@media(max-width:575px){.food-recommendations{padding-top:30px}.food-recommendation-body{padding:12px}.food-recommendation-body h3{font-size:14px}.food-recommendation-price{font-size:15px}}
+
 </style>
 
 <section class="food-cart-page">
@@ -392,6 +446,50 @@
         </div>
     </div>
 </section>
+
+
+{{-- RANDOM PRODUCT RECOMMENDATIONS --}}
+@if(isset($recommendedProducts) && $recommendedProducts->isNotEmpty())
+<section class="food-recommendations">
+    <div class="container">
+        <div class="food-recommendations-header">
+            <div>
+                <span class="food-recommendations-kicker">Picked for you</span>
+                <h2>You May Also Like</h2>
+                <p>Discover something delicious to add to your order.</p>
+            </div>
+            <a href="{{ route('site.products') }}" class="food-continue-btn">View Menu <i class="fa fa-arrow-right"></i></a>
+        </div>
+        <div class="row g-3 g-md-4">
+            @foreach($recommendedProducts as $recommendedProduct)
+                @php
+                    $recommendedImage = $recommendedProduct->images->first();
+                    $recommendedImagePath = $recommendedImage->image_path ?? null;
+                @endphp
+                <div class="col-6 col-md-4 col-lg-3">
+                    <article class="food-recommendation-card">
+                        <a class="food-recommendation-image" href="{{ route('products.show', $recommendedProduct->slug) }}">
+                            @if($recommendedImagePath)
+                                <img src="{{ asset($recommendedImagePath) }}" alt="{{ $recommendedImage->alt_text ?: $recommendedProduct->name }}" loading="lazy">
+                            @else
+                                <img src="{{ asset('assets/img/food/delicious-burger.png') }}" alt="{{ $recommendedProduct->name }}" loading="lazy">
+                            @endif
+                        </a>
+                        <div class="food-recommendation-body">
+                            <h3><a href="{{ route('products.show', $recommendedProduct->slug) }}">{{ $recommendedProduct->name }}</a></h3>
+                            <div class="food-recommendation-price">₹{{ number_format((float) $recommendedProduct->price, 2) }}</div>
+                            <button type="button" class="food-recommendation-add" data-product-id="{{ $recommendedProduct->id }}">
+                                <i class="fa fa-shopping-basket"></i> Add to Cart
+                            </button>
+                        </div>
+                    </article>
+                </div>
+            @endforeach
+        </div>
+        <div id="recommendationMessage" role="status" aria-live="polite" style="margin-top:12px;font-size:13px"></div>
+    </div>
+</section>
+@endif
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -1084,6 +1182,50 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 }
+
+    // Add a recommended product using the same existing cart endpoint.
+    document.addEventListener('click', async function (event) {
+        const button = event.target.closest('.food-recommendation-add');
+        if (!button) return;
+
+        const productId = Number(button.dataset.productId);
+        if (!productId) return;
+
+        const originalText = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Adding...';
+        const message = document.getElementById('recommendationMessage');
+
+        try {
+            const result = await cartRequest("{{ route('cart.add') }}", {
+                product_id: productId,
+                quantity: 1
+            });
+
+            // Update the cart displayed on the page immediately.
+            const existingIndex = cart.findIndex(item => Number(item.product_id) === productId);
+            if (existingIndex >= 0) {
+                cart[existingIndex].quantity = Number(cart[existingIndex].quantity || 1) + 1;
+            } else {
+                // Refresh to load the complete product model and updated recommendations.
+                window.location.reload();
+                return;
+            }
+            renderCart();
+            if (message) {
+                message.textContent = result.message || 'Product added to your cart.';
+                message.style.color = 'var(--theme, #00813d)';
+            }
+        } catch (error) {
+            if (message) {
+                message.textContent = error.message || 'Could not add this product. Please try again.';
+                message.style.color = '#d12525';
+            }
+        } finally {
+            button.disabled = false;
+            button.innerHTML = originalText;
+        }
+    });
 
     renderCart();
 });

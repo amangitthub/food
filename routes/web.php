@@ -16,6 +16,7 @@ use App\Http\Controllers\AdminOrderController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\FavoriteController;
 
 // ================== Website Pages ==================
 
@@ -140,6 +141,20 @@ Route::middleware('auth')->group(function () {
         ->name('addresses.default');
 });
 
+// ================== User Favorites ==================
+
+Route::middleware('auth')->group(function () {
+
+    Route::get('/my-favorites', [FavoriteController::class, 'index'])
+        ->name('favorites.index');
+
+    Route::post('/favorites/toggle', [FavoriteController::class, 'toggle'])
+        ->name('favorites.toggle');
+
+    Route::delete('/favorites/{id}', [FavoriteController::class, 'destroy'])
+        ->name('favorites.destroy');
+
+});
 
 // ================== Admin Dashboard ==================
 

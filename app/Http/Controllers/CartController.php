@@ -97,31 +97,32 @@ class CartController extends Controller
     /**
      * CART PAGE
      */
-    public function index()
-    {
-        if (Auth::check()) {
-            $this->mergeGuestCartIntoDatabase();
+    
+/**
+ * CART PAGE + RANDOM PRODUCT RECOMMENDATIONS
+ */
+public function index()
+{
+    if (Auth::check()) {
+        $this->mergeGuestCartIntoDatabase();
 
-            $cartItems = Cart::where('user_id', Auth::id())
-                ->with('product.images')
-                ->get();
+        $cartItems = Cart::where('user_id', Auth::id())
+            ->with('product.images')
+            ->get();
 
-            $user = Auth::user();
+        $user = Auth::user();
 
-            // Load only the logged-in user's saved addresses.
-            $addresses = Address::where('user_id', Auth::id())
-                ->orderByDesc('is_default')
-                ->latest()
-                ->get();
+        $addresses = Address::where('user_id', Auth::id())
+            ->orderByDesc('is_default')
+            ->latest()
+            ->get();
 
-            return view('pages.cart', compact(
-                'cartItems',
-                'user',
-                'addresses'
-            ));
-        }
-
-        // Guest cart
+        $cartProductIds = $cartItems
+            ->pluck('product_id')
+            ->filter()
+            ->map(fn ($id) => (int) $id)
+            ->all();
+    } else {
         $guestCart = session()->get('food_cart', []);
 
         $productIds = collect($guestCart)
@@ -144,10 +145,10 @@ class CartController extends Controller
                 }
 
                 return [
-                    'id'         => null,
+                    'id' => null,
                     'product_id' => $product->id,
-                    'quantity'   => (int) ($item['quantity'] ?? 1),
-                    'product'    => $product,
+                    'quantity' => (int) ($item['quantity'] ?? 1),
+                    'product' => $product,
                 ];
             })
             ->filter()
@@ -156,12 +157,31 @@ class CartController extends Controller
         $user = null;
         $addresses = collect();
 
-        return view('pages.cart', compact(
-            'cartItems',
-            'user',
-            'addresses'
-        ));
+        $cartProductIds = $cartItems
+            ->pluck('product_id')
+            ->filter()
+            ->map(fn ($id) => (int) $id)
+            ->all();
     }
+
+    // Four random active products, excluding products already in cart.
+    $recommendedProducts = Product::with('images')
+        ->where('status', 'Active')
+        ->when(!empty($cartProductIds), function ($query) use ($cartProductIds) {
+            $query->whereNotIn('id', $cartProductIds);
+        })
+        ->inRandomOrder()
+        ->take(4)
+        ->get();
+
+    return view('pages.cart', compact(
+        'cartItems',
+        'user',
+        'addresses',
+        'recommendedProducts'
+    ));
+}
+
 
     /**
      * UPDATE CART QUANTITY

@@ -84,11 +84,40 @@ class AuthController extends Controller
         | Normal User Login
         |--------------------------------------------------------------------------
         */
+        // return redirect('/')
+        //     ->with(
+        //         'login_success',
+        //         'Welcome back! You have logged in successfully.'
+        //     );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Normal User Login
+        |--------------------------------------------------------------------------
+        */
+
+
+        $redirect = $request->input('redirect');
+
+        if (
+            is_string($redirect) &&
+            str_starts_with($redirect, '/') &&
+            !str_starts_with($redirect, '//') &&
+            !str_contains($redirect, '\\')
+        ) {
+            return redirect()->to($redirect)->with(
+                'login_success',
+                'Welcome back! You have logged in successfully.'
+            );
+        }
+
         return redirect('/')
             ->with(
                 'login_success',
                 'Welcome back! You have logged in successfully.'
             );
+
     }
 
     /*

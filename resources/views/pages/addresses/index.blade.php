@@ -7,212 +7,69 @@
 
 <link rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-
 <style>
-.food-address-page {
-    --orange: #ff6b35;
-    --navy: #321710;
-    --muted: #82736b;
-    --border: #f2dfd5;
-    min-height: 75vh;
-    padding: 45px 0 70px;
-    background:
-        radial-gradient(ellipse at 5% 10%, rgba(255,107,53,.10), transparent 32%),
-        #fffaf7;
-    color: var(--navy);
-    font-family: "Plus Jakarta Sans", "Inter", sans-serif;
+/* Uses your website variables (--theme, --theme2, --theme3, --bg ...) with safe fallbacks */
+.food-address-page{--g:var(--theme,#00813d);--gd:#006a32;--r:var(--theme2,#d12525);--y:var(--theme3,#ffb936);--dark:var(--header,#212121);--txt:var(--text,#5c5c5b);--ln:var(--border,#d9d9d9);--cream:var(--bg,#f4f1ea);--soft:#e6f4ec;--sh:0 8px 30px rgba(33,33,33,.07);min-height:75vh;padding:45px 0 70px;background:var(--cream);color:var(--dark)}
+.food-address-page *,.food-address-page *::before,.food-address-page *::after{box-sizing:border-box}
+
+/* ---------- Heading banner ---------- */
+.food-address-page .page-heading{position:relative;overflow:hidden;padding:36px;margin-bottom:26px;border-radius:22px;background:linear-gradient(120deg,#003d1c,var(--g) 70%,#2fb36b);color:#fff;box-shadow:0 15px 35px rgba(0,129,61,.22)}
+.food-address-page .page-heading::after{content:"";position:absolute;right:-70px;top:-90px;width:260px;height:260px;border-radius:50%;border:1px solid rgba(255,255,255,.2);box-shadow:0 0 0 30px rgba(255,255,255,.04),0 0 0 60px rgba(255,255,255,.025)}
+.food-address-page .page-heading h2{position:relative;z-index:1;margin:0 0 10px;font-size:clamp(28px,4vw,40px);font-weight:800; color :var(--cream); }
+.food-address-page .page-heading h2::after{content:"";display:block;width:56px;height:4px;margin-top:12px;background:var(--y);border-radius:4px}
+.food-address-page .page-heading p{position:relative;z-index:1;margin:0;color:rgba(255,255,255,.9);line-height:1.8}
+
+/* ---------- Cards ---------- */
+.food-address-card{height:100%;padding:26px;margin-bottom:22px;background:#fff;border-radius:20px;box-shadow:var(--sh)}
+.food-address-card h4{display:flex;align-items:center;gap:10px;margin:0 0 22px;color:var(--dark);font-size:20px;font-weight:800}
+.food-address-card h4 i{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:12px;background:var(--soft);color:var(--g)!important;font-size:16px}  /* overrides the old inline orange */
+
+/* ---------- Form ---------- */
+.food-address-page .form-label{margin-bottom:7px;color:var(--dark);font-size:13px;font-weight:700}
+.food-address-page .form-control{width:100%;min-height:50px;padding:12px 14px;background:#fff;border:1px solid var(--ln);border-radius:12px;box-shadow:none;color:var(--dark);font-size:14px;transition:.25s}
+.food-address-page .form-control:focus{border-color:var(--g);box-shadow:0 0 0 4px rgba(0,129,61,.12);outline:none}
+.food-address-page textarea.form-control{min-height:95px;resize:vertical}
+
+/* ---------- Buttons ---------- */
+.food-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 18px;border:2px solid var(--g);border-radius:12px;background:var(--g);color:#fff!important;font-size:13px;font-weight:700;text-decoration:none!important;cursor:pointer;transition:.25s}
+.food-btn:hover{background:var(--dark);border-color:var(--dark);transform:translateY(-2px);box-shadow:0 8px 18px rgba(33,33,33,.18)}
+.food-btn-secondary{background:#fff;border-color:var(--ln);color:var(--dark)!important}
+.food-btn-secondary:hover{background:#fff;border-color:var(--g);color:var(--g)!important;box-shadow:none}
+.address-actions form .food-btn[style*="e52c2c"]{background:var(--r)!important;border-color:var(--r)}  /* delete button in your red */
+.address-actions form .food-btn[style*="e52c2c"]:hover{background:#a81d1d!important;border-color:#a81d1d}
+
+/* ---------- Map ---------- */
+.food-address-map-wrap{margin:20px 0}
+.food-address-map-toolbar{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:12px}
+.food-address-map{width:100%;height:330px;overflow:hidden;background:var(--cream);border:2px solid var(--soft);border-radius:16px;z-index:1}
+.food-map-help{margin:9px 0 12px;padding:8px 12px;background:var(--soft);border-radius:10px;color:#00642f;font-size:12.5px;line-height:1.6}
+.food-address-coordinates{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.food-address-coordinates .form-control{min-height:44px;background:var(--cream)}
+
+/* ---------- Saved addresses ---------- */
+.address-item{padding:20px;margin-bottom:14px;background:#fff;border:2px solid var(--cream);border-radius:16px;overflow-wrap:anywhere;transition:.25s}
+.address-item:hover{border-color:#cfe8d9;box-shadow:0 8px 22px rgba(33,33,33,.06)}
+.address-item.default-address{border-color:var(--g);background:#f7fbf8}
+.address-name{color:var(--dark);font-size:17px;font-weight:800}
+.address-details{color:var(--txt);font-size:13.5px;line-height:1.9}
+.address-details i{color:var(--g)}
+.default-badge{display:inline-block;padding:4px 12px;margin-bottom:6px;background:var(--soft);color:var(--g);border-radius:99px;font-size:11.5px;font-weight:700}
+.address-actions{display:flex;flex-wrap:wrap;align-items:center;gap:9px}
+.address-actions form{margin:0}
+.empty-address{padding:40px 15px;border:2px dashed var(--ln);border-radius:16px;color:var(--txt);text-align:center}
+.empty-address i{color:var(--g);opacity:.8}
+
+@media(max-width:767px){
+    .food-address-page{padding:25px 0 40px}
+    .food-address-page .page-heading{padding:26px 20px;border-radius:18px}
+    .food-address-card{padding:18px;border-radius:16px}
+    .food-address-map{height:290px}
+    .food-address-coordinates{grid-template-columns:1fr}
+    .address-actions{width:100%}
+    .address-actions form,.address-actions form button,.address-actions>button{width:100%}
 }
-.food-address-page *,
-.food-address-page *::before,
-.food-address-page *::after {
-    box-sizing: border-box;
-}
-.food-address-page .page-heading {
-    padding: 34px;
-    margin-bottom: 25px;
-    border-radius: 22px;
-    background: linear-gradient(115deg,#fa6028,#fc7e3a 65%,#ffc857);
-    color: #fff;
-    box-shadow: 0 15px 35px rgba(194,65,12,.17);
-}
-.food-address-page .page-heading h2 {
-    margin: 0 0 10px;
-    font-size: clamp(28px,4vw,40px);
-    font-weight: 850;
-}
-.food-address-page .page-heading p {
-    margin: 0;
-    color: #fff0e5;
-    line-height: 1.8;
-}
-.food-address-card {
-    height: 100%;
-    padding: 25px;
-    margin-bottom: 22px;
-    border: 1px solid var(--border);
-    border-radius: 19px;
-    background: #fff;
-    box-shadow: 0 10px 30px rgba(100,49,20,.05);
-}
-.food-address-card h4 {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 0 0 23px;
-    color: var(--navy);
-    font-size: 20px;
-    font-weight: 850;
-}
-.food-address-page .form-label {
-    margin-bottom: 8px;
-    color: #493326;
-    font-size: 13px;
-    font-weight: 800;
-}
-.food-address-page .form-control {
-    width: 100%;
-    min-height: 49px;
-    padding: 12px 14px;
-    border: 1px solid #ebddd3;
-    border-radius: 11px;
-    background: #fffdfa;
-    color: #352016;
-    font-size: 14px;
-    box-shadow: none;
-}
-.food-address-page .form-control:focus {
-    border-color: var(--orange);
-    box-shadow: 0 0 0 4px rgba(255,107,53,.12);
-}
-.food-address-page textarea.form-control {
-    min-height: 95px;
-    resize: vertical;
-}
-.food-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    min-height: 43px;
-    padding: 10px 17px;
-    border: 1px solid transparent;
-    border-radius: 10px;
-    background: linear-gradient(110deg,#ff6b35,#fc7e3a);
-    color: #fff !important;
-    font-size: 13px;
-    font-weight: 800;
-    text-decoration: none !important;
-    cursor: pointer;
-    transition: transform .2s ease, box-shadow .2s ease;
-}
-.food-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 7px 17px rgba(255,107,53,.22);
-}
-.food-btn-secondary {
-    background: #fff0e7;
-    border-color: #ffd4c1;
-    color: #b84219 !important;
-}
-.food-address-map-wrap {
-    margin: 20px 0;
-}
-.food-address-map-toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 9px;
-    margin-bottom: 12px;
-}
-.food-address-map {
-    width: 100%;
-    height: 330px;
-    border: 1px solid #ebddd3;
-    border-radius: 13px;
-    overflow: hidden;
-    background: #f5f1ec;
-    z-index: 1;
-}
-.food-map-help {
-    margin: 9px 0 12px;
-    color: #82736b;
-    font-size: 12px;
-    line-height: 1.7;
-}
-.food-address-coordinates {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-.food-address-coordinates .form-control {
-    min-height: 42px;
-    background: #fff7f1;
-}
-.address-item {
-    padding: 20px;
-    margin-bottom: 15px;
-    border: 1px solid #eee3d9;
-    border-radius: 15px;
-    background: #fff;
-    overflow-wrap: anywhere;
-}
-.address-item.default-address {
-    border-color: var(--orange);
-    background: #fff5ed;
-}
-.address-name {
-    color: #321710;
-    font-size: 17px;
-    font-weight: 850;
-}
-.address-details {
-    color: #82736b;
-    font-size: 13px;
-    line-height: 1.9;
-}
-.default-badge {
-    display: inline-block;
-    padding: 5px 10px;
-    margin-bottom: 8px;
-    border-radius: 20px;
-    background: #ffe8dc;
-    color: #b84219;
-    font-size: 11px;
-    font-weight: 850;
-}
-.address-actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 9px;
-}
-.address-actions form {
-    margin: 0;
-}
-.empty-address {
-    padding: 35px 15px;
-    border: 1px dashed #e8cfc0;
-    border-radius: 15px;
-    color: #82736b;
-    text-align: center;
-}
-@media(max-width:767px) {
-    .food-address-page { padding: 25px 0 40px; }
-    .food-address-page .page-heading { padding: 25px 20px; }
-    .food-address-card { padding: 18px; }
-    .food-address-map { height: 290px; }
-    .food-address-coordinates { grid-template-columns: 1fr; }
-    .address-actions { width: 100%; }
-    .address-actions form,
-    .address-actions form button,
-    .address-actions > button { width: 100%; }
-}
-@media(prefers-reduced-motion:reduce) {
-    .food-address-page *,
-    .food-address-page *::before,
-    .food-address-page *::after {
-        animation: none !important;
-        transition: none !important;
-    }
+@media(prefers-reduced-motion:reduce){
+    .food-address-page *,.food-address-page *::before,.food-address-page *::after{animation:none!important;transition:none!important}
 }
 </style>
 

@@ -878,124 +878,152 @@
 GRILLED FOOD OFFER SECTION END
 ========================================================= --}}
 
-    <!-- Food Catagory Section Start -->
-    <section class="food-category-section fix section-padding section-bg">
-        <div class="container">
+    
+<!-- Food Catagory Section Start -->
+<section class="food-category-section fix section-padding section-bg">
+    <div class="container">
 
-            <div class="section-title text-center">
-                <span class="wow fadeInUp">crispy, every bite taste</span>
-                <h2 class="wow fadeInUp" data-wow-delay=".3s">
-                    Popular Combo Items
-                </h2>
-            </div>
+        <div class="section-title text-center">
+            <span class="wow fadeInUp">crispy, every bite taste</span>
+            <h2 class="wow fadeInUp" data-wow-delay=".3s">
+                Popular Combo Items
+            </h2>
+        </div>
 
-            <div class="row">
+        <div class="row">
 
-                @forelse ($popularComboItems as $index => $item)
-                    @php
-                        $image = $item->images->first();
+            @forelse ($popularComboItems as $index => $item)
+                @php
+                    $image = $item->images->first();
 
-                        $delays = ['.3s', '.5s', '.7s', '.8s'];
-                        $delay = $delays[$index % 4];
+                    $delays = ['.3s', '.5s', '.7s', '.8s'];
+                    $delay = $delays[$index % 4];
 
-                        // Keep the original theme's active card style
-$activeClass = $index === 1 ? ' active' : '';
-                    @endphp
+                    // Original active card styling preserved
+                    $activeClass = $index === 1 ? ' active' : '';
 
-                    <div class="col-xl-3 col-lg-6 col-md-6 wow fadeInUp" data-wow-delay="{{ $delay }}">
+                    // Check favorite status
+                    $isFavorite = auth()->check()
+                        ? \App\Models\Favorite::where('user_id', auth()->id())
+                            ->where('product_id', $item->id)
+                            ->exists()
+                        : false;
+                @endphp
 
-                        <div class="catagory-product-card-2{{ $activeClass }} text-center">
-                        {{-- <div class="catagory-product-card-2 text-center"> --}}
-                            {{-- Heart --}}
-                            <div class="icon">
-                                <a href="javascript:void(0)">
+                <div class="col-xl-3 col-lg-6 col-md-6 wow fadeInUp"
+                     data-wow-delay="{{ $delay }}">
+
+                    <div class="catagory-product-card-2{{ $activeClass }} text-center">
+
+                        {{-- Wishlist Heart: Only functionality changed --}}
+                        <div class="icon">
+                            @auth
+                                <form action="{{ route('favorites.toggle') }}"
+                                      method="POST"
+                                      style="display:inline-block; margin:0;">
+                                    @csrf
+
+                                    <input type="hidden"
+                                           name="product_id"
+                                           value="{{ $item->id }}">
+
+                                    <button type="submit"
+                                            title="{{ $isFavorite ? 'Remove from Favorites' : 'Add to Favorites' }}"
+                                            aria-label="{{ $isFavorite ? 'Remove from Favorites' : 'Add to Favorites' }}"
+                                            style="border:0; background:transparent; padding:0; cursor:pointer; color:{{ $isFavorite ? '#e63946' : 'inherit' }};">
+
+                                        <i class="{{ $isFavorite ? 'fas' : 'far' }} fa-heart"></i>
+                                    </button>
+                                </form>
+                            @else
+                                <a href="javascript:void(0);"
+                                   data-bs-toggle="modal"
+                                   data-bs-target="#loginModal"
+                                   title="Login to add to Favorites"
+                                   aria-label="Login to add to Favorites">
                                     <i class="far fa-heart"></i>
+                                </a>
+                            @endauth
+                        </div>
+
+                        {{-- Product Image: Original markup preserved --}}
+                        <div class="catagory-product-image">
+
+                            @if ($image && $image->image_path)
+                                <img src="{{ asset($image->image_path) }}"
+                                     alt="{{ $image->alt_text ?: $item->name }}">
+                            @else
+                                <img src="{{ asset('assets/img/food/delicious-burger.png') }}"
+                                     alt="{{ $item->name }}">
+                            @endif
+
+                        </div>
+
+                        {{-- Product Content --}}
+                        <div class="catagory-product-content">
+
+                            {{-- Original Add To Cart / View Details button --}}
+                            <div class="catagory-button">
+                                <a href="{{ route('products.show', $item->slug) }}"
+                                   class="theme-btn-2">
+
+                                    <i class="far fa-shopping-basket"></i>
+                                    Add To Cart
+
                                 </a>
                             </div>
 
-                            {{-- Product Image --}}
-                            <div class="catagory-product-image">
-
-                                @if ($image && $image->image_path)
-                                    <img src="{{ asset($image->image_path) }}"
-                                        alt="{{ $image->alt_text ?: $item->name }}">
-                                @else
-                                    <img src="{{ asset('assets/img/food/delicious-burger.png') }}"
-                                        alt="{{ $item->name }}">
-                                @endif
-
+                            {{-- Price --}}
+                            <div class="info-price d-flex align-items-center justify-content-center">
+                                <h6>
+                                    ₹{{ number_format((float) $item->price, 2) }}
+                                </h6>
                             </div>
 
-                            {{-- Product Content --}}
-                            <div class="catagory-product-content">
-
-                                {{-- Button --}}
-                                <div class="catagory-button">
-
-                                    <a href="{{ route('products.show', $item->slug) }}" class="theme-btn-2">
-
-                                        <i class="far fa-shopping-basket"></i>
-
-                                        Add To Cart
-
-                                    </a>
-
-                                </div>
-
-                                {{-- Price --}}
-                                <div class="info-price d-flex align-items-center justify-content-center">
-                                    <h6>
-                                        ₹{{ number_format((float) $item->price, 2) }}
-                                    </h6>
-                                    {{-- <span>
-                                        ₹{{ number_format((float) $item->price * 0.95, 2) }}
-                                    </span> --}}
-
-                                </div>
-
-                                {{-- Product Name --}}
-                                <h4>
-                                    <a href="{{ route('products.show', $item->slug) }}">
-                                        {{ $item->name }}
-                                    </a>
-                                </h4>
-                            </div>
+                            {{-- Product Name --}}
+                            <h4>
+                                <a href="{{ route('products.show', $item->slug) }}">
+                                    {{ $item->name }}
+                                </a>
+                            </h4>
 
                         </div>
 
                     </div>
+                </div>
 
-                @empty
-
-                    <div class="col-12 text-center">
-                        <p class="mb-0">
-                            No combo items available right now.
-                        </p>
-                    </div>
-                @endforelse
-
-            </div>
-
-            <div class="catagory-button text-center pt-4 wow fadeInUp" data-wow-delay=".3s">
-
-                <a href="{{ route('site.products') }}" class="theme-btn">
-
-                    <span class="button-content-wrapper d-flex align-items-center">
-
-                        <span class="button-icon">
-                            <i class="flaticon-delivery"></i>
-                        </span>
-
-                        <span class="button-text">
-                            view more
-                        </span>
-
-                    </span>
-
-                </a>
-
-            </div>
+            @empty
+                <div class="col-12 text-center">
+                    <p class="mb-0">
+                        No combo items available right now.
+                    </p>
+                </div>
+            @endforelse
 
         </div>
-    </section>
+
+        {{-- View More --}}
+        <div class="catagory-button text-center pt-4 wow fadeInUp"
+             data-wow-delay=".3s">
+
+            <a href="{{ route('site.products') }}" class="theme-btn">
+
+                <span class="button-content-wrapper d-flex align-items-center">
+
+                    <span class="button-icon">
+                        <i class="flaticon-delivery"></i>
+                    </span>
+
+                    <span class="button-text">
+                        view more
+                    </span>
+
+                </span>
+
+            </a>
+
+        </div>
+
+    </div>
+</section>
 @endsection

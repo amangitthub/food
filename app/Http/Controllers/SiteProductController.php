@@ -4,39 +4,32 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Favorite;
 use Illuminate\Http\Request;
 
 class SiteProductController extends Controller
 {
     /**
-     * Product Listing
+     * Product Listing + Infinite Scroll
      */
     public function index(Request $request)
     {
-        // Active categories
         $categories = Category::where('status', 'active')
             ->orderBy('name')
             ->get();
 
-        // Active products
-        $query = Product::with([
-            'category',
-            'images'
-        ])
+        $query = Product::with(['category', 'images'])
             ->where('status', 'Active')
             ->latest();
 
         // Search filter
         if ($request->filled('search')) {
-
-            $search = $request->search;
+            $search = trim($request->search);
 
             $query->where(function ($q) use ($search) {
-
-                $q->where('name', 'LIKE', '%' . $search . '%')
-                    ->orWhere('short_description', 'LIKE', '%' . $search . '%')
-                    ->orWhere('description', 'LIKE', '%' . $search . '%');
-
+                $q->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('short_description', 'LIKE', "%{$search}%")
+                    ->orWhere('description', 'LIKE', "%{$search}%");
             });
         }
 
@@ -45,75 +38,70 @@ class SiteProductController extends Controller
             $query->where('category_id', $request->category_id);
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Infinite Scroll Pagination
-        |--------------------------------------------------------------------------
-        */
-
+        // Keep 9 products per page
         $products = $query->paginate(9)->withQueryString();
 
-        /*
-        |--------------------------------------------------------------------------
-        | AJAX Request
-        |--------------------------------------------------------------------------
-        */
+        // Get favorite IDs for the current page
+        $favoriteIds = collect();
 
-        if ($request->ajax()) {
+        if (auth()->check() && $products->isNotEmpty()) {
+            $favoriteIds = Favorite::where('user_id', auth()->id())
+                ->whereIn('product_id', $products->pluck('id'))
+                ->pluck('product_id')
+                ->map(fn($id) => (int) $id);
+        }
 
-            $items = $products->map(function ($product) {
+        // AJAX / Infinite Scroll response
+        if ($request->ajax() || $request->expectsJson()) {
+            $items = $products->getCollection()->map(
+                function ($product) use ($favoriteIds, $request) {
+                    $image = $product->images->first();
 
-                $image = $product->images->first();
+                    return [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'category' => $product->category->name ?? 'Food',
 
-                return [
-                    'id' => $product->id,
+                        'short_description' =>
+                            $product->short_description
+                            ?: $product->description
+                            ?: 'Delicious food made for you.',
 
-                    'name' => $product->name,
+                        'price' => number_format(
+                            (float) $product->price,
+                            2,
+                            '.',
+                            ''
+                        ),
 
-                    'category' => $product->category->name ?? 'Food',
+                        'image' => $image && $image->image_path
+                            ? asset($image->image_path)
+                            : null,
 
-                    'short_description' =>
-                        $product->short_description
-                        ?: $product->description
-                        ?: 'Delicious food made for you.',
+                        'image_alt' => $image
+                            ? ($image->alt_text ?: $product->name)
+                            : $product->name,
 
-                    'price' => number_format(
-                        (float) $product->price,
-                        2
-                    ),
+                        'url' => route('products.show', $product->slug),
 
-                    'image' => $image && $image->image_path
-                        ? asset($image->image_path)
-                        : null,
+                        'is_favorite' => $favoriteIds->contains(
+                            (int) $product->id
+                        ),
 
-                    'image_alt' => $image
-                        ? ($image->alt_text ?: $product->name)
-                        : $product->name,
-
-                    // Product URL using slug
-                    'url' => route(
-                        'products.show',
-                        $product->slug
-                    ),
-                ];
-            });
+                        'login_url' => route('login', [
+                            'redirect' => $request->fullUrl()
+                        ]),
+                    ];
+                }
+            );
 
             return response()->json([
-                'products' => $items,
-
+                'products' => $items->values(),
                 'current_page' => $products->currentPage(),
-
                 'last_page' => $products->lastPage(),
-
                 'has_more' => $products->hasMorePages(),
             ]);
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Normal Page
-        |--------------------------------------------------------------------------
-        */
 
         return view('pages.product', compact(
             'categories',
@@ -121,45 +109,49 @@ class SiteProductController extends Controller
         ));
     }
 
-
     /**
-     * Product Details
+     * Product Details + Random Recommendations
      */
     public function show($slug)
     {
-        $product = Product::with([
-            'category',
-            'images'
-        ])
+        // Current product details
+        $product = Product::with(['category', 'images'])
             ->where('slug', $slug)
             ->where('status', 'Active')
             ->firstOrFail();
 
+        // Combo products
         $comboProducts = collect();
 
         if (
-            $product->product_type === 'combo' &&
-            !empty($product->combo_product_ids)
+            $product->product_type === 'combo'
+            && !empty($product->combo_product_ids)
         ) {
             $comboIds = is_array($product->combo_product_ids)
                 ? $product->combo_product_ids
                 : json_decode($product->combo_product_ids, true);
 
             if (is_array($comboIds) && count($comboIds)) {
-
-                $comboProducts = Product::with([
-                    'images',
-                    'category'
-                ])
+                $comboProducts = Product::with(['images', 'category'])
                     ->whereIn('id', $comboIds)
                     ->where('status', 'Active')
                     ->get();
             }
         }
 
-        return view(
-            'pages.view-product',
-            compact('product', 'comboProducts')
-        );
+        // Random active recommendations, excluding current product
+        $recommendedProducts = Product::with(['category', 'images'])
+            ->where('status', 'Active')
+            ->where('id', '!=', $product->id)
+            ->inRandomOrder()
+            ->take(4)
+            ->get();
+
+        // Product details view
+        return view('pages.view-product', compact(
+            'product',
+            'comboProducts',
+            'recommendedProducts'
+        ));
     }
 }

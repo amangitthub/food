@@ -288,8 +288,25 @@
                                     {{ $headerCartCount ?? 0 }}
                                 </span>
                             </a>
+                       </div>
+                        
+                        {{-- MY FAVORITES / WISHLIST --}}
+                        <div class="menu-cart">
+                            @auth
+                            <a href="{{ route('favorites.index') }}" class="cart-icon" aria-label="My Favorites" title="My Favorites"
+                               >
+                        
+                                <i class="far fa-heart"></i>
+                            </a>
+                            @else
+                            <a href="javascript:void(0);" class="cart-icon" aria-label="Login to view Favorites" title="My Favorites"
+                                data-bs-toggle="modal" data-bs-target="#loginModal">
+                        
+                                <i class="far fa-heart"></i>
+                            </a>
+                            @endauth
                         </div>
-
+                        
                         {{-- Login / Logout --}}
                         <div class="header-button">
                             @auth
@@ -379,9 +396,7 @@
         </div>
 
     </div>
-    <!-- =========================================================
-     FOODKING MOBILE SIDEBAR
-     ========================================================= -->
+    <!-- ==========================================  FOODKING MOBILE SIDEBAR======================================== -->
 
     <div class="food-mobile-overlay" id="foodMobileOverlay"></div>
 
@@ -438,15 +453,29 @@
 
                     </ul>
                 </li>
-               {{-- CONTACT --}}
+                {{-- CONTACT --}}
                 <li> <a href="{{ route('contact') }}"> Contact </a> </li>
 
                 {{-- Orders--}}
-
-                <li> <a href="{{ route('orders.my') }}">My Orders</a> </li>
-
-
-                {{-- CART --}}
+                     <li> <a href="{{ route('orders.my') }}">My Orders</a> </li>
+                        
+                        
+                        {{-- MY FAVORITES / WISHLIST --}}
+                        <li>
+                            @auth
+                            <a href="{{ route('favorites.index') }}">
+                                <i class="far fa-heart me-2"></i>
+                                <span>My Favorites</span>
+                            </a>
+                            @else
+                            <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#loginModal">
+                                <i class="far fa-heart me-2"></i>
+                                <span>My Favorites</span>
+                            </a>
+                            @endauth
+                        </li>
+                        
+                        {{-- CART --}}
                 <li>
                     <a href="{{ route('cart') }}" class="cart-icon" aria-label="Shopping Cart">
                         <i class="far fa-shopping-basket"> <span>Cart</span></i>

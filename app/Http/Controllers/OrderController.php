@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
-
 class OrderController extends Controller
 {
     /**
@@ -101,7 +100,7 @@ class OrderController extends Controller
 
         $customer = Auth::user();
 
-       $pdf = Pdf::loadView('pages.receipt-pdf', [
+        $pdf = Pdf::loadView('pages.receipt-pdf', [
             'order' => $order,
             'address' => $address,
             'customer' => $customer,

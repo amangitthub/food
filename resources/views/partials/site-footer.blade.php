@@ -15,7 +15,7 @@
             <div class="row">
 
                 {{-- ==============================
-                    COMPANY INFO
+                COMPANY INFO
                 =============================== --}}
                 <div class="col-xl-3 col-sm-6 col-md-6 col-lg-3 wow fadeInUp" data-wow-delay=".2s">
 
@@ -34,9 +34,6 @@
                                 quality you can trust.
                             </p>
 
-                            <span>
-                                Interested in working with us?
-                            </span>
 
                             <br>
 
@@ -71,7 +68,7 @@
 
 
                 {{-- ==============================
-                    QUICK LINKS
+                QUICK LINKS
                 =============================== --}}
                 <div class="col-xl-2 ps-lg-5 col-sm-6 col-md-3 col-lg-3 wow fadeInUp" data-wow-delay=".4s">
 
@@ -93,7 +90,7 @@
                             </li>
 
                             <li>
-                                <a  href="{{ route('site.products') }}">
+                                <a href="{{ route('site.products') }}">
                                     <span class="text-effect">
                                         <span class="effect-1">Our Menu</span>
                                         <span class="effect-1">Our Menu</span>
@@ -127,7 +124,7 @@
 
 
                 {{-- ==============================
-                    MY ACCOUNT
+                MY ACCOUNT
                 =============================== --}}
                 <div class="col-xl-2 ps-lg-4 col-sm-6 col-md-3 col-lg-3 wow fadeInUp" data-wow-delay=".6s">
 
@@ -149,7 +146,7 @@
                             </li>
 
                             <li>
-                                <a  href="{{ route('orders.my') }}">
+                                <a href="{{ route('orders.my') }}">
                                     <span class="text-effect">
                                         <span class="effect-1">My Orders</span>
                                         <span class="effect-1">My Orders</span>
@@ -158,16 +155,28 @@
                             </li>
 
                             <li>
-                                <a href="{{ url('/wishlist') }}">
+                                {{-- MY FAVORITES / WISHLIST --}}
+
+                                @auth
+                                <a href="{{ route('favorites.index') }}">
                                     <span class="text-effect">
                                         <span class="effect-1">My Wishlist</span>
                                         <span class="effect-1">My Wishlist</span>
                                     </span>
                                 </a>
+                                @else
+                                <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#loginModal">
+                                    <span class="text-effect">
+                                        <span class="effect-1">My Wishlist</span>
+                                        <span class="effect-1">My Wishlist</span>
+                                    </span>
+                                </a>
+                                @endauth
+
                             </li>
 
                             <li>
-                                <a href="{{ route('cart') }}" >
+                                <a href="{{ route('cart') }}">
                                     <span class="text-effect">
                                         <span class="effect-1">Shopping Cart</span>
                                         <span class="effect-1">Shopping Cart</span>
@@ -182,7 +191,7 @@
 
 
                 {{-- ==============================
-                    ADDRESS
+                ADDRESS
                 =============================== --}}
                 <div class="col-xl-2 col-sm-6 col-md-6 col-lg-3 wow fadeInUp" data-wow-delay=".8s">
 
@@ -214,13 +223,13 @@
 
 
                 {{-- ==============================
-                    APP / SUPPORT
+                APP / SUPPORT
                 =============================== --}}
                 <div class="col-xl-3 ps-xl-5 col-sm-6 col-md-6 col-lg-4 wow fadeInUp" data-wow-delay=".9s">
 
                     <div class="single-footer-widget">
 
-                        <div class="widget-head">
+                        {{-- <div class="widget-head">
                             <h4>Download Our App</h4>
                         </div>
 
@@ -240,7 +249,7 @@
                                     <img src="{{ asset('assets/img/google-play.png') }}" alt="Get it on Google Play">
                                 </a>
 
-                            </div>
+                            </div> --}}
 
 
                             <div class="support-text">
@@ -269,13 +278,13 @@
 
 
     {{-- ==============================
-        FOOTER BOTTOM
+    FOOTER BOTTOM
     =============================== --}}
     <div class="footer-bottom">
 
         <div class="container">
 
-            <div class="footer-bottom-wrapper d-flex align-items-center justify-content-between">
+            <div class="footer-bottom-wrapper d-flex align-items-center justify-content-center">
 
                 <p class="wow fadeInLeft" data-wow-delay=".3s">
 
@@ -293,11 +302,11 @@
                 </p>
 
 
-                <div class="card-image wow fadeInRight" data-wow-delay=".5s">
+                {{-- <div class="card-image wow fadeInRight" data-wow-delay=".5s">
 
                     <img src="{{ asset('assets/img/card.png') }}" alt="Payment Methods">
 
-                </div>
+                </div> --}}
 
             </div>
 

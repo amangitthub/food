@@ -9,50 +9,83 @@
 @section('content')
 
 <style>
+    /* Uses your website variables (--theme, --theme2, --bg ...) with safe fallbacks */
     .food-product-details-section {
+        --g: var(--theme, #00813d);
+        --r: var(--theme2, #d12525);
+        --dark: var(--header, #212121);
+        --txt: var(--text, #5c5c5b);
+        --ln: var(--border, #d9d9d9);
+        --cream: var(--bg, #f4f1ea);
+        --sh: 0 8px 30px rgba(33, 33, 33, .07);
         padding: 70px 0;
-        background: #f8f9fa;
+        background: var(--cream)
     }
 
+    .food-product-details-section * {
+        box-sizing: border-box
+    }
+
+    /* Back link */
     .food-product-back {
-        margin-bottom: 25px;
+        margin-bottom: 24px
     }
 
     .food-product-back a {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        color: #222;
+        padding: 9px 18px;
+        background: #fff;
+        border-radius: 99px;
+        box-shadow: 0 2px 10px rgba(33, 33, 33, .06);
+        color: var(--dark);
         text-decoration: none;
         font-weight: 600;
-        transition: color .2s ease;
+        font-size: 14px;
+        transition: .2s
     }
 
     .food-product-back a:hover {
-        color: #e63946;
+        background: var(--g);
+        color: #fff
+    }
+
+    /* Gallery */
+    .food-gallery,
+    .food-detail-placeholder {
+        width: 100%;
+        height: 480px;
+        background: #fff;
+        border-radius: 22px;
+        box-shadow: var(--sh);
+        display: flex;
+        align-items: center;
+        justify-content: center
     }
 
     .food-gallery {
         position: relative;
-        width: 100%;
-        height: 480px;
-        background: #fff;
-        border-radius: 20px;
-        border: 1px solid #e5e5e5;
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        overflow: hidden
+    }
+
+    .food-detail-placeholder {
+        flex-direction: column;
+        color: #aaa
+    }
+
+    .placeholder-icon {
+        font-size: 60px;
+        margin-bottom: 10px
     }
 
     .gallery-main-image {
         width: 100%;
         height: 100%;
-        padding: 25px;
+        padding: 26px;
         object-fit: contain;
         display: block;
-        user-select: none;
-        transition: opacity .2s ease;
+        user-select: none
     }
 
     .gallery-arrow {
@@ -60,56 +93,66 @@
         top: 50%;
         transform: translateY(-50%);
         z-index: 20;
-        width: 50px;
-        height: 50px;
-        border: none;
+        width: 46px;
+        height: 46px;
+        border: 0;
         border-radius: 50%;
-        background: rgba(255, 255, 255, .95);
-        color: #222;
-        font-size: 25px;
+        background: #fff;
+        color: var(--dark);
+        font-size: 18px;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, .15);
-        transition: all .2s ease;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, .16);
+        transition: .2s
     }
 
     .gallery-arrow:hover {
-        background: #222;
-        color: #fff;
+        background: var(--g);
+        color: #fff
     }
 
-    .gallery-prev { left: 15px; }
-    .gallery-next { right: 15px; }
+    .gallery-prev {
+        left: 15px
+    }
+
+    .gallery-next {
+        right: 15px
+    }
 
     .gallery-counter {
-        text-align: center;
-        margin-top: 12px;
-        color: #777;
-        font-size: 14px;
-        font-weight: 600;
+        width: fit-content;
+        margin: 14px auto 0;
+        padding: 4px 16px;
+        background: #fff;
+        border-radius: 99px;
+        box-shadow: 0 2px 10px rgba(33, 33, 33, .06);
+        color: var(--dark);
+        font-size: 13px;
+        font-weight: 700
     }
 
     .gallery-thumbnails {
         display: flex;
         gap: 12px;
-        margin-top: 15px;
-        padding: 3px;
-        overflow-x: auto;
+        margin-top: 14px;
+        padding: 4px;
+        overflow-x: auto
     }
 
     .gallery-thumbnail {
-        flex: 0 0 85px;
-        width: 85px;
-        height: 85px;
+        flex: 0 0 82px;
+        width: 82px;
+        height: 82px;
         padding: 4px;
         background: #fff;
         border: 2px solid transparent;
-        border-radius: 10px;
+        border-radius: 14px;
         overflow: hidden;
         cursor: pointer;
-        transition: all .2s ease;
+        opacity: .7;
+        transition: .2s
     }
 
     .gallery-thumbnail img {
@@ -117,229 +160,312 @@
         height: 100%;
         object-fit: cover;
         display: block;
-        border-radius: 6px;
+        border-radius: 9px
     }
 
-    .gallery-thumbnail:hover { border-color: #999; }
-    .gallery-thumbnail.active { border-color: #e63946; }
+    .gallery-thumbnail:hover {
+        opacity: 1
+    }
 
+    .gallery-thumbnail.active {
+        border-color: var(--g);
+        opacity: 1
+    }
+
+    /* Details card */
     .food-detail-content {
-        padding: 10px 0;
         min-width: 0;
+        padding: 32px;
+        background: #fff;
+        border-radius: 22px;
+        box-shadow: var(--sh)
     }
 
     .food-detail-category {
         display: inline-block;
-        color: #e63946;
-        font-size: 14px;
+        padding: 5px 15px;
+        margin-bottom: 12px;
+        background: #e6f4ec;
+        color: var(--g);
+        border-radius: 99px;
+        font-size: 12.5px;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: .5px;
-        margin-bottom: 10px;
+        letter-spacing: .8px
+    }
+
+    .food-title-favorite-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px
     }
 
     .food-detail-title {
-        font-size: 44px;
-        line-height: 1.2;
-        font-weight: 700;
-        color: #222;
-        margin-bottom: 15px;
-        overflow-wrap: anywhere;
+        flex: 1;
+        min-width: 0;
+        margin: 0;
+        font-size: 42px;
+        line-height: 1.18;
+        font-weight: 800;
+        color: var(--dark);
+        overflow-wrap: anywhere
+    }
+
+    .food-favorite-form {
+        flex-shrink: 0;
+        margin: 0
+    }
+
+    .food-title-favorite-row .food-favorite-btn,
+    .food-title-favorite-row .food-card-favorite-btn {
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border: 1px solid var(--ln);
+        border-radius: 50%;
+        background: #fff;
+        color: var(--r);
+        text-decoration: none;
+        cursor: pointer;
+        transition: .25s
+    }
+
+    .food-title-favorite-row .food-favorite-btn:hover,
+    .food-title-favorite-row .food-favorite-btn.is-favorite,
+    .food-title-favorite-row .food-card-favorite-btn:hover,
+    .food-title-favorite-row .food-card-favorite-btn.is-favorite {
+        background: var(--r);
+        border-color: var(--r);
+        color: #fff;
+        box-shadow: 0 6px 16px rgba(209, 37, 37, .22)
     }
 
     .food-product-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 30px;
-        padding: 20px 0;
-        border-top: 1px solid #eee;
-        border-bottom: 1px solid #eee;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+        padding: 0;
+        margin: 0 0 6px;
+        border: 0
     }
 
     .food-meta-item {
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 4px;
+        min-width: 0;
+        padding: 14px 16px;
+        background: var(--cream);
+        border-radius: 14px
     }
 
     .food-meta-item span {
-        color: #888;
-        font-size: 13px;
+        color: var(--txt);
+        font-size: 12.5px
     }
 
     .food-meta-item strong {
-        color: #222;
+        color: var(--dark);
         font-size: 16px;
-        font-weight: 600;
+        font-weight: 700;
+        text-transform: capitalize;
+        overflow-wrap: anywhere
     }
 
     .food-detail-price {
-        font-size: 34px;
-        font-weight: 700;
-        color: #e63946;
-        margin: 25px 0;
+        margin: 22px 0;
+        font-size: 38px;
+        line-height: 1.1;
+        font-weight: 800;
+        color: var(--g)
     }
 
-    .food-description-block { margin-top: 25px; }
-
-    .food-description-block h5 {
-        font-size: 18px;
-        font-weight: 700;
-        margin-bottom: 10px;
-        color: #222;
-    }
-
-    .food-description-block p {
-        color: #666;
-        line-height: 1.8;
-        margin: 0;
-        overflow-wrap: anywhere;
-    }
-
+    /* Add to cart */
     .food-add-cart-box {
         display: flex;
         align-items: center;
         flex-wrap: wrap;
-        gap: 15px;
-        margin: 25px 0 10px;
+        gap: 14px;
+        margin: 0 0 10px
     }
 
     .food-quantity-box {
         display: flex;
         align-items: center;
         flex-shrink: 0;
-        height: 52px;
-        border: 1px solid #e2e2e2;
-        border-radius: 6px;
+        height: 54px;
+        border: 1px solid var(--ln);
+        border-radius: 12px;
         overflow: hidden;
-        background: #fff;
+        background: #fff
     }
 
     .food-qty-btn {
-        width: 45px;
-        height: 52px;
+        width: 46px;
+        height: 54px;
         border: 0;
-        background: #f8f8f8;
-        color: #222;
-        font-size: 21px;
+        background: var(--cream);
+        color: var(--dark);
+        font-size: 22px;
         font-weight: 600;
         cursor: pointer;
-        transition: all .2s ease;
+        transition: .2s
     }
 
     .food-qty-btn:hover {
-        background: #e63946;
-        color: #fff;
+        background: var(--g);
+        color: #fff
     }
 
     .food-qty-btn:disabled {
         opacity: .5;
-        cursor: not-allowed;
+        cursor: not-allowed
     }
 
     #productQuantity {
-        width: 50px;
-        height: 52px;
+        width: 52px;
+        height: 54px;
         border: 0;
-        border-left: 1px solid #eee;
-        border-right: 1px solid #eee;
         text-align: center;
-        font-size: 16px;
+        font-size: 17px;
         font-weight: 700;
-        color: #222;
+        color: var(--dark);
         outline: none;
-        background: #fff;
+        background: #fff
     }
 
     .food-add-cart-btn {
-        min-height: 52px;
-        padding: 0 22px;
+        flex: 1 1 220px;
+        min-height: 54px;
+        padding: 0 26px;
         border: 0;
-        border-radius: 6px;
-        background: linear-gradient(135deg, #e63946, #ff7a00);
+        border-radius: 12px;
+        background: var(--g);
         color: #fff;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 10px;
-        font-size: 15px;
+        font-size: 16px;
         font-weight: 700;
         cursor: pointer;
-        box-shadow: 0 8px 20px rgba(230, 57, 70, .20);
-        transition: all .3s ease;
+        box-shadow: 0 8px 20px rgba(0, 129, 61, .22);
+        transition: .25s
     }
 
     .food-add-cart-btn:hover {
         transform: translateY(-2px);
-        background: linear-gradient(135deg, #c62828, #e85d00);
-        box-shadow: 0 12px 25px rgba(230, 57, 70, .28);
+        background: var(--dark);
+        box-shadow: 0 12px 24px rgba(33, 33, 33, .25)
     }
 
     .food-add-cart-btn:disabled {
         cursor: not-allowed;
         opacity: .75;
-        transform: none;
+        transform: none
     }
 
     .food-cart-success-message {
         display: none;
         align-items: center;
         gap: 8px;
-        margin-top: 10px;
-        color: #16803c;
+        margin-top: 12px;
+        padding: 10px 14px;
+        background: #e6f4ec;
+        border-radius: 10px;
+        color: #00642f;
         font-size: 14px;
-        font-weight: 600;
+        font-weight: 600
     }
 
-    .food-cart-success-message.show { display: flex; }
+    .food-cart-success-message.show {
+        display: flex
+    }
 
+    /* Descriptions */
+    .food-description-block {
+        margin-top: 26px;
+        padding-top: 22px;
+        border-top: 1px dashed var(--ln)
+    }
+
+    .food-description-block h5 {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0 0 10px;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--dark)
+    }
+
+    .food-description-block h5::before {
+        content: "";
+        width: 4px;
+        height: 18px;
+        background: var(--g);
+        border-radius: 4px
+    }
+
+    .food-description-block p {
+        margin: 0;
+        color: var(--txt);
+        line-height: 1.85;
+        overflow-wrap: anywhere
+    }
+
+    /* Combo items */
     .combo-items-section {
         width: 100%;
-        margin-top: 28px;
-        padding: 25px 0 5px;
-        border-top: 1px solid #e5e5e5;
+        margin-top: 26px;
+        padding: 24px 0 4px;
+        border-top: 1px dashed var(--ln)
     }
 
     .combo-items-heading {
         text-align: left;
-        margin-bottom: 20px;
+        margin-bottom: 20px
     }
 
     .combo-items-label {
         display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 6px 12px;
-        background: #fff0f1;
-        color: #e63946;
-        border-radius: 50px;
-        font-size: 10px;
-        font-weight: 800;
-        letter-spacing: 1px;
+        padding: 5px 13px;
         margin-bottom: 10px;
+        background: #e6f4ec;
+        color: var(--g);
+        border-radius: 50px;
+        font-size: 10.5px;
+        font-weight: 800;
+        letter-spacing: 1px
     }
 
     .combo-items-heading h2 {
         margin: 0;
-        color: #222;
+        color: var(--dark);
         font-size: 24px;
         line-height: 1.35;
-        font-weight: 700;
+        font-weight: 800
     }
 
     .combo-heading-line {
-        width: 42px;
-        height: 3px;
-        background: #e63946;
+        width: 44px;
+        height: 4px;
+        background: var(--g);
         border-radius: 5px;
-        margin: 10px 0;
+        margin: 10px 0
     }
 
     .combo-items-heading p {
         margin: 0;
-        color: #888;
-        font-size: 13px;
-        line-height: 1.6;
+        color: var(--txt);
+        font-size: 13.5px;
+        line-height: 1.6
     }
 
     .combo-item-card {
@@ -348,14 +474,15 @@
         height: 100%;
         overflow: hidden;
         background: #fff;
-        border: 1px solid #ededed;
-        border-radius: 12px;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, .04);
-        transition: box-shadow .25s ease;
+        border: 1px solid #ebe6da;
+        border-radius: 14px;
+        box-shadow: 0 4px 14px rgba(33, 33, 33, .05);
+        transition: .25s
     }
 
     .combo-item-card:hover {
-        box-shadow: 0 8px 22px rgba(0, 0, 0, .09);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 24px rgba(33, 33, 33, .1)
     }
 
     .combo-item-image {
@@ -363,26 +490,26 @@
         width: 100%;
         height: 145px;
         overflow: hidden;
-        background: #f4f4f4;
+        background: var(--cream)
     }
 
     .combo-item-image img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        display: block;
+        display: block
     }
 
     .combo-item-badge {
         position: absolute;
         top: 8px;
         right: 8px;
-        padding: 5px 9px;
-        background: rgba(255, 255, 255, .95);
-        color: #e63946;
+        padding: 4px 10px;
+        background: var(--g);
+        color: #fff;
         border-radius: 50px;
-        font-size: 10px;
-        font-weight: 700;
+        font-size: 10.5px;
+        font-weight: 700
     }
 
     .combo-item-placeholder {
@@ -391,36 +518,37 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #aaa;
-        font-size: 32px;
+        color: #bbb;
+        font-size: 32px
     }
 
     .combo-item-content {
         padding: 12px 8px;
-        text-align: center;
+        text-align: center
     }
 
     .combo-item-content h4 {
         margin: 0;
-        color: #222;
+        color: var(--dark);
         font-size: 14px;
         line-height: 1.45;
         font-weight: 700;
-        overflow-wrap: anywhere;
+        overflow-wrap: anywhere
     }
 
+    /* Product information */
     .food-product-type-section {
-        margin-top: 35px;
-        background: #fff;
-        padding: 25px;
-        border-radius: 18px;
-        border: 1px solid #eee;
+        margin-top: 26px;
+        padding: 22px;
+        background: var(--cream);
+        border-radius: 16px
     }
 
     .food-product-type-section h3 {
-        margin-bottom: 20px;
-        font-size: 24px;
-        font-weight: 700;
+        margin: 0 0 14px;
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--dark)
     }
 
     .food-type-box {
@@ -428,90 +556,434 @@
         justify-content: space-between;
         align-items: center;
         gap: 15px;
-        padding: 15px 20px;
-        background: #f8f9fa;
-        border-radius: 10px;
-    }
-
-    .food-type-box span { color: #777; }
-    .food-type-box strong { text-transform: capitalize; }
-
-    .food-detail-placeholder {
-        width: 100%;
-        height: 480px;
+        padding: 14px 18px;
         background: #fff;
-        border-radius: 20px;
-        border: 1px solid #eee;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        color: #aaa;
+        border-radius: 12px
     }
 
-    .placeholder-icon {
-        font-size: 60px;
-        margin-bottom: 10px;
+    .food-type-box span {
+        color: var(--txt)
     }
 
-    @media (max-width: 1199px) {
-        .food-add-cart-box { gap: 10px; }
-        .food-add-cart-btn { padding: 0 16px; }
-        .food-qty-btn { width: 38px; }
-        #productQuantity { width: 38px; }
-        .combo-item-image { height: 130px; }
+    .food-type-box strong {
+        color: var(--dark);
+        text-transform: capitalize
+    }
+        /* ========================================
+   YOU MAY ALSO LIKE - RECOMMENDED PRODUCTS
+======================================== */
+
+.food-recommend-section {
+    padding: 55px 0 70px;
+    background: var(--bg, #f4f1ea);
+}
+
+.food-recommend-section * {
+    box-sizing: border-box;
+}
+
+.food-recommend-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+}
+
+.food-recommend-eyebrow {
+    display: inline-block;
+    margin-bottom: 8px;
+    padding: 6px 13px;
+    border-radius: 50px;
+    background: #e6f4ec;
+    color: var(--theme, #00813d);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.food-recommend-heading h2 {
+    margin: 0;
+    color: var(--header, #212121);
+    font-size: clamp(25px, 4vw, 34px);
+    font-weight: 800;
+}
+
+.food-recommend-heading p {
+    margin: 8px 0 0;
+    color: var(--text, #5c5c5b);
+    font-size: 14px;
+}
+
+.food-recommend-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.food-recommend-card {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, .06);
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 6px 22px rgba(33, 33, 33, .05);
+    transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.food-recommend-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 30px rgba(33, 33, 33, .12);
+}
+
+.food-recommend-image {
+    position: relative;
+    display: block;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: #f4f1ea;
+}
+
+.food-recommend-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .35s ease;
+}
+
+.food-recommend-card:hover .food-recommend-image img {
+    transform: scale(1.07);
+}
+
+.food-recommend-no-image {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    color: #aaa;
+    font-size: 35px;
+}
+
+.food-recommend-category {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    max-width: calc(100% - 24px);
+    overflow: hidden;
+    padding: 6px 10px;
+    border-radius: 50px;
+    background: #fff;
+    color: var(--theme, #00813d);
+    font-size: 10px;
+    font-weight: 800;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.food-recommend-content {
+    padding: 17px;
+}
+
+.food-recommend-name {
+    display: -webkit-box;
+    min-height: 44px;
+    margin: 0 0 8px;
+    overflow: hidden;
+    color: var(--header, #212121);
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.5;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.food-recommend-name a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.food-recommend-name a:hover {
+    color: var(--theme, #00813d);
+}
+
+.food-recommend-price {
+    margin-bottom: 14px;
+    color: var(--theme, #00813d);
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.food-recommend-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 9px;
+}
+
+.food-recommend-view,
+.food-recommend-add {
+    display: flex;
+    width: 100%;
+    min-height: 42px;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 10px;
+    border: 0;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 800;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.food-recommend-view {
+    border: 1px solid var(--theme, #00813d);
+    background: #fff;
+    color: var(--theme, #00813d);
+}
+
+.food-recommend-view:hover {
+    background: var(--theme, #00813d);
+    color: #fff;
+}
+
+.food-recommend-add {
+    background: var(--theme, #00813d);
+    color: #fff;
+}
+
+.food-recommend-add:hover {
+    background: var(--header, #212121);
+}
+
+.food-recommend-add:disabled {
+    cursor: wait;
+    opacity: .65;
+}
+
+.food-recommend-message {
+    min-height: 16px;
+    color: var(--theme, #00813d);
+    font-size: 11px;
+    text-align: center;
+}
+
+.food-recommend-empty {
+    padding: 30px;
+    border-radius: 16px;
+    background: #fff;
+    color: var(--text, #5c5c5b);
+    text-align: center;
+}
+
+@media (max-width: 991px) {
+    .food-recommend-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+    }
+}
+
+@media (max-width: 767px) {
+    .food-recommend-section {
+        padding: 35px 0 45px;
     }
 
-    @media (max-width: 991px) {
-        .food-gallery { height: 400px; }
-        .food-detail-title { font-size: 36px; }
-        .combo-item-image { height: 165px; }
+    .food-recommend-grid {
+        gap: 12px;
     }
 
-    @media (max-width: 575px) {
-        .food-product-details-section { padding: 40px 0; }
-        .food-gallery { height: 320px; border-radius: 15px; }
-        .gallery-main-image { padding: 15px; }
-        .gallery-arrow { width: 40px; height: 40px; }
-        .gallery-prev { left: 8px; }
-        .gallery-next { right: 8px; }
+    .food-recommend-content {
+        padding: 12px;
+    }
 
-        .gallery-thumbnail {
-            flex-basis: 70px;
-            width: 70px;
-            height: 70px;
+    .food-recommend-heading {
+        margin-bottom: 20px;
+    }
+
+    .food-recommend-name {
+        font-size: 13px;
+    }
+
+    .food-recommend-price {
+        font-size: 18px;
+    }
+
+    .food-recommend-category {
+        top: 7px;
+        left: 7px;
+        font-size: 9px;
+    }
+}
+
+    /* Tablet */
+    @media(max-width:991px) {
+
+        .food-gallery,
+        .food-detail-placeholder {
+            height: 400px
         }
 
-        .food-detail-title { font-size: 30px; }
-        .food-product-meta { gap: 25px; }
-        .food-detail-price { font-size: 28px; }
+        .food-detail-title {
+            font-size: 34px
+        }
+
+        .combo-item-image {
+            height: 150px
+        }
+    }
+
+    /* Mobile */
+    @media(max-width:767px) {
+        .food-product-details-section {
+            padding: 26px 0 40px
+        }
+
+        .food-product-details-section .container {
+            padding-left: 14px;
+            padding-right: 14px
+        }
+
+        .food-product-details-section .row.g-5 {
+            --bs-gutter-x: 0;
+            --bs-gutter-y: 1.25rem
+        }
+
+        /* removes the big Bootstrap gap */
+        .food-product-back {
+            margin-bottom: 14px
+        }
+
+        .food-gallery,
+        .food-detail-placeholder {
+            height: 300px;
+            border-radius: 16px
+        }
+
+        .gallery-main-image {
+            padding: 12px
+        }
+
+        .gallery-arrow {
+            width: 38px;
+            height: 38px
+        }
+
+        .gallery-prev {
+            left: 8px
+        }
+
+        .gallery-next {
+            right: 8px
+        }
+
+        .gallery-thumbnails {
+            gap: 8px
+        }
+
+        .gallery-thumbnail {
+            flex-basis: 60px;
+            width: 60px;
+            height: 60px;
+            border-radius: 10px
+        }
+
+        .food-detail-content {
+            padding: 20px 16px;
+            border-radius: 16px
+        }
+
+        .food-title-favorite-row {
+            gap: 10px
+        }
+
+        .food-detail-title {
+            font-size: 25px;
+            line-height: 1.25
+        }
+
+        .food-title-favorite-row .food-favorite-btn,
+        .food-title-favorite-row .food-card-favorite-btn {
+            width: 42px;
+            height: 42px
+        }
+
+        .food-product-meta {
+            grid-template-columns: 1fr 1fr;
+            gap: 10px
+        }
+
+        .food-meta-item {
+            padding: 12px 14px
+        }
+
+        .food-meta-item strong {
+            font-size: 14.5px
+        }
+
+        .food-detail-price {
+            margin: 16px 0;
+            font-size: 28px
+        }
 
         .food-add-cart-box {
             flex-direction: column;
-            align-items: stretch;
+            align-items: stretch
         }
 
         .food-quantity-box {
             width: 100%;
-            justify-content: center;
+            justify-content: center
         }
 
-        .food-add-cart-btn { width: 100%; }
-
-        .combo-items-section {
-            margin-top: 24px;
-            padding-top: 20px;
+        #productQuantity {
+            flex: 1
         }
 
-        .combo-items-heading { margin-bottom: 18px; }
-        .combo-items-heading h2 { font-size: 21px; }
-        .combo-item-image { height: 115px; }
+        .food-add-cart-btn {
+            flex: none;
+            width: 100%
+        }
 
-        .combo-item-content { padding: 10px 6px; }
-        .combo-item-content h4 { font-size: 12px; }
+        /* flex:none stops the button from getting 220px tall */
+        .food-description-block {
+            margin-top: 20px;
+            padding-top: 18px
+        }
 
-        .food-product-type-section { padding: 20px 15px; }
-        .food-product-type-section h3 { font-size: 21px; }
+        .food-description-block h5 {
+            font-size: 16.5px
+        }
+
+        .combo-items-heading h2 {
+            font-size: 19px
+        }
+
+        .combo-item-image {
+            height: 105px
+        }
+
+        .combo-item-content {
+            padding: 10px 6px
+        }
+
+        .combo-item-content h4 {
+            font-size: 12.5px
+        }
+
+        .food-product-type-section {
+            padding: 18px 14px
+        }
+
+        .food-type-box {
+            flex-wrap: wrap;
+            padding: 12px 14px
+        }
     }
 </style>
 
@@ -529,51 +1001,46 @@
             {{-- PRODUCT GALLERY --}}
             <div class="col-lg-6">
                 @if ($product->images->count() > 0)
-                    <div class="food-gallery" id="foodGallery">
-
-                        @if ($product->images->count() > 1)
-                            <button type="button" class="gallery-arrow gallery-prev"
-                                    id="galleryPrev" aria-label="Previous image">
-                                &#10094;
-                            </button>
-                        @endif
-
-                        <img id="galleryMainImage"
-                             class="gallery-main-image"
-                             src="{{ asset($product->images->first()->image_path) }}"
-                             alt="{{ $product->images->first()->alt_text ?: $product->name }}">
-
-                        @if ($product->images->count() > 1)
-                            <button type="button" class="gallery-arrow gallery-next"
-                                    id="galleryNext" aria-label="Next image">
-                                &#10095;
-                            </button>
-                        @endif
-                    </div>
+                <div class="food-gallery" id="foodGallery">
 
                     @if ($product->images->count() > 1)
-                        <div class="gallery-counter">
-                            <span id="galleryCurrent">1</span> /
-                            <span>{{ $product->images->count() }}</span>
-                        </div>
-
-                        <div class="gallery-thumbnails">
-                            @foreach ($product->images as $index => $image)
-                                <button type="button"
-                                        class="gallery-thumbnail {{ $index === 0 ? 'active' : '' }}"
-                                        data-index="{{ $index }}"
-                                        aria-label="View image {{ $index + 1 }}">
-                                    <img src="{{ asset($image->image_path) }}"
-                                         alt="{{ $image->alt_text ?: $product->name }}">
-                                </button>
-                            @endforeach
-                        </div>
+                    <button type="button" class="gallery-arrow gallery-prev" id="galleryPrev"
+                        aria-label="Previous image">
+                        &#10094;
+                    </button>
                     @endif
+
+                    <img id="galleryMainImage" class="gallery-main-image"
+                        src="{{ asset($product->images->first()->image_path) }}"
+                        alt="{{ $product->images->first()->alt_text ?: $product->name }}">
+
+                    @if ($product->images->count() > 1)
+                    <button type="button" class="gallery-arrow gallery-next" id="galleryNext" aria-label="Next image">
+                        &#10095;
+                    </button>
+                    @endif
+                </div>
+
+                @if ($product->images->count() > 1)
+                <div class="gallery-counter">
+                    <span id="galleryCurrent">1</span> /
+                    <span>{{ $product->images->count() }}</span>
+                </div>
+
+                <div class="gallery-thumbnails">
+                    @foreach ($product->images as $index => $image)
+                    <button type="button" class="gallery-thumbnail {{ $index === 0 ? 'active' : '' }}"
+                        data-index="{{ $index }}" aria-label="View image {{ $index + 1 }}">
+                        <img src="{{ asset($image->image_path) }}" alt="{{ $image->alt_text ?: $product->name }}">
+                    </button>
+                    @endforeach
+                </div>
+                @endif
                 @else
-                    <div class="food-detail-placeholder">
-                        <div class="placeholder-icon">🖼</div>
-                        <span>No Image Available</span>
-                    </div>
+                <div class="food-detail-placeholder">
+                    <div class="placeholder-icon">🖼</div>
+                    <span>No Image Available</span>
+                </div>
                 @endif
             </div>
 
@@ -585,7 +1052,47 @@
                         {{ $product->category->name ?? 'Food' }}
                     </div>
 
-                    <h1 class="food-detail-title">{{ $product->name }}</h1>
+                    {{-- <h1 class="food-detail-title">{{ $product->name }}</h1> --}}
+
+                    <div class="food-title-favorite-row">
+                        <h1 class="food-detail-title">{{ $product->name }}</h1>
+
+                        @auth
+                        @php
+                        $isFavorite = \App\Models\Favorite::where('user_id', auth()->id())
+                        ->where('product_id', $product->id)
+                        ->exists();
+                        @endphp
+
+                        <form action="{{ route('favorites.toggle') }}" method="POST" class="food-favorite-form">
+                            @csrf
+                            <input type="hidden" name="product_id" value="{{ $product->id }}">
+
+                            <button type="submit" class="food-card-favorite-btn {{ $isFavorite ? 'is-favorite' : '' }}"
+                                title="{{ $isFavorite ? 'Remove from Favorites' : 'Add to Favorites' }}"
+                                aria-label="{{ $isFavorite ? 'Remove from Favorites' : 'Add to Favorites' }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 24 24"
+                                    fill="{{ $isFavorite ? 'currentColor' : 'none' }}" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path
+                                        d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8z" />
+                                </svg>
+                            </button>
+                        </form>
+                        @else
+                        <a href="{{ route('login', ['redirect' => request()->fullUrl()]) }}"
+                            class="food-card-favorite-form food-card-favorite-btn" title="Login to add to Favorites"
+                            aria-label="Login to add to Favorites">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path
+                                    d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8z" />
+                            </svg>
+                        </a>
+                        @endauth
+                    </div>
+
 
                     <div class="food-product-meta">
                         <div class="food-meta-item">
@@ -608,19 +1115,15 @@
 
                         {{-- <div class="food-quantity-box">
                             <button type="button" class="food-qty-btn" id="qtyMinus"
-                                    aria-label="Decrease quantity">−</button>
+                                aria-label="Decrease quantity">−</button>
 
-                            <input type="text" id="productQuantity" value="1"
-                                   readonly aria-label="Quantity">
+                            <input type="text" id="productQuantity" value="1" readonly aria-label="Quantity">
 
                             <button type="button" class="food-qty-btn" id="qtyPlus"
-                                    aria-label="Increase quantity">+</button>
+                                aria-label="Increase quantity">+</button>
                         </div> --}}
 
-                        <button type="button"
-                                class="food-add-cart-btn"
-                                id="addToCartBtn"
-                                data-id="{{ $product->id }}">
+                        <button type="button" class="food-add-cart-btn" id="addToCartBtn" data-id="{{ $product->id }}">
                             <i class="fa fa-shopping-cart"></i>
                             <span>Add To Cart</span>
                         </button>
@@ -633,85 +1136,179 @@
 
                     {{-- COMBO ITEMS --}}
                     @if (
-                        $product->product_type === 'combo' &&
-                        isset($comboProducts) &&
-                        $comboProducts->count() > 0
+                    $product->product_type === 'combo' &&
+                    isset($comboProducts) &&
+                    $comboProducts->count() > 0
                     )
-                        <div class="combo-items-section">
-                            <div class="combo-items-heading">
-                                <span class="combo-items-label">COMBO COLLECTION</span>
-                                <h2>What's Inside This Combo?</h2>
-                                <div class="combo-heading-line"></div>
-                                <p>Discover the delicious items included in this combo.</p>
-                            </div>
-
-                            <div class="row g-3">
-                                @foreach ($comboProducts as $comboItem)
-                                    <div class="col-xl-6 col-md-6 col-6">
-                                        <div class="combo-item-card">
-                                            <div class="combo-item-image">
-                                                @if (
-                                                    $comboItem->images->count() > 0 &&
-                                                    $comboItem->images->first()->image_path
-                                                )
-                                                    <img
-                                                        src="{{ asset($comboItem->images->first()->image_path) }}"
-                                                        alt="{{ $comboItem->images->first()->alt_text ?: $comboItem->name }}"
-                                                        loading="lazy">
-                                                @else
-                                                    <div class="combo-item-placeholder">
-                                                        <i class="fa fa-picture-o"></i>
-                                                    </div>
-                                                @endif
-
-                                                <span class="combo-item-badge">Included</span>
-                                            </div>
-
-                                            <div class="combo-item-content">
-                                                <h4>{{ $comboItem->name }}</h4>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
+                    <div class="combo-items-section">
+                        <div class="combo-items-heading">
+                            <span class="combo-items-label">COMBO COLLECTION</span>
+                            <h2>What's Inside This Combo?</h2>
+                            <div class="combo-heading-line"></div>
+                            <p>Discover the delicious items included in this combo.</p>
                         </div>
+
+                        <div class="row g-3">
+                            @foreach ($comboProducts as $comboItem)
+                            <div class="col-xl-6 col-md-6 col-6">
+                                <div class="combo-item-card">
+                                    <div class="combo-item-image">
+                                        @if (
+                                        $comboItem->images->count() > 0 &&
+                                        $comboItem->images->first()->image_path
+                                        )
+                                        <img src="{{ asset($comboItem->images->first()->image_path) }}"
+                                            alt="{{ $comboItem->images->first()->alt_text ?: $comboItem->name }}"
+                                            loading="lazy">
+                                        @else
+                                        <div class="combo-item-placeholder">
+                                            <i class="fa fa-picture-o"></i>
+                                        </div>
+                                        @endif
+
+                                        <span class="combo-item-badge">Included</span>
+                                    </div>
+
+                                    <div class="combo-item-content">
+                                        <h4>{{ $comboItem->name }}</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
                     @endif
 
                     {{-- SHORT DESCRIPTION --}}
                     @if (!empty($product->short_description))
-                        <div class="food-description-block">
-                            <h5>Short Description</h5>
-                            <p>{{ $product->short_description }}</p>
-                        </div>
+                    <div class="food-description-block">
+                        <h5>Short Description</h5>
+                        <p>{{ $product->short_description }}</p>
+                    </div>
                     @endif
 
                     {{-- DESCRIPTION --}}
                     @if (!empty($product->description))
-                        <div class="food-description-block">
-                            <h5>Description</h5>
-                            <p>{!! nl2br(e($product->description)) !!}</p>
-                        </div>
+                    <div class="food-description-block">
+                        <h5>Description</h5>
+                        <p>{!! nl2br(e($product->description)) !!}</p>
+                    </div>
                     @endif
 
                     {{-- PRODUCT INFORMATION --}}
                     @if (!empty($product->product_type))
-                        <div class="food-product-type-section">
-                            <h3>Product Information</h3>
-                            <div class="food-type-box">
-                                <span>Product Type</span>
-                                <strong>{{ $product->product_type }}</strong>
-                            </div>
+                    <div class="food-product-type-section">
+                        <h3>Product Information</h3>
+                        <div class="food-type-box">
+                            <span>Product Type</span>
+                            <strong>{{ $product->product_type }}</strong>
                         </div>
+                    </div>
                     @endif
 
                 </div>
             </div>
         </div>
     </div>
+    {{-- ========================================
+    YOU MAY ALSO LIKE
+    ======================================== --}}
+    <section class="food-recommend-section">
+        <div class="container">
+
+            <div class="food-recommend-heading">
+                <div>
+                    <span class="food-recommend-eyebrow">
+                        Handpicked For You
+                    </span>
+
+                    <h2>You May Also Like ❤️</h2>
+
+                    <p>Discover more delicious favourites from our menu.</p>
+                </div>
+
+                <a href="{{ route('site.products') }}" class="food-recommend-view"
+                    style="width:auto;padding:12px 18px;">
+                    View All Products <span>→</span>
+                </a>
+            </div>
+
+            @if(isset($recommendedProducts) && $recommendedProducts->isNotEmpty())
+
+            <div class="food-recommend-grid">
+
+                @foreach($recommendedProducts as $recommended)
+                @php
+                $recommendImage = $recommended->images->first();
+                @endphp
+
+                <article class="food-recommend-card">
+
+                    <a href="{{ route('products.show', $recommended->slug) }}" class="food-recommend-image">
+
+                        @if($recommendImage && $recommendImage->image_path)
+                        <img src="{{ asset($recommendImage->image_path) }}"
+                            alt="{{ $recommendImage->alt_text ?: $recommended->name }}" loading="lazy">
+                        @else
+                        <div class="food-recommend-no-image">
+                            <i class="fa fa-cutlery"></i>
+                        </div>
+                        @endif
+
+                        <span class="food-recommend-category">
+                            {{ $recommended->category->name ?? 'Food' }}
+                        </span>
+
+                    </a>
+
+                    <div class="food-recommend-content">
+
+                        <h3 class="food-recommend-name">
+                            <a href="{{ route('products.show', $recommended->slug) }}">
+                                {{ $recommended->name }}
+                            </a>
+                        </h3>
+
+                        <div class="food-recommend-price">
+                            ₹{{ number_format((float) $recommended->price, 2) }}
+                        </div>
+
+                        <div class="food-recommend-actions">
+
+                            <a href="{{ route('products.show', $recommended->slug) }}" class="food-recommend-view">
+                                View Product
+                            </a>
+
+                            <button type="button" class="food-recommend-add" data-id="{{ $recommended->id }}">
+
+                                <i class="fa fa-shopping-cart"></i>
+                                <span>Add To Cart</span>
+                            </button>
+
+                            <div class="food-recommend-message" aria-live="polite"></div>
+
+                        </div>
+
+                    </div>
+
+                </article>
+                @endforeach
+
+            </div>
+
+            @else
+            <div class="food-recommend-empty">
+                More delicious products are coming soon!
+                <a href="{{ route('site.products') }}">Explore Menu</a>
+            </div>
+            @endif
+
+        </div>
+    </section>
 </section>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () {
 
     /* =========================================================
        PRODUCT GALLERY
@@ -977,6 +1574,82 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+    /* ========================================
+   RECOMMENDED PRODUCTS - ADD TO CART
+======================================== */
+
+document.querySelectorAll('.food-recommend-add').forEach(function (button) {
+
+    button.addEventListener('click', async function () {
+
+        if (button.disabled) return;
+
+        const productId = Number(button.dataset.id);
+        const card = button.closest('.food-recommend-card');
+        const message = card.querySelector('.food-recommend-message');
+        const originalHTML = button.innerHTML;
+
+        if (!productId) return;
+
+        button.disabled = true;
+        button.innerHTML =
+            '<i class="fa fa-spinner fa-spin"></i> Adding...';
+
+        message.textContent = '';
+
+        try {
+            const response = await fetch(@json(route('cart.add')), {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN':
+                        document.querySelector('meta[name="csrf-token"]')
+                            ?.getAttribute('content') || @json(csrf_token()),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    quantity: 1
+                })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || result.success === false || result.error) {
+                throw new Error(
+                    result.message || 'Unable to add product to cart.'
+                );
+            }
+
+            if (result.cart_count !== undefined &&
+                typeof window.updateHeaderCartCount === 'function') {
+                window.updateHeaderCartCount(result.cart_count);
+            }
+
+            button.innerHTML =
+                '<i class="fa fa-check"></i> Added To Cart';
+
+            message.textContent =
+                result.message || 'Product added successfully!';
+
+        } catch (error) {
+            button.innerHTML = originalHTML;
+            message.textContent =
+                error.message || 'Please try again.';
+        } finally {
+            button.disabled = false;
+
+            if (button.innerHTML.includes('Added To Cart')) {
+                setTimeout(function () {
+                    button.innerHTML = originalHTML;
+                }, 1800);
+            }
+        }
+    });
+
+});
 
 });
 </script>
