@@ -1,4 +1,4 @@
-@extends('layouts.dash-layout')
+{{-- @extends('layouts.dash-layout')
 
 @section('title', 'Categories')
 
@@ -45,4 +45,4 @@
         </div>
         @endforeach
     </div>
-@endsection
+@endsection --}}
