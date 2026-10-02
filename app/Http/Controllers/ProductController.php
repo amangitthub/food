@@ -1,11 +1,10 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
@@ -21,7 +20,9 @@ class ProductController extends Controller
         $products = Product::with([
             'category',
             'images'
-        ])->latest()->get();
+        ])
+            ->latest()
+            ->get();
 
         return view('products.index', compact('products'));
     }
@@ -39,13 +40,15 @@ class ProductController extends Controller
             ->orderBy('name')
             ->get();
 
-        $products = Product::orderBy('name')
+        $products = Product::where('product_type', 'single')
+            ->where('status', 'Active')
+            ->orderBy('name')
             ->get();
 
-        return view('products.add-product-form', compact(
-            'categories',
-            'products'
-        ));
+        return view(
+            'products.add-product-form',
+            compact('categories', 'products')
+        );
     }
 
 
@@ -58,115 +61,201 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'category_id' => 'required|integer|exists:categories,id',
 
-            'name' => 'required|string|max:255',
+            'category_id' => [
+                'required',
+                'integer',
+                'exists:categories,id'
+            ],
 
-            'product_type' => 'required|in:single,combo',
+            'name' => [
+                'required',
+                'string',
+                'max:255'
+            ],
 
-            'combo_product_ids' => 'nullable|array',
-            'combo_product_ids.*' => 'integer|exists:products,id',
+            'product_type' => [
+                'required',
+                'in:single,combo'
+            ],
 
-            'short_description' => 'nullable|string',
+            'combo_product_ids' => [
+                'required_if:product_type,combo',
+                'array',
+                'min:1'
+            ],
 
-            'description' => 'nullable|string',
+            'combo_product_ids.*' => [
+                'integer',
+                'distinct',
+                'exists:products,id'
+            ],
 
-            'price' => 'required|numeric|min:0',
+            'short_description' => [
+                'nullable',
+                'string'
+            ],
 
-            'status' => 'nullable|in:Active,Inactive',
+            'description' => [
+                'nullable',
+                'string'
+            ],
 
-            'images' => 'nullable|array',
-            'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
+            'price' => [
+                'required',
+                'numeric',
+                'min:0'
+            ],
+
+            'status' => [
+                'nullable',
+                'in:Active,Inactive'
+            ],
+
+            'images' => [
+                'nullable',
+                'array'
+            ],
+
+            'images.*' => [
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:2048'
+            ],
+
         ]);
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Generate Slug
-        |--------------------------------------------------------------------------
-        */
 
         $slug = Str::slug($request->name);
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Combo Product IDs
-        |--------------------------------------------------------------------------
-        */
-
         $comboProductIds = null;
+
 
         if ($request->product_type === 'combo') {
 
-            $comboProductIds = $request->combo_product_ids ?: null;
-        }
+            $comboProductIds = $request->input(
+                'combo_product_ids',
+                []
+            );
+
+            $validProductCount = Product::whereIn(
+                'id',
+                $comboProductIds
+            )
+                ->where('product_type', 'single')
+                ->where('status', 'Active')
+                ->count();
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | Create Product
-        |--------------------------------------------------------------------------
-        */
+            if (
+                $validProductCount !==
+                count($comboProductIds)
+            ) {
 
-        $product = Product::create([
-            'category_id' => $request->category_id,
-            'name' => $request->name,
-            'slug' => $slug,
-            'product_type' => $request->product_type,
-            'combo_product_ids' => $comboProductIds,
-            'short_description' => $request->short_description,
-            'description' => $request->description,
-            'price' => $request->price,
-            'status' => $request->status ?? 'Active',
-        ]);
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Upload Product Images
-        |--------------------------------------------------------------------------
-        */
-
-        if ($request->hasFile('images')) {
-
-            $uploadPath = public_path('uploads/products');
-
-            if (!file_exists($uploadPath)) {
-                mkdir($uploadPath, 0755, true);
-            }
-
-            foreach ($request->file('images') as $image) {
-
-                $imageName = time()
-                    . '_'
-                    . uniqid()
-                    . '.'
-                    . $image->getClientOriginalExtension();
-
-                $image->move($uploadPath, $imageName);
-
-                $imagePath = 'uploads/products/' . $imageName;
-
-
-                ProductImage::create([
-                    'product_id' => $product->id,
-                    'image_path' => $imagePath,
-                    'alt_text' => $request->name,
-                ]);
+                return back()
+                    ->withInput()
+                    ->withErrors([
+                        'combo_product_ids' =>
+                            'Please select valid active single products for the combo.'
+                    ]);
             }
         }
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | Redirect
-        |--------------------------------------------------------------------------
-        */
+        DB::transaction(function () use ($request, $slug, $comboProductIds) {
+
+            $product = Product::create([
+
+                'category_id' =>
+                    $request->category_id,
+
+                'name' =>
+                    $request->name,
+
+                'slug' =>
+                    $slug,
+
+                'product_type' =>
+                    $request->product_type,
+
+                'combo_product_ids' =>
+                    $comboProductIds,
+
+                'short_description' =>
+                    $request->short_description,
+
+                'description' =>
+                    $request->description,
+
+                'price' =>
+                    $request->price,
+
+                'status' =>
+                    $request->status ?? 'Active',
+
+            ]);
+
+
+            if ($request->hasFile('images')) {
+
+                $uploadPath =
+                    public_path('uploads/products');
+
+
+                if (!file_exists($uploadPath)) {
+
+                    mkdir(
+                        $uploadPath,
+                        0755,
+                        true
+                    );
+                }
+
+
+                foreach (
+                    $request->file('images')
+                    as $image
+                ) {
+
+                    $imageName =
+                        time()
+                        . '_'
+                        . uniqid()
+                        . '.'
+                        . $image->getClientOriginalExtension();
+
+
+                    $image->move(
+                        $uploadPath,
+                        $imageName
+                    );
+
+
+                    ProductImage::create([
+
+                        'product_id' =>
+                            $product->id,
+
+                        'image_path' =>
+                            'uploads/products/'
+                            . $imageName,
+
+                        'alt_text' =>
+                            $request->name,
+
+                    ]);
+                }
+            }
+
+        });
+
 
         return redirect()
             ->route('products.index')
-            ->with('success', 'Product added successfully.');
+            ->with(
+                'success',
+                'Product added successfully.'
+            );
     }
 
 
@@ -183,7 +272,30 @@ class ProductController extends Controller
             'images'
         ]);
 
-        return view('products.show', compact('product'));
+
+        $comboProducts = collect();
+
+
+        if (
+            $product->product_type === 'combo' &&
+            !empty($product->combo_product_ids)
+        ) {
+
+            $comboProducts = Product::whereIn(
+                'id',
+                $product->combo_product_ids
+            )
+                ->get();
+        }
+
+
+        return view(
+            'products.show',
+            compact(
+                'product',
+                'comboProducts'
+            )
+        );
     }
 
 
@@ -195,44 +307,50 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | Active Categories
-        |--------------------------------------------------------------------------
-        */
-
-        $categories = Category::where('status', 'active')
+        $categories = Category::where(
+            'status',
+            'active'
+        )
             ->orderBy('name')
             ->get();
 
 
         /*
         |--------------------------------------------------------------------------
-        | Products For Combo
+        | Combo ke liye sirf Active Single Products
         |--------------------------------------------------------------------------
-        | Current product ko combo list se remove kar rahe hain.
+        | Current product ko exclude kiya gaya hai.
         |--------------------------------------------------------------------------
         */
 
-        $products = Product::where('id', '!=', $product->id)
+        $products = Product::where(
+            'id',
+            '!=',
+            $product->id
+        )
+            ->where(
+                'product_type',
+                'single'
+            )
+            ->where(
+                'status',
+                'Active'
+            )
             ->orderBy('name')
             ->get();
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Load Images
-        |--------------------------------------------------------------------------
-        */
 
         $product->load('images');
 
 
-        return view('products.edit', compact(
-            'product',
-            'categories',
-            'products'
-        ));
+        return view(
+            'products.edit',
+            compact(
+                'product',
+                'categories',
+                'products'
+            )
+        );
     }
 
 
@@ -242,38 +360,91 @@ class ProductController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function update(Request $request, Product $product)
-    {
+    public function update(
+        Request $request,
+        Product $product
+    ) {
+
         $request->validate([
-            'category_id' => 'required|integer|exists:categories,id',
 
-            'name' => 'required|string|max:255',
+            'category_id' => [
+                'required',
+                'integer',
+                'exists:categories,id'
+            ],
 
-            'product_type' => 'required|in:single,combo',
+            'name' => [
+                'required',
+                'string',
+                'max:255'
+            ],
 
-            'combo_product_ids' => 'nullable|array',
-            'combo_product_ids.*' => 'integer|exists:products,id',
+            'product_type' => [
+                'required',
+                'in:single,combo'
+            ],
 
-            'short_description' => 'nullable|string',
+            'combo_product_ids' => [
+                'required_if:product_type,combo',
+                'array',
+                'min:1'
+            ],
 
-            'description' => 'nullable|string',
+            'combo_product_ids.*' => [
+                'integer',
+                'distinct',
+                'exists:products,id'
+            ],
 
-            'price' => 'required|numeric|min:0',
+            'short_description' => [
+                'nullable',
+                'string'
+            ],
 
-            'status' => 'nullable|in:Active,Inactive',
+            'description' => [
+                'nullable',
+                'string'
+            ],
 
-            'images' => 'nullable|array',
-            'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
+            'price' => [
+                'required',
+                'numeric',
+                'min:0'
+            ],
+
+            'status' => [
+                'nullable',
+                'in:Active,Inactive'
+            ],
+
+            'images' => [
+                'nullable',
+                'array'
+            ],
+
+            'images.*' => [
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:2048'
+            ],
+
+            /*
+            |--------------------------------------------------------------------------
+            | Existing Image Delete
+            |--------------------------------------------------------------------------
+            */
+
+            'delete_images' => [
+                'nullable',
+                'array'
+            ],
+
+            'delete_images.*' => [
+                'integer',
+                'exists:product_images,id'
+            ],
+
         ]);
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Generate Slug
-        |--------------------------------------------------------------------------
-        */
-
-        $slug = Str::slug($request->name);
 
 
         /*
@@ -284,9 +455,70 @@ class ProductController extends Controller
 
         $comboProductIds = null;
 
+
         if ($request->product_type === 'combo') {
 
-            $comboProductIds = $request->combo_product_ids ?: null;
+            $comboProductIds = $request->input(
+                'combo_product_ids',
+                []
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Prevent Self Combo
+            |--------------------------------------------------------------------------
+            */
+
+            if (
+                in_array(
+                    $product->id,
+                    $comboProductIds
+                )
+            ) {
+
+                return back()
+                    ->withInput()
+                    ->withErrors([
+                        'combo_product_ids' =>
+                            'A product cannot be included in its own combo.'
+                    ]);
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Verify Selected Products
+            |--------------------------------------------------------------------------
+            */
+
+            $validProductCount = Product::whereIn(
+                'id',
+                $comboProductIds
+            )
+                ->where(
+                    'product_type',
+                    'single'
+                )
+                ->where(
+                    'status',
+                    'Active'
+                )
+                ->count();
+
+
+            if (
+                $validProductCount !==
+                count($comboProductIds)
+            ) {
+
+                return back()
+                    ->withInput()
+                    ->withErrors([
+                        'combo_product_ids' =>
+                            'Please select valid active single products for the combo.'
+                    ]);
+            }
         }
 
 
@@ -297,49 +529,156 @@ class ProductController extends Controller
         */
 
         $product->update([
-            'category_id' => $request->category_id,
-            'name' => $request->name,
-            'slug' => $slug,
-            'product_type' => $request->product_type,
-            'combo_product_ids' => $comboProductIds,
-            'short_description' => $request->short_description,
-            'description' => $request->description,
-            'price' => $request->price,
-            'status' => $request->status ?? 'Active',
+
+            'category_id' =>
+                $request->category_id,
+
+            'name' =>
+                $request->name,
+
+            'slug' =>
+                Str::slug($request->name),
+
+            'product_type' =>
+                $request->product_type,
+
+            'combo_product_ids' =>
+                $comboProductIds,
+
+            'short_description' =>
+                $request->short_description,
+
+            'description' =>
+                $request->description,
+
+            'price' =>
+                $request->price,
+
+            'status' =>
+                $request->status ?? 'Active',
+
         ]);
 
 
         /*
         |--------------------------------------------------------------------------
-        | Add New Product Images
+        | Delete Existing Images
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->filled('delete_images')) {
+
+            $deleteImages = $request->input(
+                'delete_images',
+                []
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | IMPORTANT
+            |--------------------------------------------------------------------------
+            | Sirf isi product ki images delete hongi.
+            |--------------------------------------------------------------------------
+            */
+
+            $imagesToDelete = ProductImage::whereIn(
+                'id',
+                $deleteImages
+            )
+                ->where(
+                    'product_id',
+                    $product->id
+                )
+                ->get();
+
+
+            foreach ($imagesToDelete as $image) {
+
+                /*
+                |--------------------------------------------------------------------------
+                | Delete Physical File
+                |--------------------------------------------------------------------------
+                */
+
+                if ($image->image_path) {
+
+                    $imageFile = public_path(
+                        $image->image_path
+                    );
+
+
+                    if (file_exists($imageFile)) {
+
+                        unlink($imageFile);
+                    }
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Delete Database Record
+                |--------------------------------------------------------------------------
+                */
+
+                $image->delete();
+            }
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Upload New Images
         |--------------------------------------------------------------------------
         */
 
         if ($request->hasFile('images')) {
 
-            $uploadPath = public_path('uploads/products');
+            $uploadPath =
+                public_path('uploads/products');
+
 
             if (!file_exists($uploadPath)) {
-                mkdir($uploadPath, 0755, true);
+
+                mkdir(
+                    $uploadPath,
+                    0755,
+                    true
+                );
             }
 
-            foreach ($request->file('images') as $image) {
 
-                $imageName = time()
+            foreach (
+                $request->file('images')
+                as $image
+            ) {
+
+                $imageName =
+                    time()
                     . '_'
                     . uniqid()
                     . '.'
                     . $image->getClientOriginalExtension();
 
-                $image->move($uploadPath, $imageName);
 
-                $imagePath = 'uploads/products/' . $imageName;
+                $image->move(
+                    $uploadPath,
+                    $imageName
+                );
 
 
                 ProductImage::create([
-                    'product_id' => $product->id,
-                    'image_path' => $imagePath,
-                    'alt_text' => $request->name,
+
+                    'product_id' =>
+                        $product->id,
+
+                    'image_path' =>
+                        'uploads/products/'
+                        . $imageName,
+
+                    'alt_text' =>
+                        $request->name,
+
                 ]);
             }
         }
@@ -353,7 +692,10 @@ class ProductController extends Controller
 
         return redirect()
             ->route('products.index')
-            ->with('success', 'Product updated successfully.');
+            ->with(
+                'success',
+                'Product updated successfully.'
+            );
     }
 
 
@@ -365,60 +707,42 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | Load Product Images
-        |--------------------------------------------------------------------------
-        */
-
         $product->load('images');
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | Delete Images From Public Folder
-        |--------------------------------------------------------------------------
-        */
-
-        foreach ($product->images as $image) {
+        foreach (
+            $product->images
+            as $image
+        ) {
 
             if ($image->image_path) {
 
-                $imageFile = public_path($image->image_path);
+                $imageFile =
+                    public_path(
+                        $image->image_path
+                    );
+
 
                 if (file_exists($imageFile)) {
+
                     unlink($imageFile);
                 }
             }
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | Delete Product Image Record
-            |--------------------------------------------------------------------------
-            */
-
             $image->delete();
         }
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | Delete Product
-        |--------------------------------------------------------------------------
-        */
-
         $product->delete();
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | Redirect
-        |--------------------------------------------------------------------------
-        */
-
         return redirect()
             ->route('products.index')
-            ->with('success', 'Product deleted successfully.');
+            ->with(
+                'success',
+                'Product deleted successfully.'
+            );
     }
 }
+

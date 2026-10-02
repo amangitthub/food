@@ -1,254 +1,1673 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap');
+
+/* =====================================================================
+   Little Pause restaurant admin - Black and rose gold
+   Dark sidebar, light content, fine serif type.
+   Fonts: Cormorant Garamond (headings, numbers) + Jost (body)
+   Replace your current CSS file with this one.
+   ===================================================================== */
+
 :root {
-    --lp-cream: #F3ECDC;
-    --lp-cream-dark: #E8DEC7;
-    --lp-green: #1F3D2E;
-    --lp-green-dark: #142A20;
-    --lp-brown: #4A2E1E;
-    --lp-gold: #C9963E;
-    --lp-gold-light: #E0B65C;
-    --lp-text: #2B241C;
+    /* Core palette */
+    --lp-ink: #151515;
+    /* sidebar */
+    --lp-ink-2: #2A2A2A;
+    /* sidebar hover / active */
+    --lp-rose: #D9A5A0;
+    /* accent */
+    --lp-rose-deep: #B9807A;
+    /* accent for text on light, hover */
+    --lp-rose-soft: #F3E3E1;
+    /* tints */
+    --lp-page: #FBF7F6;
+    /* page background */
+    --lp-card: #FFFFFF;
+    /* cards */
+    --lp-line: #EBDEDC;
+    /* hairlines */
+    --lp-text: #1E1A1A;
+    --lp-muted: #9A8C8A;
+    --lp-sidebar-text: #A8A5A5;
+
+    --lp-success: #3F7A57;
+    --lp-success-bg: #E5F0E8;
+    --lp-warning: #9A6B1F;
+    --lp-warning-bg: #F8ECD3;
+    --lp-danger: #A8433A;
+    --lp-danger-bg: #F7E4E1;
+
     --sidebar-width: 260px;
+
+    /* Legacy names so old views keep working */
+    --lp-cream: var(--lp-page);
+    --lp-cream-dark: var(--lp-line);
+    --lp-green: var(--lp-ink);
+    --lp-green-dark: var(--lp-ink);
+    --lp-brown: var(--lp-ink-2);
+    --lp-gold: var(--lp-rose);
+    --lp-gold-light: var(--lp-rose-soft);
 }
 
-* { box-sizing: border-box; }
+* {
+    box-sizing: border-box;
+}
 
 body {
-    background: var(--lp-cream);
-    font-family: 'Lora', Georgia, serif;
+    background: var(--lp-page);
     color: var(--lp-text);
+    font-family: 'Jost', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-weight: 300;
+    font-size: .95rem;
+    line-height: 1.6;
 }
 
-h1, h2, h3, h4, h5, h6, .brand span, .page-title { font-family: 'Playfair Display', Georgia, serif; }
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.brand span,
+.page-title,
+.stat-card h3 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 400;
+    letter-spacing: .01em;
+}
 
-/* ---------- Sidebar ---------- */
+a {
+    color: var(--lp-rose-deep);
+}
+
+a:hover {
+    color: var(--lp-ink);
+}
+
+:focus-visible {
+    outline: 2px solid var(--lp-rose);
+    outline-offset: 2px;
+}
+
+/* =====================================================================
+   Sidebar (dark)
+   ===================================================================== */
 .ok-sidebar {
     position: fixed;
-    top: 0; left: 0;
+    top: 0;
+    left: 0;
     width: var(--sidebar-width);
     height: 100vh;
-    background: linear-gradient(180deg, var(--lp-green) 0%, var(--lp-green-dark) 100%);
-    color: #EFE7D4;
+    background: var(--lp-ink);
+    color: var(--lp-sidebar-text);
     z-index: 1030;
-    transition: transform .25s ease;
     overflow-y: auto;
-    border-right: 1px solid rgba(201,150,62,.25);
+    display: flex;
+    flex-direction: column;
+    transition: transform .25s ease;
 }
 
 .ok-sidebar .brand {
     display: flex;
     align-items: center;
-    gap: .6rem;
-    padding: 1.4rem 1.2rem;
-    border-bottom: 1px solid rgba(201,150,62,.25);
+    gap: .7rem;
+    padding: 1.5rem 1.4rem 1.3rem;
+    border-bottom: 1px solid rgba(217, 165, 160, .22);
     position: relative;
 }
-.ok-sidebar .brand img { height: 38px; }
-.ok-sidebar .brand span {
-    font-weight: 700;
-    font-size: 1.2rem;
-    letter-spacing: .5px;
-    color: #F3ECDC;
+
+.ok-sidebar .brand .brand-mark {
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--lp-rose);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.05rem;
+    color: var(--lp-rose);
+    flex-shrink: 0;
 }
+
+.ok-sidebar .brand img {
+    height: 36px;
+}
+
+.ok-sidebar .brand span {
+    font-size: 1.4rem;
+    color: #F6EDEB;
+    line-height: 1.1;
+    display: block;
+}
+
 .ok-sidebar .brand small {
     display: block;
-    font-family: 'Lora', Georgia, serif;
+    font-family: 'Cormorant Garamond', Georgia, serif;
     font-style: italic;
-    font-size: .68rem;
-    color: var(--lp-gold);
-    font-weight: 400;
+    font-size: .85rem;
+    color: var(--lp-rose);
+    font-weight: 300;
 }
 
 .sidebar-close-btn {
     display: none;
     margin-left: auto;
-    background: rgba(255,255,255,.1);
+    background: rgba(255, 255, 255, .08);
     border: none;
-    color: #EFE7D4;
-    width: 34px; height: 34px;
+    color: #F6EDEB;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     align-items: center;
     justify-content: center;
-    font-size: 1rem;
 }
 
 .sidebar-overlay {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(20,15,10,.55);
+    background: rgba(10, 10, 10, .6);
     z-index: 1025;
 }
-.sidebar-overlay.show { display: block; }
+
+.sidebar-overlay.show {
+    display: block;
+}
 
 .ok-sidebar .nav-section-title {
-    font-size: .68rem;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: rgba(239,231,212,.4);
-    padding: 1.2rem 1.4rem .3rem;
-    font-family: 'Lora', serif;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-size: .95rem;
+    color: rgba(217, 165, 160, .7);
+    padding: 1.4rem 1.5rem .35rem;
 }
 
 .ok-sidebar .nav-link {
-    color: rgba(239,231,212,.82);
-    padding: .68rem 1.4rem;
-    font-size: .9rem;
+    color: var(--lp-sidebar-text);
+    padding: .68rem 1.5rem;
+    font-size: .92rem;
     display: flex;
     align-items: center;
-    gap: .75rem;
-    border-left: 3px solid transparent;
-    transition: all .15s ease;
-    font-family: 'Lora', serif;
+    gap: .8rem;
+    border-left: 2px solid transparent;
+    transition: background .15s ease, color .15s ease;
 }
-.ok-sidebar .nav-link i { font-size: 1.02rem; width: 20px; text-align: center; }
-.ok-sidebar .nav-link:hover { background: rgba(255,255,255,.06); color: #fff; }
-.ok-sidebar .nav-link.active {
-    background: rgba(201,150,62,.15);
-    border-left-color: var(--lp-gold);
-    color: #fff;
-    font-weight: 600;
-}
-.ok-sidebar .nav-link.active i { color: var(--lp-gold); }
 
-/* ---------- Topbar ---------- */
+.ok-sidebar .nav-link i {
+    font-size: .95rem;
+    width: 20px;
+    text-align: center;
+}
+
+.ok-sidebar .nav-link:hover {
+    background: rgba(255, 255, 255, .04);
+    color: #fff;
+}
+
+.ok-sidebar .nav-link.active {
+    background: var(--lp-ink-2);
+    border-left-color: var(--lp-rose);
+    color: #fff;
+    font-weight: 400;
+}
+
+.ok-sidebar .nav-link.active i {
+    color: var(--lp-rose);
+}
+
+.ok-sidebar .sidebar-footer {
+    margin-top: auto;
+    padding: 1rem 1.4rem;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+    font-size: .82rem;
+    color: rgba(168, 165, 165, .8);
+}
+
+/* =====================================================================
+   Topbar (light)
+   ===================================================================== */
 .ok-topbar {
     margin-left: var(--sidebar-width);
-    background: #FBF7EE;
-    padding: .8rem 1.6rem;
+    background: var(--lp-card);
+    padding: .8rem 1.8rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: 0 2px 10px rgba(31,61,46,.06);
+    gap: 1rem;
     position: sticky;
     top: 0;
     z-index: 1020;
-    border-bottom: 1px solid var(--lp-cream-dark);
+    border-bottom: 1px solid var(--lp-line);
 }
 
 .ok-topbar .search-box {
-    background: var(--lp-cream);
+    background: var(--lp-page);
+    border: 1px solid var(--lp-line);
     border-radius: 50px;
-    padding: .45rem 1rem;
+    padding: .45rem 1.1rem;
     display: flex;
     align-items: center;
-    gap: .5rem;
-    width: 320px;
-    border: 1px solid var(--lp-cream-dark);
+    gap: .55rem;
+    width: 340px;
+    max-width: 100%;
+    color: var(--lp-muted);
 }
+
 .ok-topbar .search-box input {
-    border: none; background: transparent; outline: none; width: 100%;
-    font-size: .87rem; font-family: 'Lora', serif;
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 100%;
+    font-size: .88rem;
+    color: var(--lp-text);
+    font-family: inherit;
+    font-weight: 300;
+}
+
+.ok-topbar .search-box:focus-within {
+    border-color: var(--lp-rose);
 }
 
 .ok-topbar .icon-btn {
-    width: 40px; height: 40px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    background: var(--lp-cream);
-    display: flex; align-items: center; justify-content: center;
-    color: var(--lp-green);
+    background: var(--lp-page);
+    border: 1px solid var(--lp-line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--lp-ink);
     position: relative;
-    border: 1px solid var(--lp-cream-dark);
 }
+
+.ok-topbar .icon-btn:hover {
+    border-color: var(--lp-rose);
+}
+
 .ok-topbar .icon-btn .badge-dot {
-    position: absolute; top: 6px; right: 8px;
-    width: 8px; height: 8px;
-    background: var(--lp-gold);
+    position: absolute;
+    top: 7px;
+    right: 9px;
+    width: 8px;
+    height: 8px;
+    background: var(--lp-rose);
     border-radius: 50%;
-    border: 2px solid #FBF7EE;
+    border: 2px solid var(--lp-card);
 }
 
 .ok-topbar .profile-chip {
-    display: flex; align-items: center; gap: .6rem;
-    background: var(--lp-cream);
-    padding: .3rem .9rem .3rem .3rem;
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    background: var(--lp-page);
+    padding: .3rem 1rem .3rem .3rem;
     border-radius: 50px;
+    border: 1px solid var(--lp-line);
     cursor: pointer;
-    border: 1px solid var(--lp-cream-dark);
+    color: var(--lp-text);
 }
-.ok-topbar .profile-chip img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
 
-.sidebar-toggle-btn { display: none; }
+.ok-topbar .profile-chip .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--lp-ink);
+    color: var(--lp-rose);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.1rem;
+}
 
-/* ---------- Main ---------- */
-.ok-main { margin-left: var(--sidebar-width); padding: 1.7rem; min-height: calc(100vh - 64px - 54px); }
+.ok-topbar .profile-chip img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.ok-topbar .profile-chip .name {
+    font-size: .88rem;
+    font-weight: 400;
+    line-height: 1.2;
+}
+
+.ok-topbar .profile-chip .role {
+    font-size: .75rem;
+    color: var(--lp-muted);
+    line-height: 1.2;
+}
+
+.sidebar-toggle-btn {
+    display: none;
+}
+
+/* =====================================================================
+   Main + footer
+   ===================================================================== */
+.ok-main {
+    margin-left: var(--sidebar-width);
+    padding: 2rem 1.8rem;
+    min-height: calc(100vh - 64px - 54px);
+}
+
 .ok-footer {
     margin-left: var(--sidebar-width);
-    background: #FBF7EE;
-    padding: 1rem 1.6rem;
+    background: var(--lp-card);
+    padding: 1rem 1.8rem;
     font-size: .85rem;
-    color: #8a7f6b;
-    border-top: 1px solid var(--lp-cream-dark);
-    font-family: 'Lora', serif;
+    color: var(--lp-muted);
+    border-top: 1px solid var(--lp-line);
 }
 
-.page-title { font-weight: 700; color: var(--lp-green-dark); }
-.page-sub { color: #8a7f6b; font-size: .9rem; font-family: 'Lora', serif; }
+.page-title {
+    font-size: 2.1rem;
+    color: var(--lp-text);
+    margin-bottom: .1rem;
+}
 
-/* ---------- Cards ---------- */
+.page-sub {
+    color: var(--lp-muted);
+    font-size: .92rem;
+}
+
+/* =====================================================================
+   Cards
+   ===================================================================== */
 .stat-card {
-    border: none; border-radius: 16px; padding: 1.3rem; color: #fff;
-    position: relative; overflow: hidden;
-    box-shadow: 0 8px 20px rgba(31,61,46,.12);
+    background: var(--lp-card);
+    border: 1px solid var(--lp-line);
+    border-top: 2px solid var(--lp-rose);
+    border-radius: 6px;
+    padding: 1.2rem 1.3rem;
+    color: var(--lp-text);
+    position: relative;
+    overflow: hidden;
 }
-.stat-card.green  { background: linear-gradient(135deg, var(--lp-green), #2E5842); }
-.stat-card.gold   { background: linear-gradient(135deg, var(--lp-gold), #E0B65C); }
-.stat-card.brown  { background: linear-gradient(135deg, var(--lp-brown), #6B4530); }
-.stat-card.dark   { background: linear-gradient(135deg, #2B241C, #4A3F30); }
 
 .stat-card .icon-wrap {
-    width: 46px; height: 46px; border-radius: 12px;
-    background: rgba(255,255,255,.2);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.3rem; margin-bottom: .8rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--lp-rose-soft);
+    color: var(--lp-rose-deep);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    margin-bottom: .9rem;
 }
-.stat-card h3 { font-weight: 700; margin-bottom: 0; }
-.stat-card small { opacity: .9; font-family: 'Lora', serif; }
+
+.stat-card h3 {
+    font-size: 2.2rem;
+    line-height: 1;
+    margin-bottom: .2rem;
+}
+
+.stat-card small {
+    color: var(--lp-muted);
+    font-size: .85rem;
+}
+
+/* legacy colour classes keep working, just calmer */
+.stat-card.green .icon-wrap {
+    background: var(--lp-success-bg);
+    color: var(--lp-success);
+}
+
+.stat-card.gold .icon-wrap {
+    background: var(--lp-warning-bg);
+    color: var(--lp-warning);
+}
+
+.stat-card.brown .icon-wrap {
+    background: var(--lp-rose-soft);
+    color: var(--lp-rose-deep);
+}
+
+.stat-card.dark .icon-wrap {
+    background: var(--lp-ink);
+    color: var(--lp-rose);
+}
 
 .ok-card {
-    background: #FBF7EE;
-    border-radius: 16px;
-    border: 1px solid var(--lp-cream-dark);
-    box-shadow: 0 4px 16px rgba(31,61,46,.05);
+    background: var(--lp-card);
+    border: 1px solid var(--lp-line);
+    border-radius: 6px;
 }
+
 .ok-card .card-header {
     background: transparent;
-    border-bottom: 1px solid var(--lp-cream-dark);
-    font-weight: 700;
-    color: var(--lp-green-dark);
-    padding: 1rem 1.3rem;
-    font-family: 'Playfair Display', serif;
+    border-bottom: 1px solid var(--lp-line);
+    padding: 1.05rem 1.4rem;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.35rem;
+    font-weight: 400;
+    color: var(--lp-text);
 }
-.ok-card .card-body { padding: 1.3rem; }
+
+.ok-card .card-header small {
+    display: block;
+    font-family: 'Jost', system-ui, sans-serif;
+    font-size: .8rem;
+    color: var(--lp-muted);
+    font-weight: 300;
+}
+
+.ok-card .card-body {
+    padding: 1.4rem;
+}
+
+/* =====================================================================
+   Tables
+   ===================================================================== */
+.table {
+    --bs-table-bg: transparent;
+    color: var(--lp-text);
+    margin-bottom: 0;
+}
 
 .table thead th {
-    color: #8a7f6b; font-size: .76rem; text-transform: uppercase;
-    letter-spacing: .5px; border-bottom: 1px solid var(--lp-cream-dark); font-weight: 600;
+    color: var(--lp-muted);
+    font-size: .8rem;
+    font-weight: 400;
+    letter-spacing: .04em;
+    background: var(--lp-page);
+    border-bottom: 1px solid var(--lp-line);
+    padding: .75rem 1rem;
 }
-.table td { vertical-align: middle; font-size: .88rem; font-family: 'Lora', serif; }
 
-.badge-status { padding: .4em .8em; border-radius: 50px; font-weight: 600; font-size: .72rem; }
-.badge-delivered { background: #e4efe6; color: var(--lp-green); }
-.badge-pending   { background: #faf0dd; color: var(--lp-gold); }
-.badge-cancelled { background: #f7e6e0; color: #b1503a; }
-.badge-preparing { background: #efe4da; color: var(--lp-brown); }
+.table td {
+    vertical-align: middle;
+    font-size: .9rem;
+    padding: .85rem 1rem;
+    border-bottom: 1px solid var(--lp-line);
+}
 
-.btn-lp-primary { background: var(--lp-green); border-color: var(--lp-green); color: #fff; }
-.btn-lp-primary:hover { background: var(--lp-green-dark); color: #fff; }
-.btn-lp-gold { background: var(--lp-gold); border-color: var(--lp-gold); color: #fff; }
-.btn-lp-gold:hover { background: #b3852f; color: #fff; }
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
 
-.food-thumb { width: 42px; height: 42px; border-radius: 10px; object-fit: cover; }
+.table-hover tbody tr:hover>* {
+    background: var(--lp-page);
+}
+
+.table .item-name {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.1rem;
+    line-height: 1.2;
+    display: block;
+}
+
+.table .item-sub {
+    font-size: .78rem;
+    color: var(--lp-muted);
+}
+
+.food-thumb {
+    width: 44px;
+    height: 44px;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+/* =====================================================================
+   Badges
+   ===================================================================== */
+.badge-status {
+    display: inline-block;
+    padding: .28em .8em;
+    border-radius: 50px;
+    font-weight: 400;
+    font-size: .76rem;
+}
+
+.badge-delivered,
+.badge-active,
+.badge-available {
+    background: var(--lp-success-bg);
+    color: var(--lp-success);
+}
+
+.badge-pending {
+    background: var(--lp-warning-bg);
+    color: var(--lp-warning);
+}
+
+.badge-cancelled,
+.badge-soldout {
+    background: var(--lp-danger-bg);
+    color: var(--lp-danger);
+}
+
+.badge-preparing,
+.badge-combo {
+    background: var(--lp-rose-soft);
+    color: var(--lp-rose-deep);
+}
+
+.badge-single {
+    background: #EFEDED;
+    color: #5C5656;
+}
 
 .rating-pill {
-    display: inline-flex; align-items: center; gap: .25rem;
-    background: #faf0dd; color: var(--lp-gold);
-    padding: .2rem .6rem; border-radius: 50px; font-size: .78rem; font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: .25rem;
+    background: var(--lp-rose-soft);
+    color: var(--lp-rose-deep);
+    padding: .2rem .65rem;
+    border-radius: 50px;
+    font-size: .8rem;
 }
 
+/* =====================================================================
+   Buttons + forms
+   ===================================================================== */
+.btn {
+    font-weight: 400;
+    border-radius: 4px;
+    letter-spacing: .02em;
+}
+
+.btn-lp-primary,
+.btn-primary {
+    background: var(--lp-ink);
+    border-color: var(--lp-ink);
+    color: #fff;
+}
+
+.btn-lp-primary:hover,
+.btn-lp-primary:focus,
+.btn-primary:hover,
+.btn-primary:focus {
+    background: var(--lp-ink-2);
+    border-color: var(--lp-ink-2);
+    color: #fff;
+}
+
+.btn-lp-gold {
+    background: var(--lp-rose);
+    border-color: var(--lp-rose);
+    color: var(--lp-ink);
+}
+
+.btn-lp-gold:hover {
+    background: var(--lp-rose-deep);
+    border-color: var(--lp-rose-deep);
+    color: #fff;
+}
+
+.btn-lp-outline,
+.btn-outline-secondary {
+    background: transparent;
+    border: 1px solid var(--lp-line);
+    color: var(--lp-text);
+}
+
+.btn-lp-outline:hover,
+.btn-outline-secondary:hover {
+    border-color: var(--lp-rose);
+    background: var(--lp-rose-soft);
+    color: var(--lp-text);
+}
+
+.form-control,
+.form-select {
+    border: 1px solid var(--lp-line);
+    border-radius: 4px;
+    background-color: var(--lp-card);
+    font-weight: 300;
+    color: var(--lp-text);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--lp-rose);
+    box-shadow: 0 0 0 .2rem rgba(217, 165, 160, .25);
+}
+
+.form-label {
+    font-size: .85rem;
+    color: var(--lp-muted);
+    margin-bottom: .3rem;
+}
+
+.dropdown-menu {
+    border: 1px solid var(--lp-line);
+    border-radius: 6px;
+    font-size: .9rem;
+}
+
+.dropdown-item:hover {
+    background: var(--lp-rose-soft);
+}
+
+.pagination .page-link {
+    color: var(--lp-text);
+    border-color: var(--lp-line);
+}
+
+.pagination .active>.page-link {
+    background: var(--lp-ink);
+    border-color: var(--lp-ink);
+    color: #fff;
+}
+
+/* =====================================================================
+   Responsive
+   ===================================================================== */
 @media (max-width: 991px) {
-    .ok-sidebar { transform: translateX(-100%); z-index: 1035; }
-    .ok-sidebar.show { transform: translateX(0); }
-    .ok-topbar, .ok-main, .ok-footer { margin-left: 0; }
-    .sidebar-toggle-btn { display: flex; }
-    .sidebar-close-btn { display: flex; }
+    .ok-sidebar {
+        transform: translateX(-100%);
+        z-index: 1035;
+    }
+
+    .ok-sidebar.show {
+        transform: translateX(0);
+    }
+
+    .ok-topbar,
+    .ok-main,
+    .ok-footer {
+        margin-left: 0;
+    }
+
+    .sidebar-toggle-btn {
+        display: flex;
+    }
+
+    .sidebar-close-btn {
+        display: flex;
+    }
+
+    .ok-topbar .search-box {
+        width: 100%;
+    }
+
+    .ok-topbar .profile-chip .meta {
+        display: none;
+    }
+
+    .page-title {
+        font-size: 1.8rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .ok-sidebar,
+    .ok-sidebar .nav-link {
+        transition: none;
+    }
+}
+
+/* =====================================================================
+   UNIVERSAL THEME ADD-ON - Black and rose gold
+   Paste this at the very END of your main admin.css.
+   It styles every Bootstrap component, so ALL pages (add, edit, list,
+   modals, tabs, alerts...) match the theme with no per-page CSS.
+   It also replaces add-product-theme.css (delete that one if pasted).
+   ===================================================================== */
+
+
+/* ---------------------------------------------------------------------
+   0. Bootstrap variables -> theme colours
+   (makes .text-primary, .bg-primary, .border-primary, links etc. match)
+   --------------------------------------------------------------------- */
+:root {
+    --bs-body-font-family: 'Jost', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --bs-body-color: #1E1A1A;
+    --bs-body-bg: #FBF7F6;
+    --bs-border-color: #EBDEDC;
+    --bs-border-radius: 4px;
+    --bs-border-radius-lg: 6px;
+    --bs-link-color: #B9807A;
+    --bs-link-hover-color: #151515;
+    --bs-link-color-rgb: 185, 128, 122;
+    --bs-link-hover-color-rgb: 21, 21, 21;
+    --bs-secondary-color: #9A8C8A;
+
+    --bs-primary: #151515;
+    --bs-primary-rgb: 21, 21, 21;
+    --bs-secondary: #9A8C8A;
+    --bs-secondary-rgb: 154, 140, 138;
+    --bs-success: #3F7A57;
+    --bs-success-rgb: 63, 122, 87;
+    --bs-danger: #A8433A;
+    --bs-danger-rgb: 168, 67, 58;
+    --bs-warning: #C9923A;
+    --bs-warning-rgb: 201, 146, 58;
+    --bs-info: #6E8794;
+    --bs-info-rgb: 110, 135, 148;
+    --bs-light: #FBF7F6;
+    --bs-light-rgb: 251, 247, 246;
+    --bs-dark: #151515;
+    --bs-dark-rgb: 21, 21, 21;
+}
+
+::selection {
+    background: var(--lp-rose);
+    color: var(--lp-ink);
+}
+
+::placeholder {
+    color: #B9AFAD !important;
+    font-weight: 300;
+}
+
+/* nice thin scrollbars */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--lp-rose) transparent;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--lp-line);
+    border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--lp-rose);
+}
+
+
+/* ---------------------------------------------------------------------
+   1. Typography + utilities
+   --------------------------------------------------------------------- */
+.container-fluid h1,
+.container-fluid h2,
+.container-fluid h3,
+.container-fluid h4,
+.container-fluid h5,
+.container-fluid h6,
+.modal-title,
+.offcanvas-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 400;
+    color: var(--lp-text);
+}
+
+.container-fluid h3 {
+    font-size: 2.1rem;
+}
+
+.container-fluid h4 {
+    font-size: 1.7rem;
+}
+
+.container-fluid h5 {
+    font-size: 1.4rem;
+}
+
+b,
+strong,
+.fw-bold,
+.fw-semibold {
+    font-weight: 400;
+}
+
+.fw-bold,
+.fw-semibold {
+    font-weight: 400 !important;
+}
+
+small,
+.small {
+    font-weight: 300;
+}
+
+hr {
+    border-color: var(--lp-line);
+    opacity: 1;
+}
+
+.text-muted,
+.text-secondary {
+    color: var(--lp-muted) !important;
+}
+
+.text-danger {
+    color: var(--lp-danger) !important;
+}
+
+.text-success {
+    color: var(--lp-success) !important;
+}
+
+.text-warning {
+    color: var(--lp-warning) !important;
+}
+
+.text-primary {
+    color: var(--lp-ink) !important;
+}
+
+.bg-light {
+    background-color: var(--lp-page) !important;
+}
+
+.bg-white {
+    background-color: var(--lp-card) !important;
+}
+
+.bg-primary {
+    background-color: var(--lp-ink) !important;
+    color: #fff !important;
+}
+
+.bg-success {
+    background-color: var(--lp-success) !important;
+}
+
+.bg-danger {
+    background-color: var(--lp-danger) !important;
+}
+
+.bg-warning {
+    background-color: var(--lp-rose) !important;
+    color: var(--lp-ink) !important;
+}
+
+.bg-info {
+    background-color: var(--bs-info) !important;
+}
+
+.bg-dark {
+    background-color: var(--lp-ink) !important;
+}
+
+.border,
+.border-top,
+.border-bottom,
+.border-start,
+.border-end {
+    border-color: var(--lp-line) !important;
+}
+
+.shadow-sm,
+.shadow {
+    box-shadow: none !important;
+}
+
+
+/* ---------------------------------------------------------------------
+   2. Cards
+   --------------------------------------------------------------------- */
+.card {
+    background: var(--lp-card);
+    border: 1px solid var(--lp-line) !important;
+    border-radius: 6px;
+    box-shadow: none !important;
+}
+
+.card-header {
+    background: transparent;
+    border-bottom: 1px solid var(--lp-line);
+    padding: 1rem 1.4rem;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.3rem;
+}
+
+.card-footer {
+    background: var(--lp-page);
+    border-top: 1px solid var(--lp-line);
+    padding: .9rem 1.4rem;
+}
+
+.card-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 400;
+}
+
+.card h5 {
+    padding-bottom: .7rem;
+    border-bottom: 1px solid var(--lp-line);
+    margin-bottom: 1.2rem !important;
+}
+
+.card-header h5,
+.card-title {
+    padding-bottom: 0;
+    border-bottom: none;
+    margin-bottom: 0 !important;
+}
+
+
+/* ---------------------------------------------------------------------
+   3. Buttons (every variant)
+   --------------------------------------------------------------------- */
+.btn {
+    font-weight: 400;
+    border-radius: 4px;
+    letter-spacing: .02em;
+}
+
+.btn:focus-visible {
+    box-shadow: 0 0 0 .2rem rgba(217, 165, 160, .35);
+}
+
+.btn-primary,
+.btn-dark {
+    --bs-btn-bg: #151515;
+    --bs-btn-border-color: #151515;
+    --bs-btn-color: #fff;
+    --bs-btn-hover-bg: #2A2A2A;
+    --bs-btn-hover-border-color: #2A2A2A;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-active-bg: #2A2A2A;
+    --bs-btn-active-border-color: #2A2A2A;
+    --bs-btn-disabled-bg: #151515;
+    --bs-btn-disabled-border-color: #151515;
+}
+
+.btn-secondary {
+    --bs-btn-bg: #F3E3E1;
+    --bs-btn-border-color: #EBDEDC;
+    --bs-btn-color: #1E1A1A;
+    --bs-btn-hover-bg: #D9A5A0;
+    --bs-btn-hover-border-color: #D9A5A0;
+    --bs-btn-hover-color: #151515;
+    --bs-btn-active-bg: #D9A5A0;
+    --bs-btn-active-border-color: #D9A5A0;
+    --bs-btn-active-color: #151515;
+}
+
+.btn-success {
+    --bs-btn-bg: #3F7A57;
+    --bs-btn-border-color: #3F7A57;
+    --bs-btn-color: #fff;
+    --bs-btn-hover-bg: #336548;
+    --bs-btn-hover-border-color: #336548;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-active-bg: #336548;
+    --bs-btn-active-border-color: #336548;
+}
+
+.btn-danger {
+    --bs-btn-bg: #A8433A;
+    --bs-btn-border-color: #A8433A;
+    --bs-btn-color: #fff;
+    --bs-btn-hover-bg: #8E352D;
+    --bs-btn-hover-border-color: #8E352D;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-active-bg: #8E352D;
+    --bs-btn-active-border-color: #8E352D;
+}
+
+.btn-warning,
+.btn-info {
+    --bs-btn-bg: #D9A5A0;
+    --bs-btn-border-color: #D9A5A0;
+    --bs-btn-color: #151515;
+    --bs-btn-hover-bg: #B9807A;
+    --bs-btn-hover-border-color: #B9807A;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-active-bg: #B9807A;
+    --bs-btn-active-border-color: #B9807A;
+    --bs-btn-active-color: #fff;
+}
+
+.btn-light {
+    --bs-btn-bg: transparent;
+    --bs-btn-border-color: #EBDEDC;
+    --bs-btn-color: #1E1A1A;
+    --bs-btn-hover-bg: #F3E3E1;
+    --bs-btn-hover-border-color: #D9A5A0;
+    --bs-btn-hover-color: #1E1A1A;
+    --bs-btn-active-bg: #F3E3E1;
+    --bs-btn-active-border-color: #D9A5A0;
+}
+
+.btn-outline-primary,
+.btn-outline-dark,
+.btn-outline-secondary {
+    --bs-btn-color: #1E1A1A;
+    --bs-btn-border-color: #EBDEDC;
+    --bs-btn-hover-bg: #F3E3E1;
+    --bs-btn-hover-border-color: #D9A5A0;
+    --bs-btn-hover-color: #1E1A1A;
+    --bs-btn-active-bg: #F3E3E1;
+    --bs-btn-active-border-color: #D9A5A0;
+    --bs-btn-active-color: #1E1A1A;
+}
+
+.btn-outline-success {
+    --bs-btn-color: #3F7A57;
+    --bs-btn-border-color: #3F7A57;
+    --bs-btn-hover-bg: #3F7A57;
+    --bs-btn-hover-border-color: #3F7A57;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-active-bg: #3F7A57;
+}
+
+.btn-outline-danger {
+    --bs-btn-color: #A8433A;
+    --bs-btn-border-color: #A8433A;
+    --bs-btn-hover-bg: #A8433A;
+    --bs-btn-hover-border-color: #A8433A;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-active-bg: #A8433A;
+}
+
+.btn-outline-warning,
+.btn-outline-info {
+    --bs-btn-color: #B9807A;
+    --bs-btn-border-color: #D9A5A0;
+    --bs-btn-hover-bg: #D9A5A0;
+    --bs-btn-hover-border-color: #D9A5A0;
+    --bs-btn-hover-color: #151515;
+    --bs-btn-active-bg: #D9A5A0;
+}
+
+.btn-link {
+    color: var(--lp-rose-deep);
+    text-decoration: none;
+}
+
+.btn-link:hover {
+    color: var(--lp-ink);
+    text-decoration: underline;
+}
+
+.btn-close:focus {
+    box-shadow: 0 0 0 .2rem rgba(217, 165, 160, .35);
+}
+
+
+/* ---------------------------------------------------------------------
+   4. Forms
+   --------------------------------------------------------------------- */
+.form-label,
+.form-label.fw-semibold,
+.form-label.fw-bold {
+    font-size: .88rem;
+    font-weight: 400 !important;
+    color: var(--lp-text);
+    margin-bottom: .35rem;
+}
+
+.form-control,
+.form-select,
+.input-group-text {
+    border: 1px solid var(--lp-line);
+    border-radius: 4px;
+    background-color: var(--lp-card);
+    color: var(--lp-text);
+    font-weight: 300;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--lp-rose);
+    box-shadow: 0 0 0 .2rem rgba(217, 165, 160, .25);
+    background-color: var(--lp-card);
+    color: var(--lp-text);
+}
+
+.form-control:disabled,
+.form-select:disabled {
+    background: var(--lp-page);
+    color: var(--lp-muted);
+}
+
+input[readonly].form-control {
+    background: var(--lp-page);
+    color: var(--lp-muted);
+}
+
+textarea.form-control {
+    line-height: 1.6;
+}
+
+.input-group-text {
+    background: var(--lp-page);
+    color: var(--lp-muted);
+}
+
+.form-text {
+    color: var(--lp-muted);
+    font-size: .8rem;
+}
+
+input[type="file"].form-control::file-selector-button {
+    background: var(--lp-rose-soft);
+    color: var(--lp-ink);
+    border: none;
+    border-right: 1px solid var(--lp-line);
+    padding: .45rem .9rem;
+    margin-right: .8rem;
+    font-family: inherit;
+}
+
+input[type="file"].form-control:hover::file-selector-button {
+    background: var(--lp-rose);
+}
+
+.form-check-input {
+    border-color: var(--lp-muted);
+}
+
+.form-check-input:checked {
+    background-color: var(--lp-ink);
+    border-color: var(--lp-ink);
+}
+
+.form-check-input:focus {
+    border-color: var(--lp-rose);
+    box-shadow: 0 0 0 .2rem rgba(217, 165, 160, .3);
+}
+
+.form-switch .form-check-input:checked {
+    background-color: var(--lp-ink);
+    border-color: var(--lp-ink);
+}
+
+.form-range::-webkit-slider-thumb {
+    background: var(--lp-ink);
+}
+
+.form-range::-moz-range-thumb {
+    background: var(--lp-ink);
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: var(--lp-danger);
+}
+
+.form-control.is-valid,
+.form-select.is-valid {
+    border-color: var(--lp-success);
+}
+
+.invalid-feedback {
+    color: var(--lp-danger);
+    font-size: .8rem;
+}
+
+.valid-feedback {
+    color: var(--lp-success);
+    font-size: .8rem;
+}
+
+
+/* ---------------------------------------------------------------------
+   5. Alerts + badges
+   --------------------------------------------------------------------- */
+.alert {
+    border-radius: 6px;
+    font-size: .9rem;
+}
+
+.alert-primary,
+.alert-info,
+.alert-secondary {
+    background: var(--lp-rose-soft);
+    border-color: var(--lp-line);
+    color: var(--lp-text);
+}
+
+.alert-success {
+    background: var(--lp-success-bg);
+    border-color: #C5DECC;
+    color: var(--lp-success);
+}
+
+.alert-danger {
+    background: var(--lp-danger-bg);
+    border-color: #EFC9C4;
+    color: var(--lp-danger);
+}
+
+.alert-warning {
+    background: var(--lp-warning-bg);
+    border-color: #EBD6A8;
+    color: var(--lp-warning);
+}
+
+.alert-light,
+.alert-dark {
+    background: var(--lp-page);
+    border-color: var(--lp-line);
+    color: var(--lp-text);
+}
+
+.alert-light strong {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.15rem;
+    font-weight: 500;
+}
+
+.badge {
+    font-weight: 400;
+    border-radius: 50px;
+    padding: .4em .8em;
+}
+
+.badge.bg-primary,
+.badge.bg-dark {
+    background-color: var(--lp-ink) !important;
+    color: var(--lp-rose) !important;
+}
+
+.badge.bg-secondary {
+    background-color: var(--lp-rose-soft) !important;
+    color: var(--lp-rose-deep) !important;
+}
+
+.badge.bg-success {
+    background-color: var(--lp-success-bg) !important;
+    color: var(--lp-success) !important;
+}
+
+.badge.bg-danger {
+    background-color: var(--lp-danger-bg) !important;
+    color: var(--lp-danger) !important;
+}
+
+.badge.bg-warning,
+.badge.bg-info {
+    background-color: var(--lp-warning-bg) !important;
+    color: var(--lp-warning) !important;
+}
+
+.badge.bg-light {
+    background-color: var(--lp-page) !important;
+    color: var(--lp-muted) !important;
+    border: 1px solid var(--lp-line);
+}
+
+
+/* ---------------------------------------------------------------------
+   6. Tables (all variants)
+   --------------------------------------------------------------------- */
+.table {
+    --bs-table-bg: transparent;
+    --bs-table-border-color: var(--lp-line);
+    color: var(--lp-text);
+}
+
+.table-striped>tbody>tr:nth-of-type(odd)>* {
+    --bs-table-bg-type: var(--lp-page);
+}
+
+.table-bordered> :not(caption)>*>* {
+    border-color: var(--lp-line);
+}
+
+.table-light {
+    --bs-table-bg: var(--lp-page);
+    --bs-table-color: var(--lp-muted);
+    --bs-table-border-color: var(--lp-line);
+}
+
+.table-dark {
+    --bs-table-bg: var(--lp-ink);
+    --bs-table-color: #F6EDEB;
+    --bs-table-border-color: var(--lp-ink-2);
+}
+
+.table> :not(caption)>*>* {
+    padding: .85rem 1rem;
+}
+
+.table-sm> :not(caption)>*>* {
+    padding: .5rem .75rem;
+}
+
+/* DataTables (if you use it) */
+.dataTables_wrapper .dataTables_filter input,
+.dataTables_wrapper .dataTables_length select {
+    border: 1px solid var(--lp-line);
+    border-radius: 4px;
+    padding: .3rem .6rem;
+}
+
+.page-item.active .page-link {
+    background: var(--lp-ink);
+    border-color: var(--lp-ink);
+    color: #fff;
+}
+
+.page-link {
+    color: var(--lp-text);
+    border-color: var(--lp-line);
+}
+
+.page-link:hover {
+    background: var(--lp-rose-soft);
+    color: var(--lp-ink);
+    border-color: var(--lp-rose);
+}
+
+.page-link:focus {
+    box-shadow: 0 0 0 .2rem rgba(217, 165, 160, .3);
+}
+
+
+/* ---------------------------------------------------------------------
+   7. Modal, dropdown, offcanvas, toast, popover, tooltip
+   --------------------------------------------------------------------- */
+.modal-content {
+    border: 1px solid var(--lp-line);
+    border-radius: 8px;
+    box-shadow: 0 20px 50px rgba(21, 21, 21, .15);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--lp-line);
+    padding: 1.1rem 1.4rem;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--lp-line);
+    background: var(--lp-page);
+}
+
+.modal-title {
+    font-size: 1.5rem;
+}
+
+.modal-backdrop.show {
+    opacity: .55;
+}
+
+.dropdown-menu {
+    border: 1px solid var(--lp-line);
+    border-radius: 6px;
+    font-size: .9rem;
+    box-shadow: 0 8px 24px rgba(21, 21, 21, .08);
+}
+
+.dropdown-item {
+    color: var(--lp-text);
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background: var(--lp-rose-soft);
+    color: var(--lp-ink);
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
+    background: var(--lp-ink);
+    color: #fff;
+}
+
+.dropdown-divider {
+    border-color: var(--lp-line);
+}
+
+.offcanvas {
+    border-color: var(--lp-line);
+}
+
+.toast {
+    border: 1px solid var(--lp-line);
+    border-radius: 6px;
+}
+
+.popover {
+    border-color: var(--lp-line);
+}
+
+.tooltip-inner {
+    background: var(--lp-ink);
+    color: #F6EDEB;
+    border-radius: 4px;
+}
+
+
+/* ---------------------------------------------------------------------
+   8. Tabs, pills, breadcrumb, list group, accordion, progress
+   --------------------------------------------------------------------- */
+.nav-tabs {
+    border-bottom: 1px solid var(--lp-line);
+}
+
+.nav-tabs .nav-link {
+    color: var(--lp-muted);
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--lp-ink);
+    border-bottom-color: var(--lp-line);
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--lp-ink);
+    border-bottom-color: var(--lp-rose);
+    background: transparent;
+}
+
+.nav-pills .nav-link {
+    color: var(--lp-text);
+    border-radius: 50px;
+}
+
+.nav-pills .nav-link.active {
+    background: var(--lp-ink);
+    color: var(--lp-rose);
+}
+
+.breadcrumb {
+    font-size: .88rem;
+}
+
+.breadcrumb-item a {
+    color: var(--lp-rose-deep);
+    text-decoration: none;
+}
+
+.breadcrumb-item.active {
+    color: var(--lp-muted);
+}
+
+.breadcrumb-item+.breadcrumb-item::before {
+    color: var(--lp-muted);
+}
+
+.list-group-item {
+    border-color: var(--lp-line);
+    background: var(--lp-card);
+    color: var(--lp-text);
+}
+
+.list-group-item.active {
+    background: var(--lp-ink);
+    border-color: var(--lp-ink);
+    color: #fff;
+}
+
+.list-group-item-action:hover {
+    background: var(--lp-page);
+}
+
+.accordion-item {
+    border-color: var(--lp-line);
+}
+
+.accordion-button {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.15rem;
+    background: var(--lp-card);
+    color: var(--lp-text);
+}
+
+.accordion-button:not(.collapsed) {
+    background: var(--lp-rose-soft);
+    color: var(--lp-ink);
+    box-shadow: none;
+}
+
+.accordion-button:focus {
+    box-shadow: 0 0 0 .2rem rgba(217, 165, 160, .3);
+    border-color: var(--lp-rose);
+}
+
+.progress {
+    background: var(--lp-rose-soft);
+    border-radius: 50px;
+}
+
+.progress-bar {
+    background: var(--lp-ink);
+}
+
+.spinner-border,
+.spinner-grow {
+    color: var(--lp-rose-deep);
+}
+
+
+/* ---------------------------------------------------------------------
+   9. Reusable page components (combo picker + image upload preview)
+   --------------------------------------------------------------------- */
+.combo-products-box {
+    border: 1px solid var(--lp-line);
+    border-radius: 6px;
+    padding: 18px;
+    background: var(--lp-page);
+}
+
+.combo-product-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 65px;
+    padding: 12px 15px;
+    background: var(--lp-card);
+    border: 1px solid var(--lp-line);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: border-color .2s ease, background .2s ease;
+}
+
+.combo-product-item:hover {
+    border-color: var(--lp-rose);
+}
+
+.combo-product-item:has(.combo-product-checkbox:checked) {
+    border-color: var(--lp-rose-deep);
+    background: var(--lp-rose-soft);
+}
+
+.combo-product-checkbox {
+    width: 19px;
+    height: 19px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.combo-product-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.combo-product-content strong {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.1rem;
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--lp-text);
+}
+
+.combo-product-content span {
+    font-size: .82rem;
+    color: var(--lp-muted);
+}
+
+.image-preview-card {
+    position: relative;
+    width: 100%;
+    height: 160px;
+    overflow: hidden;
+    border-radius: 6px;
+    border: 1px solid var(--lp-line);
+    background: var(--lp-page);
+}
+
+.image-preview-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.remove-image-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 50%;
+    background: var(--lp-ink);
+    color: var(--lp-rose);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: background .2s ease, color .2s ease;
+}
+
+.remove-image-btn:hover {
+    background: var(--lp-rose);
+    color: var(--lp-ink);
+}
+
+.image-number {
+    position: absolute;
+    left: 8px;
+    bottom: 8px;
+    min-width: 26px;
+    height: 26px;
+    padding: 0 8px;
+    border-radius: 20px;
+    background: var(--lp-ink);
+    color: var(--lp-rose);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: .95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/* ---------------------------------------------------------------------
+   10. SweetAlert2 (if used for delete confirmations)
+   --------------------------------------------------------------------- */
+.swal2-popup {
+    border-radius: 8px;
+    font-family: 'Jost', sans-serif;
+}
+
+.swal2-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 400;
+}
+
+.swal2-styled.swal2-confirm {
+    background: var(--lp-ink) !important;
+    border-radius: 4px;
+}
+
+.swal2-styled.swal2-cancel {
+    background: var(--lp-rose-soft) !important;
+    color: var(--lp-ink) !important;
+    border-radius: 4px;
 }

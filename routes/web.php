@@ -3,10 +3,15 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
-Route::get('/', function () {
-    return view('welcome');
-});
 
+// ================== Website Pages ==================
+
+Route::view('/', 'pages.home')->name('home');
+
+Route::view('/about', 'pages.about')->name('about');
+
+
+// ================== Admin Dashboard ==================
 
 Route::get('/dashboard', function () {
     $stats = [
@@ -15,32 +20,20 @@ Route::get('/dashboard', function () {
         'revenue' => '₹2.8L',
         'customers' => '419',
     ];
+
     return view('dash.home', compact('stats'));
 })->name('dashboard');
 
-Route::get('/orders', function () {
-    return view('dash.orders');
-})->name('orders.index');
-
-Route::get('/products', function () {
-    return view('dash.products');
-})->name('products.index');
-
-Route::get('/categories', function () {
-    return view('dash.categories');
-})->name('categories.index');
-
+Route::view('/orders', 'dash.orders')->name('orders.index');
 Route::get('/customers', function () {
     return view('dash.customers');
 })->name('customers.index');
 
-Route::get('/settings', function () {
-    return view('dash.settings');
-})->name('settings.index');
+Route::view('/settings', 'dash.settings')->name('settings.index');
 
 
+// ================== Category Controller ==================
 
-//================== Category  Controller===================//
 Route::get('/categories', [CategoryController::class, 'index'])
     ->name('categories.index');
 
@@ -49,9 +42,6 @@ Route::get('/categories/create', [CategoryController::class, 'create'])
 
 Route::post('/categories', [CategoryController::class, 'store'])
     ->name('categories.store');
-
-Route::get('/categories/{category}', [CategoryController::class, 'show'])
-    ->name('categories.show');
 
 Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])
     ->name('categories.edit');
@@ -62,8 +52,11 @@ Route::put('/categories/{category}', [CategoryController::class, 'update'])
 Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])
     ->name('categories.destroy');
 
+Route::get('/categories/{category}', [CategoryController::class, 'show'])
+    ->name('categories.show');
 
-// ================== Product Controller ================== //
+
+// ================== Product Controller ==================
 
 Route::get('/products', [ProductController::class, 'index'])
     ->name('products.index');
@@ -74,9 +67,6 @@ Route::get('/products/create', [ProductController::class, 'create'])
 Route::post('/products', [ProductController::class, 'store'])
     ->name('products.store');
 
-Route::get('/products/{product}', [ProductController::class, 'show'])
-    ->name('products.show');
-
 Route::get('/products/{product}/edit', [ProductController::class, 'edit'])
     ->name('products.edit');
 
@@ -85,3 +75,6 @@ Route::put('/products/{product}', [ProductController::class, 'update'])
 
 Route::delete('/products/{product}', [ProductController::class, 'destroy'])
     ->name('products.destroy');
+
+Route::get('/products/{product}', [ProductController::class, 'show'])
+    ->name('products.show');
