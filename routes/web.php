@@ -3,34 +3,34 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SiteProductController;
+use App\Http\Controllers\SiteComboController;
 
 // ================== Website Pages ==================
 
 Route::view('/', 'pages.home')->name('home');
 
-Route::view('/about', 'pages.about')->name('about');
+// Route::view('/view-product', 'pages.view-product')->name('viewproduct');
+Route::get('/view-product/{id}', [SiteProductController::class, 'show'])
+    ->name('products.show');
+
+Route::get('/menu', [SiteProductController::class, 'index'])
+    ->name('site.products');
+
+Route::get('/combos', [SiteComboController::class, 'index'])
+    ->name('site.combos');
 
 
 // ================== Admin Dashboard ==================
-
 Route::get('/dashboard', function () {
-    $stats = [
-        'total_orders' => '862',
-        'pending' => '37',
-        'revenue' => '₹2.8L',
-        'customers' => '419',
-    ];
-
-    return view('dash.home', compact('stats'));
-})->name('dashboard');
+    $stats = [ 'total_orders' => '862','pending' => '37','revenue' => '₹2.8L', 'customers' => '419', ];
+    return view('dash.home', compact('stats'));})->name('dashboard');
 
 Route::view('/orders', 'dash.orders')->name('orders.index');
-Route::get('/customers', function () {
-    return view('dash.customers');
-})->name('customers.index');
+
+Route::get('/customers', function () { return view('dash.customers');})->name('customers.index');
 
 Route::view('/settings', 'dash.settings')->name('settings.index');
-
 
 // ================== Category Controller ==================
 

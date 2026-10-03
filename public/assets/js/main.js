@@ -3,26 +3,83 @@
 
     $(document).ready(function () {
 
+        
         // =========================================================
-        // MOBILE MENU - MEANMENU
+        // MOBILE MENU - FOODKING SIDEBAR
         // =========================================================
-        $('#mobile-menu').meanmenu({
-            meanMenuContainer: '.mobile-menu',
-            meanScreenWidth: '991',
-            meanExpand: ['<i class="far fa-plus"></i>'],
-            meanContract: ['<i class="far fa-minus"></i>'],
+
+        const $foodMobileSidebar = $('#foodMobileSidebar');
+        const $foodMobileOverlay = $('#foodMobileOverlay');
+
+
+        // OPEN / CLOSE MENU
+        $('.sidebar__toggle').on('click', function (e) {
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            $foodMobileSidebar.toggleClass('active');
+            $foodMobileOverlay.toggleClass('active');
+
+            if ($foodMobileSidebar.hasClass('active')) {
+                $('body').css('overflow', 'hidden');
+            } else {
+                $('body').css('overflow', '');
+            }
+
         });
 
-        //>> Sidebar Toggle Js Start <<//
-        $(".offcanvas__close,.offcanvas__overlay").on("click", function () {
-            $(".offcanvas__info").removeClass("info-open");
-            $(".offcanvas__overlay").removeClass("overlay-open");
-        });
-        $(".sidebar__toggle").on("click", function () {
-            $(".offcanvas__info").addClass("info-open");
-            $(".offcanvas__overlay").addClass("overlay-open");
+
+        // CLOSE BUTTON
+        $('#foodMobileClose').on('click', function () {
+
+            $foodMobileSidebar.removeClass('active');
+            $foodMobileOverlay.removeClass('active');
+
+            $('body').css('overflow', '');
+
         });
 
+
+        // OVERLAY CLICK
+        $('#foodMobileOverlay').on('click', function () {
+
+            $foodMobileSidebar.removeClass('active');
+            $foodMobileOverlay.removeClass('active');
+
+            $('body').css('overflow', '');
+
+        });
+
+
+        // ESC KEY
+        $(document).on('keydown', function (e) {
+
+            if (e.key === 'Escape') {
+
+                $foodMobileSidebar.removeClass('active');
+                $foodMobileOverlay.removeClass('active');
+
+                $('body').css('overflow', '');
+
+            }
+
+        });
+
+
+        // MOBILE SUBMENU
+        $('.food-mobile-dropdown > a').on('click', function (e) {
+
+            e.preventDefault();
+
+            const $parent = $(this).parent();
+            const $submenu = $parent.children('ul');
+
+            $parent.toggleClass('active');
+
+            $submenu.stop(true, true).slideToggle(250);
+
+        });
         //>> Body Overlay Js Start <<//
         $(".body-overlay").on("click", function () {
             $(".offcanvas__area").removeClass("offcanvas-opened");

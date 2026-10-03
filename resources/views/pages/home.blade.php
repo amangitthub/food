@@ -12,7 +12,7 @@
 
         <div class="swiper-wrapper">
 
-            {{-- =========================  SLIDE 1   ========================== --}}
+            {{-- ========================= SLIDE 1 ========================== --}}
             <div class="swiper-slide">
 
                 <div class="hero-2 bg-cover"
@@ -122,7 +122,7 @@
             </div>
 
 
-            {{-- =========================     SLIDE 2       ========================== --}}
+            {{-- ========================= SLIDE 2 ========================== --}}
             <div class="swiper-slide">
 
                 <div class="hero-2 bg-cover"
@@ -435,9 +435,8 @@
 
 </section>
 <!-- Hero Section End -->
-{{-- =========================================================
-FOOD CATEGORY SECTION
-Popular food categories
+
+{{-- ========================FOOD CATEGORY SECTION Popular food categories
 ========================================================= --}}
 <section class="food-category-section fix section-padding section-bg">
 
@@ -529,7 +528,8 @@ Popular food categories
                         <div class="catagory-product-content text-center">
 
                             <div class="catagory-product-icon">
-                                <img src="{{ asset('assets/img/shape/food-shape.svg') }}" alt="Food Shape">
+                                <img src="{{ asset('assets/img/shape/food-shape.svg') }}"
+                                    alt="Food Shape (best-burgers)">
                             </div>
 
                             <h3>
@@ -574,7 +574,8 @@ Popular food categories
 
                             <div class="catagory-product-icon">
 
-                                <img src="{{ asset('assets/img/shape/food-shape.svg') }}" alt="Food Shape">
+                                <img src="{{ asset('assets/img/shape/food-shape.svg') }}"
+                                    alt="Food Shape(best-burgers)">
 
                             </div>
 
@@ -631,7 +632,8 @@ Popular food categories
 
                             <div class="catagory-product-icon">
 
-                                <img src="{{ asset('assets/img/shape/food-shape.svg') }}" alt="Food Shape">
+                                <img src="{{ asset('assets/img/shape/food-shape.svg') }}"
+                                    alt="Food Shape (best-burgers)">
 
                             </div>
 
@@ -688,7 +690,8 @@ Popular food categories
 
                             <div class="catagory-product-icon">
 
-                                <img src="{{ asset('assets/img/shape/food-shape.svg') }}" alt="Food Shape">
+                                <img src="{{ asset('assets/img/shape/food-shape.svg') }}"
+                                    alt="Food Shape(best-burgers)">
 
                             </div>
 
@@ -708,6 +711,7 @@ Popular food categories
 
 </section>
 {{-- ============================= FOOD CATEGORY SECTION END ======================== --}}
+
 
 {{-- =================== FOOD OFFER / BANNER SECTION ====================== --}}
 <section class="food-banner-section section-padding fix section-bg pt-0">
@@ -843,12 +847,12 @@ Popular food categories
     style="background-image: url('{{ asset('assets/img/banner/main-bg.jpg') }}');">
     {{-- Decorative Potato --}}
     <div class="patato-shape">
-        <img src="{{ asset('assets/img/shape/patato-shape.png') }}" alt="Potato Shape">
+        <img src="{{ asset('assets/img/shape/patato-shape.png') }}" alt="Potato frise Shape">
     </div>
 
     {{-- Discount Badge --}}
     <div class="offer-shape float-bob-y">
-        <img src="{{ asset('assets/img/offer/50percent-off-2.png') }}" alt="Special Discount">
+        <img src="{{ asset('assets/img/offer/50percent-off-2.png') }}" alt="Special 50% Discount">
     </div>
 
     {{-- Decorative Text --}}
@@ -866,7 +870,6 @@ Popular food categories
 
 
     <div class="container">
-
         <div class="grilled-wrapper">
             <div class="row align-items-center">
 
@@ -919,9 +922,7 @@ Popular food categories
                 <div class="col-xl-6 col-lg-6 mt-5 mt-lg-0 wow fadeInUp" data-wow-delay=".4s">
 
                     <div class="grilled-image">
-
                         <img src="{{ asset('assets/img/food/grilled.png') }}" alt="Grilled Chicken">
-
                     </div>
 
                 </div>
