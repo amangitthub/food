@@ -1,5 +1,5 @@
 @extends('layouts.dash-layout')
-
+@section('title', 'Categories')
 @section('content')
 
     <div class="container-fluid py-4">

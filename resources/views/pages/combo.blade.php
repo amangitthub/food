@@ -8,18 +8,17 @@
 
 <style>
     /* =========================================================
-           COMBO PAGE
-        ========================================================= */
+       COMBO PAGE
+    ========================================================= */
 
     .food-products-page {
         padding: 70px 0;
         background: #f8f9fb;
     }
 
-
     /* =========================================================
-           HEADING
-        ========================================================= */
+       HEADING
+    ========================================================= */
 
     .food-products-heading {
         text-align: center;
@@ -37,10 +36,9 @@
         margin-bottom: 0;
     }
 
-
     /* =========================================================
-           CATEGORY FILTER
-        ========================================================= */
+       CATEGORY FILTER
+    ========================================================= */
 
     .food-category-filter {
         margin-bottom: 35px;
@@ -101,10 +99,9 @@
         color: #fff;
     }
 
-
     /* =========================================================
-           COMBO CARD
-        ========================================================= */
+       COMBO CARD
+    ========================================================= */
 
     .food-product-card {
         height: 100%;
@@ -122,10 +119,9 @@
         box-shadow: 0 12px 30px rgba(0, 0, 0, .08);
     }
 
-
     /* =========================================================
-           COMBO IMAGE
-        ========================================================= */
+       COMBO IMAGE
+    ========================================================= */
 
     .food-product-image {
         height: 230px;
@@ -153,10 +149,9 @@
         font-size: 45px;
     }
 
-
     /* =========================================================
-           COMBO INFO
-        ========================================================= */
+       COMBO INFO
+    ========================================================= */
 
     .food-product-info {
         padding: 20px;
@@ -189,10 +184,9 @@
         margin-bottom: 15px;
     }
 
-
     /* =========================================================
-           COMBO BOTTOM
-        ========================================================= */
+       COMBO BOTTOM
+    ========================================================= */
 
     .food-product-bottom {
         display: flex;
@@ -225,10 +219,9 @@
         color: #fff;
     }
 
-
     /* =========================================================
-           EMPTY
-        ========================================================= */
+       EMPTY
+    ========================================================= */
 
     .food-empty-state {
         padding: 50px 20px;
@@ -237,10 +230,9 @@
         border-radius: 12px;
     }
 
-
     /* =========================================================
-           INFINITE SCROLL LOADER
-        ========================================================= */
+       INFINITE SCROLL LOADER
+    ========================================================= */
 
     .food-load-more-loader {
         width: 100%;
@@ -303,7 +295,6 @@
     }
 
     @keyframes foodLoaderSpin {
-
         from {
             transform: rotate(0deg);
         }
@@ -311,20 +302,17 @@
         to {
             transform: rotate(360deg);
         }
-
     }
 
-
     /* =========================================================
-           NEW COMBO FADE
-        ========================================================= */
+       NEW COMBO FADE
+    ========================================================= */
 
     .food-new-product {
         animation: foodProductAppear .35s ease both;
     }
 
     @keyframes foodProductAppear {
-
         from {
             opacity: 0;
             transform: translateY(10px);
@@ -334,13 +322,11 @@
             opacity: 1;
             transform: translateY(0);
         }
-
     }
 
-
     /* =========================================================
-           MOBILE
-        ========================================================= */
+       MOBILE
+    ========================================================= */
 
     @media (max-width: 575px) {
 
@@ -366,113 +352,118 @@
             padding: 8px 14px;
             font-size: 12px;
         }
-
     }
 </style>
 
-
 <section class="food-products-page">
 
-    <div class="container">
+```
+<div class="container">
+
+    {{-- =====================================================
+    PAGE HEADING
+    ====================================================== --}}
+
+    <div class="food-products-heading">
+
+        <h2>
+            Our Delicious Combos
+        </h2>
+
+        <p>
+            Enjoy our delicious food combinations at amazing prices.
+        </p>
+
+    </div>
 
 
-        {{-- =====================================================
-        PAGE HEADING
-        ====================================================== --}}
+    {{-- =====================================================
+    CATEGORY FILTER
+    ====================================================== --}}
 
-        <div class="food-products-heading">
+    <div class="food-category-filter">
 
-            <h2>
-                Our Delicious Combos
-            </h2>
+        <div class="d-flex flex-wrap justify-content-center gap-2">
 
-            <p>
-                Enjoy our delicious food combinations at amazing prices.
-            </p>
+            {{-- ALL COMBOS --}}
 
-        </div>
+            <a href="{{ route('site.combos') }}"
+                class="btn {{ !request('category_id') ? 'btn-dark' : 'btn-outline-dark' }}">
 
+                All Combos
 
-        {{-- =====================================================
-        CATEGORY FILTER
-        ====================================================== --}}
-
-        <div class="food-category-filter">
-
-            <div class="d-flex flex-wrap justify-content-center gap-2">
-
-                {{-- ALL COMBOS --}}
-
-                <a href="{{ route('site.combos') }}"
-                    class="btn {{ !request('category_id') ? 'btn-dark' : 'btn-outline-dark' }}">
-
-                    All Combos
-
-                </a>
+            </a>
 
 
-                {{-- CATEGORIES --}}
+            {{-- CATEGORIES --}}
 
-                @foreach ($categories as $category)
-                <a href="{{ route('site.combos', ['category_id' => $category->id]) }}" class="btn
-                        {{ request('category_id') == $category->id ? 'btn-warning' : 'btn-outline-warning' }}">
+            @foreach ($categories as $category)
+
+                <a href="{{ route('site.combos', ['category_id' => $category->id]) }}"
+                    class="btn {{ request('category_id') == $category->id ? 'btn-warning' : 'btn-outline-warning' }}">
 
                     {{ $category->name }}
 
                 </a>
-                @endforeach
 
-            </div>
-
-        </div>
-
-
-        {{-- =====================================================
-        COMBO COUNT
-        ====================================================== --}}
-
-        <div class="d-flex justify-content-between align-items-center mb-4">
-
-            <h5 class="mb-0">
-                Explore Our Combos
-            </h5>
-
-            <span class="text-muted">
-
-                {{ $combos->total() }}
-
-                combos
-
-            </span>
+            @endforeach
 
         </div>
 
+    </div>
 
-        {{-- =====================================================
-        COMBOS
-        ====================================================== --}}
 
-        <div class="row g-4" id="foodProductsContainer">
+    {{-- =====================================================
+    COMBO COUNT
+    ====================================================== --}}
 
-            @forelse($combos as $combo)
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h5 class="mb-0">
+            Explore Our Combos
+        </h5>
+
+        <span class="text-muted">
+
+            {{ $combos->total() }}
+
+            combos
+
+        </span>
+
+    </div>
+
+
+    {{-- =====================================================
+    COMBOS
+    ====================================================== --}}
+
+    <div class="row g-4" id="foodProductsContainer">
+
+        @forelse($combos as $combo)
+
             <div class="col-lg-4 col-md-6">
 
                 <div class="food-product-card">
-
 
                     {{-- Combo Image --}}
 
                     <div class="food-product-image">
 
                         @if ($combo->images->isNotEmpty() && $combo->images->first()->image_path)
-                        <img src="{{ asset($combo->images->first()->image_path) }}"
-                            alt="{{ $combo->images->first()->alt_text ?: $combo->name }}" loading="lazy">
+
+                            <img src="{{ asset($combo->images->first()->image_path) }}"
+                                alt="{{ $combo->images->first()->alt_text ?: $combo->name }}"
+                                loading="lazy">
+
                         @else
-                        <div class="food-product-placeholder">
 
-                            <i class="bi bi-image"></i>
+                            <div class="food-product-placeholder">
 
-                        </div>
+                                <i class="bi bi-image"></i>
+
+                            </div>
+
                         @endif
 
                     </div>
@@ -481,7 +472,6 @@
                     {{-- Combo Details --}}
 
                     <div class="food-product-info">
-
 
                         {{-- Category --}}
 
@@ -506,8 +496,10 @@
                         <p>
 
                             {{ \Illuminate\Support\Str::limit(
-                            $combo->short_description ?: $combo->description ?: 'Delicious combo made for you.',
-                            100,
+                                $combo->short_description
+                                    ?: $combo->description
+                                    ?: 'Delicious combo made for you.',
+                                100
                             ) }}
 
                         </p>
@@ -516,7 +508,6 @@
                         {{-- Bottom --}}
 
                         <div class="food-product-bottom">
-
 
                             {{-- Price --}}
 
@@ -529,14 +520,14 @@
 
                             {{-- Details --}}
 
-                            <a href="{{ route('products.show', $combo->id) }}" class="food-product-button">
+                            <a href="{{ route('products.show', $combo->slug) }}"
+                                class="food-product-button">
 
                                 View Details
 
                                 <i class="bi bi-arrow-right ms-1"></i>
 
                             </a>
-
 
                         </div>
 
@@ -546,7 +537,7 @@
 
             </div>
 
-            @empty
+        @empty
 
             <div class="col-12">
 
@@ -566,46 +557,47 @@
                 </div>
 
             </div>
-            @endforelse
 
-        </div>
-
-
-        {{-- =====================================================
-        INFINITE SCROLL LOADER
-        ====================================================== --}}
-
-        <div class="food-load-more-loader" id="foodLoadMoreLoader">
-
-            <div class="food-loader-box">
-
-                <span class="food-loader-spinner"></span>
-
-                <span>
-                    Loading Combos...
-                </span>
-
-            </div>
-
-        </div>
-
-
-        {{-- =====================================================
-        NO MORE COMBOS
-        ====================================================== --}}
-
-        <div id="foodNoMoreProducts" class="text-center text-muted py-4"
-            style="{{ $combos->hasMorePages() ? 'display:none;' : '' }}">
-
-            All combos loaded.
-
-        </div>
-
+        @endforelse
 
     </div>
 
-</section>
 
+    {{-- =====================================================
+    INFINITE SCROLL LOADER
+    ====================================================== --}}
+
+    <div class="food-load-more-loader" id="foodLoadMoreLoader">
+
+        <div class="food-loader-box">
+
+            <span class="food-loader-spinner"></span>
+
+            <span>
+                Loading Combos...
+            </span>
+
+        </div>
+
+    </div>
+
+
+    {{-- =====================================================
+    NO MORE COMBOS
+    ====================================================== --}}
+
+    <div id="foodNoMoreProducts"
+        class="text-center text-muted py-4"
+        style="{{ $combos->hasMorePages() ? 'display:none;' : '' }}">
+
+        All combos loaded.
+
+    </div>
+
+</div>
+```
+
+</section>
 
 {{-- =============================================================
 INFINITE SCROLL JAVASCRIPT
@@ -614,206 +606,185 @@ INFINITE SCROLL JAVASCRIPT
 <script>
     document.addEventListener('DOMContentLoaded', function() {
 
+        /* ---------------------------------------------------------
+           Elements
+        --------------------------------------------------------- */
 
-            /*
-            |--------------------------------------------------------------------------
-            | Elements
-            |--------------------------------------------------------------------------
-            */
+        const productsContainer =
+            document.getElementById('foodProductsContainer');
 
-            const productsContainer =
-                document.getElementById('foodProductsContainer');
+        const loader =
+            document.getElementById('foodLoadMoreLoader');
 
-            const loader =
-                document.getElementById('foodLoadMoreLoader');
-
-            const noMoreProducts =
-                document.getElementById('foodNoMoreProducts');
+        const noMoreProducts =
+            document.getElementById('foodNoMoreProducts');
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | Pagination State
-            |--------------------------------------------------------------------------
-            */
+        /* ---------------------------------------------------------
+           Pagination State
+        --------------------------------------------------------- */
 
-            let currentPage =
-                {{ $combos->currentPage() }};
+        let currentPage =
+            {{ $combos->currentPage() }};
 
-            let lastPage =
-                {{ $combos->lastPage() }};
+        let lastPage =
+            {{ $combos->lastPage() }};
 
-            let loading = false;
+        let loading = false;
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | Current Category
-            |--------------------------------------------------------------------------
-            */
+        /* ---------------------------------------------------------
+           Current Category
+        --------------------------------------------------------- */
 
-            const categoryId =
-                "{{ request('category_id') }}";
+        const categoryId =
+            @json(request('category_id'));
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | Show Loader
-            |--------------------------------------------------------------------------
-            */
+        /* ---------------------------------------------------------
+           Show Loader
+        --------------------------------------------------------- */
 
-            function showLoader() {
+        function showLoader() {
 
-                if (loader) {
+            if (loader) {
 
-                    loader.classList.add('show');
-
-                }
+                loader.classList.add('show');
 
             }
 
+        }
 
-            /*
-            |--------------------------------------------------------------------------
-            | Hide Loader
-            |--------------------------------------------------------------------------
-            */
 
-            function hideLoader() {
+        /* ---------------------------------------------------------
+           Hide Loader
+        --------------------------------------------------------- */
 
-                if (loader) {
+        function hideLoader() {
 
-                    loader.classList.remove('show');
+            if (loader) {
 
-                }
+                loader.classList.remove('show');
 
             }
 
+        }
 
-            /*
-            |--------------------------------------------------------------------------
-            | Escape HTML
-            |--------------------------------------------------------------------------
-            */
 
-            function escapeHtml(value) {
+        /* ---------------------------------------------------------
+           Escape HTML
+        --------------------------------------------------------- */
 
-                if (
-                    value === null ||
-                    value === undefined
-                ) {
+        function escapeHtml(value) {
 
-                    return '';
+            if (
+                value === null ||
+                value === undefined
+            ) {
 
-                }
-
-                const div =
-                    document.createElement('div');
-
-                div.textContent = value;
-
-                return div.innerHTML;
+                return '';
 
             }
 
+            const div =
+                document.createElement('div');
 
-            /*
-            |--------------------------------------------------------------------------
-            | Create Combo Card
-            |--------------------------------------------------------------------------
-            */
+            div.textContent = value;
 
-            function createComboCard(combo) {
+            return div.innerHTML;
 
-                const imageHtml = combo.image
-
-                    ?
-
-                    `
-            <img
-                src="${escapeHtml(combo.image)}"
-                alt="${escapeHtml(combo.image_alt)}"
-                loading="lazy"
-            >
-            `
-
-                    :
-
-                    `
-            <div class="food-product-placeholder">
-
-                <i class="bi bi-image"></i>
-
-            </div>
-            `;
+        }
 
 
-                const description =
-                    combo.short_description ||
-                    'Delicious combo made for you.';
+        /* ---------------------------------------------------------
+           Create Combo Card
+        --------------------------------------------------------- */
 
+        function createComboCard(combo) {
 
-                return `
+            const imageHtml = combo.image
 
-            <div class="col-lg-4 col-md-6 food-new-product">
+                ? `
+                    <img
+                        src="${escapeHtml(combo.image)}"
+                        alt="${escapeHtml(combo.image_alt)}"
+                        loading="lazy"
+                    >
+                `
 
-                <div class="food-product-card">
+                : `
+                    <div class="food-product-placeholder">
 
-
-                    <div class="food-product-image">
-
-                        ${imageHtml}
+                        <i class="bi bi-image"></i>
 
                     </div>
+                `;
 
 
-                    <div class="food-product-info">
+            const description =
+                combo.short_description ||
+                'Delicious combo made for you.';
 
 
-                        <span class="food-product-category">
+            return `
 
-                            ${escapeHtml(combo.category)}
+                <div class="col-lg-4 col-md-6 food-new-product">
 
-                        </span>
+                    <div class="food-product-card">
 
+                        <div class="food-product-image">
 
-                        <h5>
+                            ${imageHtml}
 
-                            ${escapeHtml(combo.name)}
-
-                        </h5>
-
-
-                        <p>
-
-                            ${escapeHtml(
-                                description.substring(0, 100)
-                            )}
-
-                        </p>
+                        </div>
 
 
-                        <div class="food-product-bottom">
+                        <div class="food-product-info">
 
+                            <span class="food-product-category">
 
-                            <span class="food-product-price">
-
-                                ₹${escapeHtml(combo.price)}
+                                ${escapeHtml(combo.category)}
 
                             </span>
 
 
-                            <a
-                                href="${escapeHtml(combo.url)}"
-                                class="food-product-button"
-                            >
+                            <h5>
 
-                                View Details
+                                ${escapeHtml(combo.name)}
 
-                                <i class="bi bi-arrow-right ms-1"></i>
+                            </h5>
 
-                            </a>
 
+                            <p>
+
+                                ${escapeHtml(
+                                    description.substring(0, 100)
+                                )}
+
+                            </p>
+
+
+                            <div class="food-product-bottom">
+
+                                <span class="food-product-price">
+
+                                    ₹${escapeHtml(combo.price)}
+
+                                </span>
+
+
+                                <a
+                                    href="${escapeHtml(combo.url)}"
+                                    class="food-product-button"
+                                >
+
+                                    View Details
+
+                                    <i class="bi bi-arrow-right ms-1"></i>
+
+                                </a>
+
+                            </div>
 
                         </div>
 
@@ -821,258 +792,220 @@ INFINITE SCROLL JAVASCRIPT
 
                 </div>
 
-            </div>
+            `;
+        }
 
-        `;
+
+        /* ---------------------------------------------------------
+           Load More Combos
+        --------------------------------------------------------- */
+
+        async function loadMoreCombos() {
+
+            if (loading) {
+                return;
+            }
+
+            if (currentPage >= lastPage) {
+
+                hideLoader();
+
+                return;
 
             }
 
+            loading = true;
 
-            /*
-            |--------------------------------------------------------------------------
-            | Load More Combos
-            |--------------------------------------------------------------------------
-            */
+            showLoader();
 
-            async function loadMoreCombos() {
+            const nextPage =
+                currentPage + 1;
 
 
-                // Already loading
+            try {
 
-                if (loading) {
+                /* -------------------------------------------------
+                   Build URL
+                ------------------------------------------------- */
 
-                    return;
-
-                }
-
-
-                // No more pages
-
-                if (currentPage >= lastPage) {
-
-                    hideLoader();
-
-                    return;
-
-                }
+                const url = new URL(
+                    "{{ route('site.combos') }}",
+                    window.location.origin
+                );
 
 
-                loading = true;
+                /* -------------------------------------------------
+                   Page
+                ------------------------------------------------- */
 
-                showLoader();
-
-
-                const nextPage =
-                    currentPage + 1;
-
-
-                try {
+                url.searchParams.set(
+                    'page',
+                    nextPage
+                );
 
 
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Build URL
-                    |--------------------------------------------------------------------------
-                    */
+                /* -------------------------------------------------
+                   Category
+                ------------------------------------------------- */
 
-                    const url = new URL(
-                        "{{ route('site.combos') }}",
-                        window.location.origin
-                    );
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Page
-                    |--------------------------------------------------------------------------
-                    */
+                if (categoryId) {
 
                     url.searchParams.set(
-                        'page',
-                        nextPage
+                        'category_id',
+                        categoryId
                     );
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Category
-                    |--------------------------------------------------------------------------
-                    */
-
-                    if (categoryId) {
-
-                        url.searchParams.set(
-                            'category_id',
-                            categoryId
-                        );
-
-                    }
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | AJAX Request
-                    |--------------------------------------------------------------------------
-                    */
-
-                    const response =
-                        await fetch(
-                            url.toString(), {
-                                method: 'GET',
-
-                                headers: {
-
-                                    'X-Requested-With': 'XMLHttpRequest',
-
-                                    'Accept': 'application/json'
-
-                                }
-                            }
-                        );
-
-
-                    if (!response.ok) {
-
-                        throw new Error(
-                            'Failed to load combos.'
-                        );
-
-                    }
-
-
-                    const data =
-                        await response.json();
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Add Combos
-                    |--------------------------------------------------------------------------
-                    */
-
-                    if (
-                        data.combos &&
-                        data.combos.length
-                    ) {
-
-                        data.combos.forEach(
-                            function(combo) {
-
-                                productsContainer.insertAdjacentHTML(
-                                    'beforeend',
-                                    createComboCard(combo)
-                                );
-
-                            }
-                        );
-
-                    }
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Update Pagination
-                    |--------------------------------------------------------------------------
-                    */
-
-                    currentPage =
-                        data.current_page;
-
-                    lastPage =
-                        data.last_page;
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | No More Combos
-                    |--------------------------------------------------------------------------
-                    */
-
-                    if (!data.has_more) {
-
-                        if (noMoreProducts) {
-
-                            noMoreProducts.style.display =
-                                'block';
-
-                        }
-
-                    }
-
-
-                } catch (error) {
-
-                    console.error(
-                        'Infinite Scroll Error:',
-                        error
-                    );
-
-                } finally {
-
-                    loading = false;
-
-                    hideLoader();
 
                 }
+
+
+                /* -------------------------------------------------
+                   AJAX Request
+                ------------------------------------------------- */
+
+                const response =
+                    await fetch(
+                        url.toString(),
+                        {
+                            method: 'GET',
+
+                            headers: {
+
+                                'X-Requested-With':
+                                    'XMLHttpRequest',
+
+                                'Accept':
+                                    'application/json'
+
+                            }
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        'Failed to load combos.'
+                    );
+
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                /* -------------------------------------------------
+                   Add Combos
+                ------------------------------------------------- */
+
+                if (
+                    data.combos &&
+                    data.combos.length
+                ) {
+
+                    data.combos.forEach(
+                        function(combo) {
+
+                            productsContainer.insertAdjacentHTML(
+                                'beforeend',
+                                createComboCard(combo)
+                            );
+
+                        }
+                    );
+
+                }
+
+
+                /* -------------------------------------------------
+                   Update Pagination
+                ------------------------------------------------- */
+
+                currentPage =
+                    data.current_page;
+
+                lastPage =
+                    data.last_page;
+
+
+                /* -------------------------------------------------
+                   No More Combos
+                ------------------------------------------------- */
+
+                if (!data.has_more) {
+
+                    if (noMoreProducts) {
+
+                        noMoreProducts.style.display =
+                            'block';
+
+                    }
+
+                }
+
+
+            } catch (error) {
+
+                console.error(
+                    'Infinite Scroll Error:',
+                    error
+                );
+
+            } finally {
+
+                loading = false;
+
+                hideLoader();
 
             }
 
-
-            /*
-            |--------------------------------------------------------------------------
-            | Scroll Detection
-            |--------------------------------------------------------------------------
-            */
-
-            window.addEventListener(
-                'scroll',
-                function() {
+        }
 
 
-                    if (loading) {
+        /* ---------------------------------------------------------
+           Scroll Detection
+        --------------------------------------------------------- */
 
-                        return;
+        window.addEventListener(
+            'scroll',
+            function() {
 
-                    }
-
-
-                    if (currentPage >= lastPage) {
-
-                        return;
-
-                    }
-
-
-                    const scrollPosition =
-                        window.innerHeight +
-                        window.scrollY;
-
-
-                    const pageHeight =
-                        document.documentElement.scrollHeight;
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | 500px Before Bottom
-                    |--------------------------------------------------------------------------
-                    */
-
-                    if (
-                        scrollPosition >=
-                        pageHeight - 500
-                    ) {
-
-                        loadMoreCombos();
-
-                    }
-
-                }, {
-                    passive: true
+                if (loading) {
+                    return;
                 }
-            );
 
-        });
+                if (currentPage >= lastPage) {
+                    return;
+                }
+
+                const scrollPosition =
+                    window.innerHeight +
+                    window.scrollY;
+
+                const pageHeight =
+                    document.documentElement.scrollHeight;
+
+
+                /* -------------------------------------------------
+                   500px Before Bottom
+                ------------------------------------------------- */
+
+                if (
+                    scrollPosition >=
+                    pageHeight - 500
+                ) {
+
+                    loadMoreCombos();
+
+                }
+
+            },
+            {
+                passive: true
+            }
+        );
+
+    });
 </script>
 
 @endsection

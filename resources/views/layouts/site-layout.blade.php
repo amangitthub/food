@@ -13,7 +13,7 @@
     <meta name="robots" content="@yield('meta_robots', 'index, follow')">
 
     {{-- Favicon --}}
-    <link rel="icon" type="image/png" href="{{ asset('assets/img/favicon.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('assets/img/logo/favicon.svg') }}">
 
     {{-- Theme CSS --}}
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}">

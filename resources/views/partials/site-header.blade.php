@@ -192,27 +192,27 @@
 
 
                                         {{-- POPULAR --}}
-                                        <li>
+                                        {{-- <li>
 
                                             <a href="{{ url('/popular') }}">
                                                 Popular
                                             </a>
 
-                                        </li>
+                                        </li> --}}
 
 
                                         {{-- NEW ARRIVALS --}}
-                                        <li>
+                                        {{-- <li>
 
                                             <a href="{{ url('/products/new-arrivals') }}">
                                                 New Arrivals
                                             </a>
 
-                                        </li>
+                                        </li> --}}
 
 
                                         {{-- OFFERS --}}
-                                        <li class="has-dropdown">
+                                        {{-- <li class="has-dropdown">
 
                                             <a href="{{ url('/offers') }}">
                                                 Offers
@@ -241,7 +241,7 @@
 
                                             </ul>
 
-                                        </li>
+                                        </li> --}}
 
                                         {{-- ABOUT --}}
                                         {{-- <li>
@@ -471,23 +471,17 @@
 
 
                 {{-- POPULAR --}}
-                <li>
+                {{-- <li>
                     <a href="{{ url('/popular') }}">
                         Popular
                     </a>
-                </li>
+                </li> --}}
 
 
                 {{-- NEW ARRIVALS --}}
-                <li>
-                    <a href="{{ url('/products/new-arrivals') }}">
-                        New Arrivals
-                    </a>
-                </li>
-
-
+               
                 {{-- OFFERS --}}
-                <li class="food-mobile-dropdown">
+                {{-- <li class="food-mobile-dropdown">
 
                     <a href="javascript:void(0);">
                         <span>Offers</span>
@@ -516,7 +510,7 @@
 
                     </ul>
 
-                </li>
+                </li> --}}
 
 
                 {{-- CONTACT --}}

@@ -1,11 +1,11 @@
 {{-- resources/views/partials/dash-sidebar.blade.php --}}
 <aside class="ok-sidebar" id="okSidebar">
     <div class="brand">
-        <img src="https://placehold.co/60x60/1F3D2E/C9963E?text=LP&font=playfair" alt="Little Pause">
-        <div>
-            <span>Little Pause</span>
+         <img src="{{ asset('assets/img/logo/logoo.png') }}" alt="Food Website Logo">
+        {{-- <div>
+            <span>FOODKING</span>
             <small>a moment worth pausing for</small>
-        </div>
+        </div> --}}
         <button class="sidebar-close-btn" id="sidebarClose" aria-label="Close sidebar">
             <i class="bi bi-x-lg"></i>
         </button>

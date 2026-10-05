@@ -8,1033 +8,1584 @@
 
 @section('content')
 
-    <section class="food-product-details-section">
+<section class="food-product-details-section">
 
-        <div class="container">
+    <div class="container">
 
-            {{-- Back --}}
-            <div class="food-product-back">
-                <a href="{{ route('site.products') }}">
-                    <span>←</span>
-                    Back to Products
-                </a>
-            </div>
+        {{-- =====================================================
+        BACK
+        ====================================================== --}}
 
-            <div class="row g-5">
+        <div class="food-product-back">
 
-                {{-- ================= PRODUCT GALLERY ================= --}}
-                <div class="col-lg-6">
+            <a href="{{ route('site.products') }}">
+                <span>←</span>
+                Back to Products
+            </a>
 
-                    @if ($product->images->count() > 0)
+        </div>
 
-                        <div class="food-gallery" id="foodGallery">
 
-                            {{-- Previous --}}
-                            @if ($product->images->count() > 1)
-                                <button type="button" class="gallery-arrow gallery-prev" id="galleryPrev"
-                                    aria-label="Previous image">
-                                    &#10094;
-                                </button>
-                            @endif
+        <div class="row g-5">
 
-                            {{-- Main Image --}}
-                            <img id="galleryMainImage" class="gallery-main-image"
-                                src="{{ asset($product->images->first()->image_path) }}"
-                                alt="{{ $product->images->first()->alt_text ?: $product->name }}">
+            {{-- =====================================================
+            PRODUCT GALLERY
+            ====================================================== --}}
 
-                            {{-- Next --}}
-                            @if ($product->images->count() > 1)
-                                <button type="button" class="gallery-arrow gallery-next" id="galleryNext"
-                                    aria-label="Next image">
-                                    &#10095;
-                                </button>
-                            @endif
+            <div class="col-lg-6">
+
+                @if ($product->images->count() > 0)
+
+                    <div class="food-gallery" id="foodGallery">
+
+                        @if ($product->images->count() > 1)
+
+                            <button
+                                type="button"
+                                class="gallery-arrow gallery-prev"
+                                id="galleryPrev"
+                                aria-label="Previous image">
+
+                                &#10094;
+
+                            </button>
+
+                        @endif
+
+
+                        <img
+                            id="galleryMainImage"
+                            class="gallery-main-image"
+                            src="{{ asset($product->images->first()->image_path) }}"
+                            alt="{{ $product->images->first()->alt_text ?: $product->name }}"
+                        >
+
+
+                        @if ($product->images->count() > 1)
+
+                            <button
+                                type="button"
+                                class="gallery-arrow gallery-next"
+                                id="galleryNext"
+                                aria-label="Next image">
+
+                                &#10095;
+
+                            </button>
+
+                        @endif
+
+                    </div>
+
+
+                    @if ($product->images->count() > 1)
+
+                        <div class="gallery-counter">
+
+                            <span id="galleryCurrent">1</span>
+
+                            <span>/</span>
+
+                            <span>
+                                {{ $product->images->count() }}
+                            </span>
 
                         </div>
 
-                        {{-- Counter --}}
-                        @if ($product->images->count() > 1)
-                            <div class="gallery-counter">
-                                <span id="galleryCurrent">1</span>
-                                <span>/</span>
-                                <span>{{ $product->images->count() }}</span>
-                            </div>
+                    @endif
+
+
+                    @if ($product->images->count() > 1)
+
+                        <div class="gallery-thumbnails">
+
+                            @foreach ($product->images as $index => $image)
+
+                                <button
+                                    type="button"
+                                    class="gallery-thumbnail {{ $index === 0 ? 'active' : '' }}"
+                                    data-index="{{ $index }}"
+                                    aria-label="View image {{ $index + 1 }}">
+
+                                    <img
+                                        src="{{ asset($image->image_path) }}"
+                                        alt="{{ $image->alt_text ?: $product->name }}"
+                                    >
+
+                                </button>
+
+                            @endforeach
+
+                        </div>
+
+                    @endif
+
+                @else
+
+                    <div class="food-detail-placeholder">
+
+                        <div class="placeholder-icon">
+                            🖼
+                        </div>
+
+                        <span>
+                            No Image Available
+                        </span>
+
+                    </div>
+
+                @endif
+
+            </div>
+
+
+            {{-- =====================================================
+            PRODUCT DETAILS
+            ====================================================== --}}
+
+            <div class="col-lg-6">
+
+                <div class="food-detail-content">
+
+                    <div class="food-detail-category">
+
+                        {{ $product->category->name ?? 'Food' }}
+
+                    </div>
+
+
+                    <h1 class="food-detail-title">
+
+                        {{ $product->name }}
+
+                    </h1>
+
+
+                    <div class="food-detail-status">
+
+                        @if ($product->status === 'Active')
+
+                            <span class="food-status-active">
+                                ● Active
+                            </span>
+
+                        @else
+
+                            <span class="food-status-inactive">
+                                ● {{ $product->status }}
+                            </span>
+
                         @endif
 
+                    </div>
 
-                        {{-- Thumbnails --}}
-                        @if ($product->images->count() > 1)
 
-                            <div class="gallery-thumbnails">
+                    <div class="food-product-meta">
 
-                                @foreach ($product->images as $index => $image)
-                                    <button type="button" class="gallery-thumbnail {{ $index === 0 ? 'active' : '' }}"
-                                        data-index="{{ $index }}" aria-label="View image {{ $index + 1 }}">
+                        <div class="food-meta-item">
 
-                                        <img src="{{ asset($image->image_path) }}"
-                                            alt="{{ $image->alt_text ?: $product->name }}">
+                            <span>
+                                Category
+                            </span>
 
-                                    </button>
-                                @endforeach
+                            <strong>
+                                {{ $product->category->name ?? 'N/A' }}
+                            </strong>
 
-                            </div>
+                        </div>
 
-                        @endif
-                    @else
-                        <div class="food-detail-placeholder">
-                            <div class="placeholder-icon">🖼</div>
-                            <span>No Image Available</span>
+
+                        <div class="food-meta-item">
+
+                            <span>
+                                Product Type
+                            </span>
+
+                            <strong>
+                                {{ $product->product_type ?? 'Single' }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="food-detail-price">
+
+                        ₹{{ number_format((float) $product->price, 2) }}
+
+                    </div>
+
+
+                    @if (!empty($product->short_description))
+
+                        <div class="food-description-block">
+
+                            <h5>
+                                Short Description
+                            </h5>
+
+                            <p>
+                                {{ $product->short_description }}
+                            </p>
+
+                        </div>
+
+                    @endif
+
+
+                    @if (!empty($product->description))
+
+                        <div class="food-description-block">
+
+                            <h5>
+                                Description
+                            </h5>
+
+                            <p>
+                                {!! nl2br(e($product->description)) !!}
+                            </p>
+
                         </div>
 
                     @endif
 
                 </div>
 
+            </div>
 
-                {{-- ================= PRODUCT DETAILS ================= --}}
-                <div class="col-lg-6">
-
-                    <div class="food-detail-content">
-
-                        {{-- Category --}}
-                        <div class="food-detail-category">
-                            {{ $product->category->name ?? 'Food' }}
-                        </div>
+        </div>
 
 
-                        {{-- Name --}}
-                        <h1 class="food-detail-title">
-                            {{ $product->name }}
-                        </h1>
+        {{-- =====================================================
+        COMBO ITEMS
+        ====================================================== --}}
+
+        @if (
+            $product->product_type === 'combo' &&
+            isset($comboProducts) &&
+            $comboProducts->count() > 0
+        )
+
+            <div class="combo-items-section">
+
+                {{-- Heading --}}
+
+                <div class="combo-items-heading">
+
+                    <span class="combo-items-label">
+                        COMBO ITEMS
+                    </span>
+
+                    <h2>
+                        What's Inside This Combo?
+                    </h2>
+
+                    <div class="combo-heading-line"></div>
+
+                    <p>
+                        Delicious items included in this combo
+                    </p>
+
+                </div>
 
 
-                        {{-- Status --}}
-                        <div class="food-detail-status">
+                {{-- Items --}}
 
-                            @if ($product->status === 'Active')
-                                <span class="food-status-active">
-                                    ● Active
-                                </span>
-                            @else
-                                <span class="food-status-inactive">
-                                    ● {{ $product->status }}
-                                </span>
-                            @endif
+                <div class="row g-4 justify-content-center">
 
-                        </div>
+                    @foreach ($comboProducts as $comboItem)
 
+                        <div class="col-xl-3 col-lg-4 col-md-6">
 
-                        {{-- Product Meta --}}
-                        <div class="food-product-meta">
+                            <div class="combo-item-card">
 
-                            <div class="food-meta-item">
+                                {{-- Image --}}
 
-                                <span>Category</span>
+                                <div class="combo-item-image">
 
-                                <strong>
-                                    {{ $product->category->name ?? 'N/A' }}
-                                </strong>
+                                    @if (
+                                        $comboItem->images->count() > 0 &&
+                                        $comboItem->images->first()->image_path
+                                    )
 
-                            </div>
+                                        <img
+                                            src="{{ asset($comboItem->images->first()->image_path) }}"
+                                            alt="{{ $comboItem->images->first()->alt_text ?: $comboItem->name }}"
+                                            loading="lazy"
+                                        >
 
+                                    @else
 
-                            <div class="food-meta-item">
+                                        <div class="combo-item-placeholder">
 
-                                <span>Product Type</span>
+                                            <i class="bi bi-image"></i>
 
-                                <strong>
-                                    {{ $product->product_type ?? 'Single' }}
-                                </strong>
+                                        </div>
 
-                            </div>
-
-                        </div>
+                                    @endif
 
 
-                        {{-- Price --}}
-                        <div class="food-detail-price">
-                            ₹{{ number_format((float) $product->price, 2) }}
-                        </div>
+                                    {{-- Small combo badge --}}
+
+                                    <span class="combo-item-badge">
+                                        Included
+                                    </span>
+
+                                </div>
 
 
-                        {{-- Short Description --}}
-                        @if (!empty($product->short_description))
-                            <div class="food-description-block">
+                                {{-- Name --}}
 
-                                <h5>
-                                    Short Description
-                                </h5>
+                                <div class="combo-item-content">
 
-                                <p>
-                                    {{ $product->short_description }}
-                                </p>
+                                    <h4>
+                                        {{ $comboItem->name }}
+                                    </h4>
 
-                            </div>
-                        @endif
-
-
-                        {{-- Description --}}
-                        @if (!empty($product->description))
-                            <div class="food-description-block">
-
-                                <h5>
-                                    Description
-                                </h5>
-
-                                <p>
-                                    {!! nl2br(e($product->description)) !!}
-                                </p>
+                                </div>
 
                             </div>
-                        @endif
 
-                    </div>
+                        </div>
+
+                    @endforeach
 
                 </div>
 
             </div>
 
+        @endif
 
-            {{-- Product Type --}}
-            @if (!empty($product->product_type))
-                <div class="food-product-type-section">
 
-                    <h3>
-                        Product Information
-                    </h3>
+        {{-- =====================================================
+        PRODUCT TYPE
+        ====================================================== --}}
 
-                    <div class="food-type-box">
+        @if (!empty($product->product_type))
 
-                        <span>
-                            Product Type
-                        </span>
+            <div class="food-product-type-section">
 
-                        <strong>
-                            {{ $product->product_type }}
-                        </strong>
+                <h3>
+                    Product Information
+                </h3>
 
-                    </div>
+                <div class="food-type-box">
+
+                    <span>
+                        Product Type
+                    </span>
+
+                    <strong>
+                        {{ $product->product_type }}
+                    </strong>
 
                 </div>
-            @endif
 
-        </div>
+            </div>
 
-    </section>
+        @endif
+
+    </div>
+
+</section>
 
 
-    {{-- =========================================================
-     GALLERY JAVASCRIPT
+{{-- =========================================================
+GALLERY JAVASCRIPT
 ========================================================= --}}
 
-    @if ($product->images->count() > 1)
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
+@if ($product->images->count() > 1)
 
-                /*
-                |--------------------------------------------------------------------------
-                | Product Images
-                |--------------------------------------------------------------------------
-                */
+<script>
 
-                const productImages = [
-                    @foreach ($product->images as $image)
-                        {
-                            src: @json(asset($image->image_path)),
-                            alt: @json($image->alt_text ?: $product->name)
-                        }
-                        {{ !$loop->last ? ',' : '' }}
-                    @endforeach
-                ];
+document.addEventListener('DOMContentLoaded', function() {
 
+    const productImages = [
 
-                /*
-                |--------------------------------------------------------------------------
-                | Elements
-                |--------------------------------------------------------------------------
-                */
+        @foreach ($product->images as $image)
 
-                const mainImage = document.getElementById('galleryMainImage');
+            {
+                src: @json(asset($image->image_path)),
+                alt: @json($image->alt_text ?: $product->name)
+            }
 
-                const previousButton = document.getElementById('galleryPrev');
+            {{ !$loop->last ? ',' : '' }}
 
-                const nextButton = document.getElementById('galleryNext');
+        @endforeach
 
-                const currentNumber = document.getElementById('galleryCurrent');
-
-                const thumbnails = document.querySelectorAll('.gallery-thumbnail');
-
-                const gallery = document.getElementById('foodGallery');
+    ];
 
 
-                /*
-                |--------------------------------------------------------------------------
-                | Current Image
-                |--------------------------------------------------------------------------
-                */
+    const mainImage =
+        document.getElementById('galleryMainImage');
 
-                let currentIndex = 0;
+    const previousButton =
+        document.getElementById('galleryPrev');
 
+    const nextButton =
+        document.getElementById('galleryNext');
 
-                /*
-                |--------------------------------------------------------------------------
-                | Show Image
-                |--------------------------------------------------------------------------
-                */
+    const currentNumber =
+        document.getElementById('galleryCurrent');
 
-                function showImage(index) {
+    const thumbnails =
+        document.querySelectorAll('.gallery-thumbnail');
 
-                    if (!productImages.length) {
-                        return;
-                    }
+    const gallery =
+        document.getElementById('foodGallery');
 
 
-                    // Previous from first image
-                    if (index < 0) {
-                        index = productImages.length - 1;
-                    }
+    let currentIndex = 0;
 
 
-                    // Next from last image
-                    if (index >= productImages.length) {
-                        index = 0;
-                    }
+    function showImage(index) {
+
+        if (!productImages.length) {
+            return;
+        }
 
 
-                    currentIndex = index;
+        if (index < 0) {
+            index = productImages.length - 1;
+        }
 
 
-                    /*
-                    | Change Main Image
-                    */
-
-                    mainImage.src = productImages[index].src;
-
-                    mainImage.alt = productImages[index].alt;
+        if (index >= productImages.length) {
+            index = 0;
+        }
 
 
-                    /*
-                    | Update Counter
-                    */
-
-                    if (currentNumber) {
-
-                        currentNumber.textContent = index + 1;
-
-                    }
+        currentIndex = index;
 
 
-                    /*
-                    | Update Active Thumbnail
-                    */
+        mainImage.src =
+            productImages[index].src;
 
-                    thumbnails.forEach(function(thumbnail, thumbnailIndex) {
-
-                        if (thumbnailIndex === index) {
-
-                            thumbnail.classList.add('active');
-
-                        } else {
-
-                            thumbnail.classList.remove('active');
-
-                        }
-
-                    });
+        mainImage.alt =
+            productImages[index].alt;
 
 
-                    /*
-                    | Scroll Active Thumbnail
-                    */
+        if (currentNumber) {
 
-                    if (thumbnails[index]) {
+            currentNumber.textContent =
+                index + 1;
 
-                        thumbnails[index].scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'nearest',
-                            inline: 'center'
-                        });
+        }
 
-                    }
+
+        thumbnails.forEach(
+            function(thumbnail, thumbnailIndex) {
+
+                if (thumbnailIndex === index) {
+
+                    thumbnail.classList.add('active');
+
+                } else {
+
+                    thumbnail.classList.remove('active');
 
                 }
 
-
-                /*
-                |--------------------------------------------------------------------------
-                | Previous Button
-                |--------------------------------------------------------------------------
-                */
-
-                if (previousButton) {
-
-                    previousButton.addEventListener('click', function(event) {
-
-                        event.preventDefault();
-
-                        showImage(currentIndex - 1);
-
-                    });
-
-                }
+            }
+        );
 
 
-                /*
-                |--------------------------------------------------------------------------
-                | Next Button
-                |--------------------------------------------------------------------------
-                */
+        if (thumbnails[index]) {
 
-                if (nextButton) {
+            thumbnails[index].scrollIntoView({
 
-                    nextButton.addEventListener('click', function(event) {
+                behavior: 'smooth',
 
-                        event.preventDefault();
+                block: 'nearest',
 
-                        showImage(currentIndex + 1);
-
-                    });
-
-                }
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | Thumbnail Click
-                |--------------------------------------------------------------------------
-                */
-
-                thumbnails.forEach(function(thumbnail, index) {
-
-                    thumbnail.addEventListener('click', function(event) {
-
-                        event.preventDefault();
-
-                        showImage(index);
-
-                    });
-
-                });
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | Keyboard Navigation
-                |--------------------------------------------------------------------------
-                */
-
-                document.addEventListener('keydown', function(event) {
-
-                    if (event.key === 'ArrowLeft') {
-
-                        showImage(currentIndex - 1);
-
-                    }
-
-
-                    if (event.key === 'ArrowRight') {
-
-                        showImage(currentIndex + 1);
-
-                    }
-
-                });
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | Mobile Swipe
-                |--------------------------------------------------------------------------
-                */
-
-                let touchStartX = 0;
-
-                let touchEndX = 0;
-
-
-                if (gallery) {
-
-                    gallery.addEventListener('touchstart', function(event) {
-
-                        touchStartX = event.changedTouches[0].screenX;
-
-                    }, {
-                        passive: true
-                    });
-
-
-                    gallery.addEventListener('touchend', function(event) {
-
-                        touchEndX = event.changedTouches[0].screenX;
-
-                        const distance = touchStartX - touchEndX;
-
-
-                        if (Math.abs(distance) < 50) {
-
-                            return;
-
-                        }
-
-
-                        if (distance > 0) {
-
-                            // Swipe left = next
-                            showImage(currentIndex + 1);
-
-                        } else {
-
-                            // Swipe right = previous
-                            showImage(currentIndex - 1);
-
-                        }
-
-                    }, {
-                        passive: true
-                    });
-
-                }
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | Initial Image
-                |--------------------------------------------------------------------------
-                */
-
-                showImage(0);
+                inline: 'center'
 
             });
-        </script>
-    @endif
+
+        }
+
+    }
 
 
-    {{-- =========================================================
-     CSS
+    if (previousButton) {
+
+        previousButton.addEventListener(
+            'click',
+            function(event) {
+
+                event.preventDefault();
+
+                showImage(
+                    currentIndex - 1
+                );
+
+            }
+        );
+
+    }
+
+
+    if (nextButton) {
+
+        nextButton.addEventListener(
+            'click',
+            function(event) {
+
+                event.preventDefault();
+
+                showImage(
+                    currentIndex + 1
+                );
+
+            }
+        );
+
+    }
+
+
+    thumbnails.forEach(
+        function(thumbnail, index) {
+
+            thumbnail.addEventListener(
+                'click',
+                function(event) {
+
+                    event.preventDefault();
+
+                    showImage(index);
+
+                }
+            );
+
+        }
+    );
+
+
+    document.addEventListener(
+        'keydown',
+        function(event) {
+
+            if (event.key === 'ArrowLeft') {
+
+                showImage(
+                    currentIndex - 1
+                );
+
+            }
+
+
+            if (event.key === 'ArrowRight') {
+
+                showImage(
+                    currentIndex + 1
+                );
+
+            }
+
+        }
+    );
+
+
+    let touchStartX = 0;
+
+    let touchEndX = 0;
+
+
+    if (gallery) {
+
+        gallery.addEventListener(
+            'touchstart',
+            function(event) {
+
+                touchStartX =
+                    event.changedTouches[0].screenX;
+
+            },
+            {
+                passive: true
+            }
+        );
+
+
+        gallery.addEventListener(
+            'touchend',
+            function(event) {
+
+                touchEndX =
+                    event.changedTouches[0].screenX;
+
+                const distance =
+                    touchStartX - touchEndX;
+
+
+                if (Math.abs(distance) < 50) {
+                    return;
+                }
+
+
+                if (distance > 0) {
+
+                    showImage(
+                        currentIndex + 1
+                    );
+
+                } else {
+
+                    showImage(
+                        currentIndex - 1
+                    );
+
+                }
+
+            },
+            {
+                passive: true
+            }
+        );
+
+    }
+
+
+    showImage(0);
+
+});
+
+</script>
+
+@endif
+
+
+{{-- =========================================================
+CSS
 ========================================================= --}}
 
-    <style>
-        .food-product-details-section {
-            padding: 70px 0;
-            background: #f8f9fa;
-        }
+<style>
 
+/* =====================================================
+   MAIN SECTION
+===================================================== */
 
-        /* Back Button */
+.food-product-details-section {
 
-        .food-product-back {
-            margin-bottom: 25px;
-        }
+    padding: 70px 0;
 
-        .food-product-back a {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: #222;
-            text-decoration: none;
-            font-weight: 600;
-        }
+    background: #f8f9fa;
 
-        .food-product-back a:hover {
-            color: #e63946;
-        }
+}
 
 
-        /* Gallery */
+/* =====================================================
+   BACK
+===================================================== */
 
-        .food-gallery {
-            position: relative;
-            width: 100%;
-            height: 480px;
-            background: #fff;
-            border-radius: 20px;
-            border: 1px solid #e5e5e5;
-            overflow: hidden;
+.food-product-back {
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    margin-bottom: 25px;
 
+}
 
-        /* Main Image */
 
-        .gallery-main-image {
-            width: 100%;
-            height: 100%;
-            padding: 25px;
+.food-product-back a {
 
-            object-fit: contain;
+    display: inline-flex;
 
-            display: block;
+    align-items: center;
 
-            user-select: none;
+    gap: 8px;
 
-            transition: opacity 0.2s ease;
-        }
+    color: #222;
 
+    text-decoration: none;
 
-        /* Arrow */
+    font-weight: 600;
 
-        .gallery-arrow {
-            position: absolute;
+    transition: color .2s ease;
 
-            top: 50%;
+}
 
-            transform: translateY(-50%);
 
-            z-index: 20;
+.food-product-back a:hover {
 
-            width: 50px;
-            height: 50px;
+    color: #e63946;
 
-            border: none;
+}
 
-            border-radius: 50%;
 
-            background: rgba(255, 255, 255, 0.95);
+/* =====================================================
+   GALLERY
+===================================================== */
 
-            color: #222;
+.food-gallery {
 
-            font-size: 25px;
+    position: relative;
 
-            display: flex;
+    width: 100%;
 
-            align-items: center;
+    height: 480px;
 
-            justify-content: center;
+    background: #fff;
 
-            cursor: pointer;
+    border-radius: 20px;
 
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    border: 1px solid #e5e5e5;
 
-            transition: all 0.2s ease;
-        }
+    overflow: hidden;
 
-        .gallery-arrow:hover {
+    display: flex;
 
-            background: #222;
+    align-items: center;
 
-            color: #fff;
+    justify-content: center;
 
-        }
+}
 
-        .gallery-prev {
-            left: 15px;
-        }
 
-        .gallery-next {
-            right: 15px;
-        }
+.gallery-main-image {
 
+    width: 100%;
 
-        /* Counter */
+    height: 100%;
 
-        .gallery-counter {
+    padding: 25px;
 
-            text-align: center;
+    object-fit: contain;
 
-            margin-top: 12px;
+    display: block;
 
-            color: #777;
+    user-select: none;
 
-            font-size: 14px;
+    transition: opacity .2s ease;
 
-            font-weight: 600;
-        }
+}
 
 
-        /* Thumbnails */
+.gallery-arrow {
 
-        .gallery-thumbnails {
+    position: absolute;
 
-            display: flex;
+    top: 50%;
 
-            gap: 12px;
+    transform: translateY(-50%);
 
-            margin-top: 15px;
+    z-index: 20;
 
-            padding: 3px;
+    width: 50px;
 
-            overflow-x: auto;
-        }
+    height: 50px;
 
+    border: none;
 
-        /* Thumbnail */
+    border-radius: 50%;
 
-        .gallery-thumbnail {
+    background: rgba(255,255,255,.95);
 
-            flex: 0 0 85px;
+    color: #222;
 
-            width: 85px;
+    font-size: 25px;
 
-            height: 85px;
+    display: flex;
 
-            padding: 4px;
+    align-items: center;
 
-            background: #fff;
+    justify-content: center;
 
-            border: 2px solid transparent;
+    cursor: pointer;
 
-            border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,.15);
 
-            overflow: hidden;
+    transition: all .2s ease;
 
-            cursor: pointer;
+}
 
-            transition: all 0.2s ease;
-        }
 
+.gallery-arrow:hover {
 
-        .gallery-thumbnail img {
+    background: #222;
 
-            width: 100%;
+    color: #fff;
 
-            height: 100%;
+}
 
-            object-fit: cover;
 
-            display: block;
+.gallery-prev {
+    left: 15px;
+}
 
-            border-radius: 6px;
 
-        }
+.gallery-next {
+    right: 15px;
+}
 
 
-        .gallery-thumbnail:hover {
+.gallery-counter {
 
-            border-color: #999;
+    text-align: center;
 
-        }
+    margin-top: 12px;
 
+    color: #777;
 
-        .gallery-thumbnail.active {
+    font-size: 14px;
 
-            border-color: #e63946;
+    font-weight: 600;
 
-        }
+}
 
 
-        /* Details */
+.gallery-thumbnails {
 
-        .food-detail-content {
+    display: flex;
 
-            padding: 10px 0;
+    gap: 12px;
 
-        }
+    margin-top: 15px;
 
+    padding: 3px;
 
-        .food-detail-category {
+    overflow-x: auto;
 
-            display: inline-block;
+}
 
-            color: #e63946;
 
-            font-size: 14px;
+.gallery-thumbnail {
 
-            font-weight: 700;
+    flex: 0 0 85px;
 
-            text-transform: uppercase;
+    width: 85px;
 
-            letter-spacing: 0.5px;
+    height: 85px;
 
-            margin-bottom: 10px;
-        }
+    padding: 4px;
 
+    background: #fff;
 
-        .food-detail-title {
+    border: 2px solid transparent;
 
-            font-size: 44px;
+    border-radius: 10px;
 
-            line-height: 1.2;
+    overflow: hidden;
 
-            font-weight: 700;
+    cursor: pointer;
 
-            color: #222;
+    transition: all .2s ease;
 
-            margin-bottom: 15px;
-        }
+}
 
 
-        /* Status */
+.gallery-thumbnail img {
 
-        .food-detail-status {
+    width: 100%;
 
-            margin-bottom: 25px;
-        }
+    height: 100%;
 
+    object-fit: cover;
 
-        .food-status-active,
-        .food-status-inactive {
+    display: block;
 
-            display: inline-flex;
+    border-radius: 6px;
 
-            padding: 7px 13px;
+}
 
-            border-radius: 50px;
 
-            font-size: 13px;
+.gallery-thumbnail:hover {
 
-            font-weight: 600;
-        }
+    border-color: #999;
 
+}
 
-        .food-status-active {
 
-            color: #16803c;
+.gallery-thumbnail.active {
 
-            background: #e9f8ef;
+    border-color: #e63946;
 
-        }
+}
 
 
-        .food-status-inactive {
+/* =====================================================
+   DETAILS
+===================================================== */
 
-            color: #c62828;
+.food-detail-content {
 
-            background: #fdecec;
+    padding: 10px 0;
 
-        }
+}
 
 
-        /* Meta */
+.food-detail-category {
 
-        .food-product-meta {
+    display: inline-block;
 
-            display: flex;
+    color: #e63946;
 
-            gap: 50px;
+    font-size: 14px;
 
-            padding: 20px 0;
+    font-weight: 700;
 
-            border-top: 1px solid #eee;
+    text-transform: uppercase;
 
-            border-bottom: 1px solid #eee;
-        }
+    letter-spacing: .5px;
 
+    margin-bottom: 10px;
 
-        .food-meta-item {
+}
 
-            display: flex;
 
-            flex-direction: column;
+.food-detail-title {
 
-            gap: 6px;
-        }
+    font-size: 44px;
 
+    line-height: 1.2;
 
-        .food-meta-item span {
+    font-weight: 700;
 
-            color: #888;
+    color: #222;
 
-            font-size: 13px;
-        }
+    margin-bottom: 15px;
 
+}
 
-        .food-meta-item strong {
 
-            color: #222;
+.food-detail-status {
 
-            font-size: 16px;
+    margin-bottom: 25px;
 
-            font-weight: 600;
-        }
+}
 
 
-        /* Price */
+.food-status-active,
+.food-status-inactive {
 
-        .food-detail-price {
+    display: inline-flex;
 
-            font-size: 34px;
+    padding: 7px 13px;
 
-            font-weight: 700;
+    border-radius: 50px;
 
-            color: #e63946;
+    font-size: 13px;
 
-            margin: 25px 0;
-        }
+    font-weight: 600;
 
+}
 
-        /* Description */
 
-        .food-description-block {
+.food-status-active {
 
-            margin-top: 25px;
-        }
+    color: #16803c;
 
+    background: #e9f8ef;
 
-        .food-description-block h5 {
+}
 
-            font-size: 18px;
 
-            font-weight: 700;
+.food-status-inactive {
 
-            margin-bottom: 10px;
+    color: #c62828;
 
-            color: #222;
-        }
+    background: #fdecec;
 
+}
 
-        .food-description-block p {
 
-            color: #666;
+.food-product-meta {
 
-            line-height: 1.8;
+    display: flex;
 
-            margin: 0;
-        }
+    gap: 50px;
 
+    padding: 20px 0;
 
-        /* Product Type */
+    border-top: 1px solid #eee;
 
-        .food-product-type-section {
+    border-bottom: 1px solid #eee;
 
-            margin-top: 50px;
+}
 
-            background: #fff;
 
-            padding: 30px;
+.food-meta-item {
 
-            border-radius: 18px;
+    display: flex;
 
-            border: 1px solid #eee;
-        }
+    flex-direction: column;
 
+    gap: 6px;
 
-        .food-product-type-section h3 {
+}
 
-            margin-bottom: 20px;
 
-            font-size: 24px;
+.food-meta-item span {
 
-            font-weight: 700;
-        }
+    color: #888;
 
+    font-size: 13px;
 
-        .food-type-box {
+}
 
-            display: flex;
 
-            justify-content: space-between;
+.food-meta-item strong {
 
-            align-items: center;
+    color: #222;
 
-            padding: 15px 20px;
+    font-size: 16px;
 
-            background: #f8f9fa;
+    font-weight: 600;
 
-            border-radius: 10px;
-        }
+}
 
 
-        .food-type-box span {
+.food-detail-price {
 
-            color: #777;
-        }
+    font-size: 34px;
 
+    font-weight: 700;
 
-        .food-type-box strong {
+    color: #e63946;
 
-            text-transform: capitalize;
-        }
+    margin: 25px 0;
 
+}
 
-        /* Placeholder */
 
-        .food-detail-placeholder {
+.food-description-block {
 
-            width: 100%;
+    margin-top: 25px;
 
-            height: 480px;
+}
 
-            background: #fff;
 
-            border-radius: 20px;
+.food-description-block h5 {
 
-            border: 1px solid #eee;
+    font-size: 18px;
 
-            display: flex;
+    font-weight: 700;
 
-            flex-direction: column;
+    margin-bottom: 10px;
 
-            align-items: center;
+    color: #222;
 
-            justify-content: center;
+}
 
-            color: #aaa;
-        }
 
+.food-description-block p {
 
-        .placeholder-icon {
+    color: #666;
 
-            font-size: 60px;
+    line-height: 1.8;
 
-            margin-bottom: 10px;
-        }
+    margin: 0;
 
+}
 
-        /* Responsive */
 
-        @media (max-width: 991px) {
+/* =====================================================
+   COMBO ITEMS
+===================================================== */
 
-            .food-gallery {
-                height: 400px;
-            }
+.combo-items-section {
 
-            .food-detail-title {
-                font-size: 36px;
-            }
+    margin-top: 65px;
 
-        }
+    padding: 55px 0 10px;
 
+    border-top: 1px solid #e5e5e5;
 
-        @media (max-width: 575px) {
+}
 
-            .food-product-details-section {
-                padding: 40px 0;
-            }
 
-            .food-gallery {
-                height: 320px;
-                border-radius: 15px;
-            }
+.combo-items-heading {
 
-            .gallery-main-image {
-                padding: 15px;
-            }
+    text-align: center;
 
-            .gallery-arrow {
-                width: 40px;
-                height: 40px;
-            }
+    margin-bottom: 38px;
 
-            .gallery-prev {
-                left: 8px;
-            }
+}
 
-            .gallery-next {
-                right: 8px;
-            }
 
-            .gallery-thumbnail {
-                flex-basis: 70px;
-                width: 70px;
-                height: 70px;
-            }
+.combo-items-label {
 
-            .food-detail-title {
-                font-size: 30px;
-            }
+    display: inline-flex;
 
-            .food-product-meta {
-                gap: 25px;
-            }
+    align-items: center;
 
-            .food-detail-price {
-                font-size: 28px;
-            }
+    justify-content: center;
 
-        }
-    </style>
+    padding: 7px 15px;
+
+    background: #fff0f1;
+
+    color: #e63946;
+
+    border-radius: 50px;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.2px;
+
+    margin-bottom: 13px;
+
+}
+
+
+.combo-items-heading h2 {
+
+    margin: 0;
+
+    color: #222;
+
+    font-size: 30px;
+
+    line-height: 1.3;
+
+    font-weight: 700;
+
+}
+
+
+.combo-heading-line {
+
+    width: 45px;
+
+    height: 3px;
+
+    background: #e63946;
+
+    border-radius: 5px;
+
+    margin: 14px auto;
+
+}
+
+
+.combo-items-heading p {
+
+    margin: 0;
+
+    color: #888;
+
+    font-size: 14px;
+
+}
+
+
+/* =====================================================
+   COMBO CARD
+===================================================== */
+
+.combo-item-card {
+
+    position: relative;
+
+    height: 100%;
+
+    overflow: hidden;
+
+    background: #fff;
+
+    border: 1px solid #ededed;
+
+    border-radius: 18px;
+
+    box-shadow: 0 5px 20px rgba(0,0,0,.035);
+
+    transition:
+        transform .3s ease,
+        box-shadow .3s ease,
+        border-color .3s ease;
+
+}
+
+
+.combo-item-card:hover {
+
+    transform: translateY(-7px);
+
+    border-color: #f1c4c7;
+
+    box-shadow: 0 15px 35px rgba(0,0,0,.09);
+
+}
+
+
+/* =====================================================
+   COMBO IMAGE
+===================================================== */
+
+.combo-item-image {
+
+    position: relative;
+
+    width: 100%;
+
+    height: 210px;
+
+    overflow: hidden;
+
+    background: #f4f4f4;
+
+}
+
+
+.combo-item-image img {
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+    display: block;
+
+    transition: transform .45s ease;
+
+}
+
+
+.combo-item-card:hover
+.combo-item-image img {
+
+    transform: scale(1.07);
+
+}
+
+
+/* =====================================================
+   INCLUDED BADGE
+===================================================== */
+
+.combo-item-badge {
+
+    position: absolute;
+
+    top: 13px;
+
+    right: 13px;
+
+    padding: 6px 11px;
+
+    background: rgba(255,255,255,.94);
+
+    color: #e63946;
+
+    border-radius: 50px;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    box-shadow: 0 3px 12px rgba(0,0,0,.10);
+
+}
+
+
+/* =====================================================
+   PLACEHOLDER
+===================================================== */
+
+.combo-item-placeholder {
+
+    width: 100%;
+
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: #aaa;
+
+    font-size: 42px;
+
+}
+
+
+/* =====================================================
+   ITEM NAME
+===================================================== */
+
+.combo-item-content {
+
+    padding: 18px 20px 20px;
+
+    text-align: center;
+
+}
+
+
+.combo-item-content h4 {
+
+    margin: 0;
+
+    color: #222;
+
+    font-size: 18px;
+
+    line-height: 1.4;
+
+    font-weight: 700;
+
+}
+
+
+/* =====================================================
+   PRODUCT TYPE
+===================================================== */
+
+.food-product-type-section {
+
+    margin-top: 50px;
+
+    background: #fff;
+
+    padding: 30px;
+
+    border-radius: 18px;
+
+    border: 1px solid #eee;
+
+}
+
+
+.food-product-type-section h3 {
+
+    margin-bottom: 20px;
+
+    font-size: 24px;
+
+    font-weight: 700;
+
+}
+
+
+.food-type-box {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 15px 20px;
+
+    background: #f8f9fa;
+
+    border-radius: 10px;
+
+}
+
+
+.food-type-box span {
+
+    color: #777;
+
+}
+
+
+.food-type-box strong {
+
+    text-transform: capitalize;
+
+}
+
+
+/* =====================================================
+   PLACEHOLDER
+===================================================== */
+
+.food-detail-placeholder {
+
+    width: 100%;
+
+    height: 480px;
+
+    background: #fff;
+
+    border-radius: 20px;
+
+    border: 1px solid #eee;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: #aaa;
+
+}
+
+
+.placeholder-icon {
+
+    font-size: 60px;
+
+    margin-bottom: 10px;
+
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 991px) {
+
+    .food-gallery {
+
+        height: 400px;
+
+    }
+
+
+    .food-detail-title {
+
+        font-size: 36px;
+
+    }
+
+
+    .combo-items-section {
+
+        margin-top: 50px;
+
+        padding-top: 45px;
+
+    }
+
+}
+
+
+@media (max-width: 575px) {
+
+    .food-product-details-section {
+
+        padding: 40px 0;
+
+    }
+
+
+    .food-gallery {
+
+        height: 320px;
+
+        border-radius: 15px;
+
+    }
+
+
+    .gallery-main-image {
+
+        padding: 15px;
+
+    }
+
+
+    .gallery-arrow {
+
+        width: 40px;
+
+        height: 40px;
+
+    }
+
+
+    .gallery-prev {
+
+        left: 8px;
+
+    }
+
+
+    .gallery-next {
+
+        right: 8px;
+
+    }
+
+
+    .gallery-thumbnail {
+
+        flex-basis: 70px;
+
+        width: 70px;
+
+        height: 70px;
+
+    }
+
+
+    .food-detail-title {
+
+        font-size: 30px;
+
+    }
+
+
+    .food-product-meta {
+
+        gap: 25px;
+
+    }
+
+
+    .food-detail-price {
+
+        font-size: 28px;
+
+    }
+
+
+    .combo-items-section {
+
+        margin-top: 40px;
+
+        padding-top: 35px;
+
+    }
+
+
+    .combo-items-heading {
+
+        margin-bottom: 28px;
+
+    }
+
+
+    .combo-items-heading h2 {
+
+        font-size: 24px;
+
+    }
+
+
+    .combo-item-image {
+
+        height: 200px;
+
+    }
+
+
+    .combo-item-content {
+
+        padding: 16px;
+
+    }
+
+
+    .combo-item-content h4 {
+
+        font-size: 17px;
+
+    }
+
+}
+
+</style>
 
 @endsection

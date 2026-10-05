@@ -53,14 +53,10 @@ class SiteProductController extends Controller
 
         $products = $query->paginate(9)->withQueryString();
 
-
         /*
-        |-------------------------------------------------------------------------- 
+        |--------------------------------------------------------------------------
         | AJAX Request
         |--------------------------------------------------------------------------
-        |
-        | Scroll se next products mangwane ke liye JSON return hoga.
-        |
         */
 
         if ($request->ajax()) {
@@ -94,9 +90,10 @@ class SiteProductController extends Controller
                         ? ($image->alt_text ?: $product->name)
                         : $product->name,
 
+                    // Product URL using slug
                     'url' => route(
                         'products.show',
-                        $product->id
+                        $product->slug
                     ),
                 ];
             });
@@ -111,7 +108,6 @@ class SiteProductController extends Controller
                 'has_more' => $products->hasMorePages(),
             ]);
         }
-
 
         /*
         |--------------------------------------------------------------------------
@@ -129,15 +125,41 @@ class SiteProductController extends Controller
     /**
      * Product Details
      */
-    public function show($id)
+    public function show($slug)
     {
         $product = Product::with([
             'category',
             'images'
-        ])->findOrFail($id);
+        ])
+            ->where('slug', $slug)
+            ->where('status', 'Active')
+            ->firstOrFail();
 
-        return view('pages.view-product', compact(
-            'product'
-        ));
+        $comboProducts = collect();
+
+        if (
+            $product->product_type === 'combo' &&
+            !empty($product->combo_product_ids)
+        ) {
+            $comboIds = is_array($product->combo_product_ids)
+                ? $product->combo_product_ids
+                : json_decode($product->combo_product_ids, true);
+
+            if (is_array($comboIds) && count($comboIds)) {
+
+                $comboProducts = Product::with([
+                    'images',
+                    'category'
+                ])
+                    ->whereIn('id', $comboIds)
+                    ->where('status', 'Active')
+                    ->get();
+            }
+        }
+
+        return view(
+            'pages.view-product',
+            compact('product', 'comboProducts')
+        );
     }
 }
