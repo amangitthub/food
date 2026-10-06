@@ -26,6 +26,9 @@ Route::get('/menu', [SiteProductController::class, 'index'])
 Route::get('/combos', [SiteComboController::class, 'index'])
     ->name('site.combos');
 
+Route::view('/contact', 'pages.contact')
+    ->name('contact');
+
 
 //=================== Auth====================
 Route::get('/login', [AuthController::class, 'showLogin'])
