@@ -7,6 +7,8 @@ use App\Http\Controllers\SiteProductController;
 use App\Http\Controllers\SiteComboController;
 use App\Http\Controllers\HomeController;
 use App\Models\Product;
+use App\Http\Controllers\AuthController;
+
 
 // ================== Website Pages ==================
 
@@ -25,70 +27,109 @@ Route::get('/combos', [SiteComboController::class, 'index'])
     ->name('site.combos');
 
 
+//=================== Auth====================
+Route::get('/login', [AuthController::class, 'showLogin'])
+    ->name('login');
+
+Route::post('/login', [AuthController::class, 'login'])
+    ->name('login.submit');
+
+Route::get('/register', [AuthController::class, 'showRegister'])
+    ->name('register');
+
+Route::post('/register', [AuthController::class, 'register'])
+    ->name('register.submit');
+
+Route::post('/logout', [AuthController::class, 'logout'])
+    ->name('logout');
+
 // ================== Admin Dashboard ==================
-Route::get('/dashboard', function () {
-    $stats = ['total_orders' => '862', 'pending' => '37', 'revenue' => '₹2.8L', 'customers' => '419',];
-    return view('dash.home', compact('stats'));
-})->name('dashboard');
 
-Route::view('/orders', 'dash.orders')->name('orders.index');
+Route::middleware(['auth', 'admin'])->group(function () {
 
-Route::get('/customers', function () {
-    return view('dash.customers'); })->name('customers.index');
+    Route::get('/dashboard', function () {
 
-Route::view('/settings', 'dash.settings')->name('settings.index');
+        $stats = [
+            'total_orders' => '862',
+            'pending' => '37',
+            'revenue' => '₹2.8L',
+            'customers' => '419',
+        ];
 
-// ================== Category Route ==================
-Route::prefix('category')->group(function () {
+        return view('dash.home', compact('stats'));
 
-    Route::get('/', [CategoryController::class, 'index'])
-        ->name('categories.index');
+    })->name('dashboard');
 
-    Route::get('/create', [CategoryController::class, 'create'])
-        ->name('categories.create');
 
-    Route::post('/categories', [CategoryController::class, 'store'])
-        ->name('categories.store');
+    // ================== Orders ==================
+    Route::view('/orders', 'dash.orders')
+        ->name('orders.index');
 
-    Route::get('/{category}/edit', [CategoryController::class, 'edit'])
-        ->name('categories.edit');
 
-    Route::put('/{category}', [CategoryController::class, 'update'])
-        ->name('categories.update');
+    // ================== Customers ==================
+    Route::get('/customers', function () {
 
-    Route::delete('{category}', [CategoryController::class, 'destroy'])
-        ->name('categories.destroy');
+        return view('dash.customers');
 
-    Route::get('/{category}', [CategoryController::class, 'show'])
-        ->name('categories.show');
-        //  Route::get('/categories/{category}', [CategoryController::class, 'show'])
-        // ->name('categories.show');
+    })->name('customers.index');
 
-});
 
-// ================== Product Route ==================
+    // ================== Settings ==================
+    Route::view('/settings', 'dash.settings')
+        ->name('settings.index');
 
-Route::prefix('product')->group(function () {
 
-    Route::get('/', [ProductController::class, 'index'])
-        ->name('products.index');
+    // ================== Category Route ==================
+    Route::prefix('category')->group(function () {
 
-    Route::get('/create', [ProductController::class, 'create'])
-        ->name('products.create');
+        Route::get('/', [CategoryController::class, 'index'])
+            ->name('categories.index');
 
-    Route::post('/', [ProductController::class, 'store'])
-        ->name('products.store');
+        Route::get('/create', [CategoryController::class, 'create'])
+            ->name('categories.create');
 
-    Route::get('/{product}/edit', [ProductController::class, 'edit'])
-        ->name('products.edit');
+        Route::post('/categories', [CategoryController::class, 'store'])
+            ->name('categories.store');
 
-    Route::put('/{product}', [ProductController::class, 'update'])
-        ->name('products.update');
+        Route::get('/{category}/edit', [CategoryController::class, 'edit'])
+            ->name('categories.edit');
 
-    Route::delete('/{product}', [ProductController::class, 'destroy'])
-        ->name('products.destroy');
+        Route::put('/{category}', [CategoryController::class, 'update'])
+            ->name('categories.update');
 
-    Route::get('/{product}', [ProductController::class, 'show'])
-        ->name('products.show');
+        Route::delete('/{category}', [CategoryController::class, 'destroy'])
+            ->name('categories.destroy');
+
+        Route::get('/{category}', [CategoryController::class, 'show'])
+            ->name('categories.show');
+
+    });
+
+
+    // ================== Product Route ==================
+    Route::prefix('product')->group(function () {
+
+        Route::get('/', [ProductController::class, 'index'])
+            ->name('products.index');
+
+        Route::get('/create', [ProductController::class, 'create'])
+            ->name('products.create');
+
+        Route::post('/', [ProductController::class, 'store'])
+            ->name('products.store');
+
+        Route::get('/{product}/edit', [ProductController::class, 'edit'])
+            ->name('products.edit');
+
+        Route::put('/{product}', [ProductController::class, 'update'])
+            ->name('products.update');
+
+        Route::delete('/{product}', [ProductController::class, 'destroy'])
+            ->name('products.destroy');
+
+        Route::get('/{product}', [ProductController::class, 'show'])
+            ->name('admin.products.show');
+
+    });
 
 });

@@ -55,14 +55,14 @@
                                             Chicken Burger
 
                                         </h1>
-
+{{-- 
                                         <div data-animation="fadeInUp" data-delay="1.7s" class="price-text">
 
                                             <h3>Special Offer /</h3>
 
                                             <h2>₹149</h2>
 
-                                        </div>
+                                        </div> --}}
 
                                         <div class="hero-button">
 
@@ -166,13 +166,13 @@
 
                                         </h1>
 
-                                        <div data-animation="fadeInUp" data-delay="1.7s" class="price-text">
+                                        {{-- <div data-animation="fadeInUp" data-delay="1.7s" class="price-text">
 
                                             <h3>Starting From /</h3>
 
                                             <h2>₹129</h2>
 
-                                        </div>
+                                        </div> --}}
 
                                         <div class="hero-button">
 
@@ -279,13 +279,13 @@
 
                                         </h1>
 
-                                        <div data-animation="fadeInUp" data-delay="1.7s" class="price-text">
+                                        {{-- <div data-animation="fadeInUp" data-delay="1.7s" class="price-text">
 
                                             <h3>Today's Deal /</h3>
 
                                             <h2>₹159</h2>
 
-                                        </div>
+                                        </div> --}}
 
                                         <div class="hero-button">
 
@@ -381,12 +381,12 @@
                                             <br>
                                             Delivered Fast
                                         </h1>
-
+{{-- 
                                         <div data-animation="fadeInUp" data-delay="1.7s" class="price-text">
                                             <h3>Meals Starting /</h3>
                                             <h2>₹99</h2>
 
-                                        </div>
+                                        </div> --}}
 
                                         <div class="hero-button">
 

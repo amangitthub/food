@@ -298,11 +298,10 @@
                                                     {{-- VIEW --}}
                                                     <li>
                                                         <a class="dropdown-item"
-                                                            href="{{ route('products.show', $product->id) }}">
+                                                            href="{{ route('admin.products.show', $product->id) }}">
                                                             <i class="bi bi-eye me-2"></i>
                                                             View
                                                         </a>
-
                                                     </li>
 
 

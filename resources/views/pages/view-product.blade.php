@@ -160,7 +160,7 @@
 
                     </h1>
 
-
+{{-- 
                     <div class="food-detail-status">
 
                         @if ($product->status === 'Active')
@@ -177,7 +177,7 @@
 
                         @endif
 
-                    </div>
+                    </div> --}}
 
 
                     <div class="food-product-meta">

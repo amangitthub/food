@@ -1,7 +1,7 @@
 <header class="section-bg">
 
     {{-- ======================HEADER TOP======================== --}}
-    <div class="header-top">
+    {{-- <div class="header-top">
         <div class="container">
             <div class="header-top-wrapper">
 
@@ -55,7 +55,7 @@
 
             </div>
         </div>
-    </div>
+    </div> --}}
 
 
     {{-- ===================== MAIN HEADER ======================== --}}
@@ -353,13 +353,64 @@
                             </a>
 
                         </div>
-
-
-                        {{-- CONTACT --}}
+                        {{-- login/register --}}
+                        {{-- Login / Logout --}}
                         <div class="header-button">
-                            <a href="{{ url('/contact') }}" class="theme-btn bg-red-2">
-                                Contact Us
-                            </a>
+
+                            @auth
+
+                                {{-- Logged In User --}}
+                                <div class="dropdown">
+
+                                    <a href="#" class="text-danger dropdown-toggle" data-bs-toggle="dropdown"
+                                        aria-expanded="false">
+
+                                        <i class="fa fa-user-circle fa-2x" aria-hidden="true"></i>
+
+                                    </a>
+
+                                    <ul class="dropdown-menu dropdown-menu-end">
+
+                                        <li>
+                                            <span class="dropdown-item-text">
+                                                Hi, {{ auth()->user()->name }}
+                                            </span>
+                                        </li>
+
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+
+                                        <li>
+                                            <a href="#" class="dropdown-item"
+                                                onclick="event.preventDefault(); document.getElementById('header-logout-form').submit();">
+
+                                                <i class="fa fa-sign-out-alt me-2"></i>
+                                                Logout
+                                            </a>
+                                        </li>
+
+                                    </ul>
+
+                                </div>
+
+                                {{-- Logout Form --}}
+                                <form id="header-logout-form" action="{{ route('logout') }}" method="POST"
+                                    style="display: none;">
+
+                                    @csrf
+
+                                </form>
+                            @else
+                                {{-- Login --}}
+                                <a href="javascript:void(0);" class="text-danger" data-bs-toggle="modal"
+                                    data-bs-target="#loginModal">
+
+                                    <i class="fa fa-user-circle fa-2x" aria-hidden="true"></i>
+
+                                </a>
+
+                            @endauth
 
                         </div>
 
@@ -479,7 +530,6 @@
 
 
                 {{-- NEW ARRIVALS --}}
-               
                 {{-- OFFERS --}}
                 {{-- <li class="food-mobile-dropdown">
 
@@ -513,12 +563,14 @@
                 </li> --}}
 
 
-                {{-- CONTACT --}}
-                <li>
-                    <a href="{{ url('/contact') }}">
-                        Contact
+                {{-- LOGIN / REGISTER --}}
+                <div class="header-button">
+                    <a href="javascript:void(0);" class="theme-btn bg-red-2 btn-sm px-3 py-2 rounded"
+                        data-bs-toggle="modal" data-bs-target="#loginModal">
+                        <i class="far fa-user"></i>
+                        Login
                     </a>
-                </li>
+                </div>
 
             </ul>
 
