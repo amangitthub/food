@@ -25,8 +25,8 @@
                                 <i class="far fa-search"></i>
                             </button>
 
-                            <input type="text" name="search" id="searchInput" placeholder="Search"
-                                aria-label="Search" value="{{ request('search') }}">
+                            <input type="text" name="search" id="searchInput" placeholder="Search" aria-label="Search"
+                                value="{{ request('search') }}">
 
                         </form>
                     </div>
@@ -255,7 +255,7 @@
                                         {{-- CONTACT --}}
                                         <li>
 
-                                            <a  href="{{ route('contact') }}">
+                                            <a href="{{ route('contact') }}">
                                                 Contact
                                             </a>
 
@@ -271,8 +271,6 @@
 
                     </div>
 
-
-                    {{-- ================= MOBILE MENU CONTAINER ================= --}}
                     <div class="mobile-menu"></div>
 
                     {{-- ================= RIGHT SIDE ================= --}}
@@ -280,85 +278,19 @@
 
                         {{-- CART --}}
                         <div class="menu-cart">
-                            <div class="cart-box">
-                                <ul>
-                                    <li>
-                                        <img src="{{ asset('assets/img/shop-food/s2.png') }}" alt="Food">
-                                        <div class="cart-product">
-
-                                            <a href="{{ route('site.products') }}">
-                                                Grilled Chicken
-                                            </a>
-
-                                            <span>
-                                                ₹168
-                                            </span>
-
-                                        </div>
-
-                                    </li>
-
-                                </ul>
-
-
-                                <ul>
-                                    <li class="border-none">
-                                        <img src="{{ asset('assets/img/shop-food/s3.png') }}" alt="Food">
-                                        <div class="cart-product">
-                                            <a href="{{ route('site.products') }}">
-                                                Grilled Chicken
-                                            </a>
-
-                                            <span>
-                                                ₹168
-                                            </span>
-
-                                        </div>
-
-                                    </li>
-
-                                </ul>
-
-
-                                <div class="shopping-items d-flex align-items-center justify-content-between">
-
-                                    <span>
-                                        Shopping : ₹20.00
-                                    </span>
-
-                                    <span>
-                                        Total : ₹168.00
-                                    </span>
-
-                                </div>
-
-
-                                <div class="cart-button d-flex justify-content-between mb-4">
-
-                                    <a href="{{ url('/cart') }}" class="theme-btn">
-                                        View Cart
-                                    </a>
-
-                                    <a href="{{ url('/checkout') }}" class="theme-btn bg-red-2">
-                                        Checkout
-                                    </a>
-
-                                </div>
-
-                            </div>
-
-
-                            <a href="{{ url('/cart') }}" class="cart-icon" aria-label="Shopping Cart">
+                            <a href="{{ route('cart') }}" class="cart-icon" aria-label="Shopping Cart">
                                 <i class="far fa-shopping-basket"></i>
-                            </a>
 
+                                <span class="header-cart-count"
+                                    style="{{ ($headerCartCount ?? 0) > 0 ? 'display:inline-flex;' : 'display:none;' }}">
+                                    {{ $headerCartCount ?? 0 }}
+                                </span>
+                            </a>
                         </div>
-                        {{-- login/register --}}
+
                         {{-- Login / Logout --}}
                         <div class="header-button">
-
                             @auth
-
                                 {{-- Logged In User --}}
                                 <div class="dropdown">
 
@@ -492,42 +424,28 @@
                             </a>
                         </li>
 
-                        {{-- <li>
-                            <a href="{{ url('/combos/burger') }}">
-                                Burger Combos
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="{{ url('/combos/pizza') }}">
-                                Pizza Combos
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="{{ url('/combos/family') }}">
-                                Family Combos
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="{{ url('/combos/meal') }}">
-                                Meal Combos
-                            </a>
-                        </li> --}}
-
                     </ul>
 
                 </li>
 
+                {{-- CART --}}
+                <div class="menu-cart">
+                    <a href="{{ route('cart') }}" class="cart-icon" aria-label="Shopping Cart">
+                        <i class="far fa-shopping-basket"></i>
+                        <span>Cart</span>
 
+                        <span class="header-cart-count"
+                            style="{{ ($headerCartCount ?? 0) > 0 ? 'display:inline-flex;' : 'display:none;' }}">
+                            {{ $headerCartCount ?? 0 }}
+                        </span>
+                    </a>
+                </div>
                 {{-- POPULAR --}}
                 {{-- <li>
                     <a href="{{ url('/popular') }}">
                         Popular
                     </a>
                 </li> --}}
-
 
                 {{-- NEW ARRIVALS --}}
                 {{-- OFFERS --}}

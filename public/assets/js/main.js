@@ -3,7 +3,7 @@
 
     $(document).ready(function () {
 
-        
+
         // =========================================================
         // MOBILE MENU - FOODKING SIDEBAR
         // =========================================================
@@ -771,33 +771,7 @@
             }
         });
 
-        //>> Quantity Cart Js Start <<//
-        let quantity = 0;
-        let price = 0;
-        $(".cart-item-quantity-amount, .product-quant").html(quantity);
-        $(".total-price, .product-pri").html(price.toFixed(2));
-        $(".cart-increment, .cart-incre").on("click", function () {
-            if (quantity <= 4) {
-                quantity++;
-                $(".cart-item-quantity-amount, .product-quant").html(quantity);
-                let basePrice = $(".base-price, .base-pri").text();
-                $(".total-price, .product-pri").html((basePrice * quantity).toFixed(2));
-            }
-        });
-
-        $(".cart-decrement, .cart-decre").on("click", function () {
-            if (quantity >= 1) {
-                quantity--;
-                $(".cart-item-quantity-amount, .product-quant").html(quantity);
-                let basePrice = $(".base-price, .base-pri").text();
-                $(".total-price, .product-pri").html((basePrice * quantity).toFixed(2));
-            }
-        });
-
-        $(".cart-item-remove>a").on("click", function () {
-            $(this).closest(".cart-item").hide(300);
-        });
-
+        
         //>> PaymentMethod Js Start <<//
         let paymentMethod = $("input[name='pay-method']:checked").val();
         $(".payment").html(paymentMethod);

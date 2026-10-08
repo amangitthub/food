@@ -8,6 +8,7 @@ use App\Http\Controllers\SiteComboController;
 use App\Http\Controllers\HomeController;
 use App\Models\Product;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CartController;
 
 
 // ================== Website Pages ==================
@@ -28,6 +29,20 @@ Route::get('/combos', [SiteComboController::class, 'index'])
 
 Route::view('/contact', 'pages.contact')
     ->name('contact');
+Route::post('/cart/add', [CartController::class, 'add'])
+    ->name('cart.add');
+
+Route::get('/cart', [CartController::class, 'index'])
+    ->name('cart');
+
+Route::post('/cart/update', [CartController::class, 'update'])
+    ->name('cart.update');
+
+Route::post('/cart/remove', [CartController::class, 'remove'])
+    ->name('cart.remove');
+
+Route::post('/cart/clear', [CartController::class, 'clear'])
+    ->name('cart.clear');
 
 
 //=================== Auth====================

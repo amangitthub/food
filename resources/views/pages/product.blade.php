@@ -8,8 +8,8 @@
 
     <style>
         /* =========================================================
-           PRODUCTS PAGE
-        ========================================================= */
+                       PRODUCTS PAGE
+                    ========================================================= */
 
         .food-products-page {
             padding: 70px 0;
@@ -18,8 +18,8 @@
 
 
         /* =========================================================
-           HEADING
-        ========================================================= */
+                       HEADING
+                    ========================================================= */
 
         .food-products-heading {
             text-align: center;
@@ -39,8 +39,8 @@
 
 
         /* =========================================================
-           CATEGORY FILTER
-        ========================================================= */
+                       CATEGORY FILTER
+                    ========================================================= */
 
         .food-category-filters {
             display: flex;
@@ -72,8 +72,8 @@
 
 
         /* =========================================================
-           PRODUCT CARD
-        ========================================================= */
+                       PRODUCT CARD
+                    ========================================================= */
 
         .food-product-card {
             height: 100%;
@@ -93,8 +93,8 @@
 
 
         /* =========================================================
-           PRODUCT IMAGE
-        ========================================================= */
+                       PRODUCT IMAGE
+                    ========================================================= */
 
         .food-product-image {
             height: 230px;
@@ -124,8 +124,8 @@
 
 
         /* =========================================================
-           PRODUCT INFO
-        ========================================================= */
+                       PRODUCT INFO
+                    ========================================================= */
 
         .food-product-info {
             padding: 20px;
@@ -160,8 +160,8 @@
 
 
         /* =========================================================
-           PRODUCT BOTTOM
-        ========================================================= */
+                       PRODUCT BOTTOM
+                    ========================================================= */
 
         .food-product-bottom {
             display: flex;
@@ -195,8 +195,8 @@
 
 
         /* =========================================================
-           EMPTY
-        ========================================================= */
+                       EMPTY
+                    ========================================================= */
 
         .food-empty-state {
             padding: 50px 20px;
@@ -207,8 +207,8 @@
 
 
         /* =========================================================
-           INFINITE SCROLL LOADER
-        ========================================================= */
+                       INFINITE SCROLL LOADER
+                    ========================================================= */
 
         .food-load-more-loader {
             width: 100%;
@@ -289,8 +289,8 @@
 
 
         /* =========================================================
-           NEW PRODUCTS SMALL FADE
-        ========================================================= */
+                       NEW PRODUCTS SMALL FADE
+                    ========================================================= */
 
         .food-new-product {
             animation: foodProductAppear .35s ease both;
@@ -312,8 +312,8 @@
 
 
         /* =========================================================
-           MOBILE
-        ========================================================= */
+                       MOBILE
+                    ========================================================= */
 
         @media (max-width: 575px) {
 
@@ -333,6 +333,57 @@
             .food-loader-spinner {
                 width: 19px;
                 height: 19px;
+            }
+
+        }
+
+        /* =========================================================
+       ADD TO CART BUTTON
+    ========================================================= */
+
+        .food-product-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .food-add-cart-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px 13px;
+            border: 0;
+            border-radius: 6px;
+            background: #ff8c1a;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .25s ease;
+        }
+
+        .food-add-cart-button:hover {
+            background: #071b2c;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .food-add-cart-button.added {
+            background: #198754;
+        }
+
+        @media (max-width: 575px) {
+
+            .food-product-actions {
+                width: 100%;
+            }
+
+            .food-product-button,
+            .food-add-cart-button {
+                flex: 1;
+                text-align: center;
             }
 
         }
@@ -477,28 +528,25 @@
                                 {{-- Bottom --}}
 
                                 <div class="food-product-bottom">
-
-
                                     {{-- Price --}}
-
                                     <span class="food-product-price">
-
                                         ₹{{ number_format((float) $product->price, 2) }}
-
                                     </span>
 
+                                    <button type="button" class="food-add-cart-button" data-id="{{ $product->id }}"
+                                        data-name="{{ $product->name }}" data-price="{{ (float) $product->price }}"
+                                        data-image="{{ $product->images->isNotEmpty() && $product->images->first()->image_path
+                                            ? asset($product->images->first()->image_path)
+                                            : '' }}">
+                                        <i class="bi bi-cart-plus"></i>
+                                        Add to Cart
+                                    </button>
 
                                     {{-- Details --}}
-
-                                    <a href="{{ route('products.show', $product->slug) }}"
-                                        class="food-product-button">
-
+                                    <a href="{{ route('products.show', $product->slug) }}" class="food-product-button">
                                         View Details
-
                                         <i class="bi bi-arrow-right ms-1"></i>
-
                                     </a>
-
                                 </div>
 
                             </div>
@@ -572,147 +620,151 @@
     </section>
 
 
-    {{-- =============================================================
-INFINITE SCROLL JAVASCRIPT
+{{-- =============================================================
+    INFINITE SCROLL + BACKEND CART JAVASCRIPT
 ============================================================= --}}
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    /* ============================================================
+       ELEMENTS
+    ============================================================ */
+
+    const productsContainer =
+        document.getElementById('foodProductsContainer');
+
+    const loader =
+        document.getElementById('foodLoadMoreLoader');
+
+    const noMoreProducts =
+        document.getElementById('foodNoMoreProducts');
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | Elements
-            |--------------------------------------------------------------------------
-            */
+    /* ============================================================
+       SAFETY CHECK
+    ============================================================ */
 
-            const productsContainer =
-                document.getElementById('foodProductsContainer');
-
-            const loader =
-                document.getElementById('foodLoadMoreLoader');
-
-            const noMoreProducts =
-                document.getElementById('foodNoMoreProducts');
+    if (!productsContainer) {
+        console.error('foodProductsContainer not found.');
+        return;
+    }
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | Pagination State
-            |--------------------------------------------------------------------------
-            */
+    /* ============================================================
+       PAGINATION STATE
+    ============================================================ */
 
-            let currentPage = {{ $products->currentPage() }};
+    let currentPage = Number(
+        @json($products->currentPage())
+    );
 
-            let lastPage = {{ $products->lastPage() }};
+    let lastPage = Number(
+        @json($products->lastPage())
+    );
 
-            let loading = false;
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Current Category
-            |--------------------------------------------------------------------------
-            */
-
-            const categoryId =
-                @json(request('category_id'));
+    let loading = false;
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | Show Loader
-            |--------------------------------------------------------------------------
-            */
+    /* ============================================================
+       CURRENT FILTER
+    ============================================================ */
 
-            function showLoader() {
+    const categoryId =
+        @json(request('category_id'));
 
-                if (loader) {
-
-                    loader.classList.add('show');
-
-                }
-
-            }
+    const searchValue =
+        @json(request('search'));
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | Hide Loader
-            |--------------------------------------------------------------------------
-            */
+    /* ============================================================
+       LOADER
+    ============================================================ */
 
-            function hideLoader() {
+    function showLoader() {
 
-                if (loader) {
+        if (loader) {
+            loader.classList.add('show');
+        }
 
-                    loader.classList.remove('show');
-
-                }
-
-            }
+    }
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | Escape HTML
-            |--------------------------------------------------------------------------
-            */
+    function hideLoader() {
 
-            function escapeHtml(value) {
+        if (loader) {
+            loader.classList.remove('show');
+        }
 
-                if (value === null || value === undefined) {
-
-                    return '';
-
-                }
-
-                const div = document.createElement('div');
-
-                div.textContent = value;
-
-                return div.innerHTML;
-
-            }
+    }
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | Create Product Card
-            |--------------------------------------------------------------------------
-            */
+    /* ============================================================
+       ESCAPE HTML
+    ============================================================ */
 
-            function createProductCard(product) {
+    function escapeHtml(value) {
 
-                const imageHtml = product.image
+        if (
+            value === null ||
+            value === undefined
+        ) {
+            return '';
+        }
 
-                    ?
-                    `
+        const div =
+            document.createElement('div');
+
+        div.textContent = String(value);
+
+        return div.innerHTML;
+    }
+
+
+    function escapeAttribute(value) {
+
+        return escapeHtml(value);
+    }
+
+
+    /* ============================================================
+       CREATE PRODUCT CARD
+    ============================================================ */
+
+    function createProductCard(product) {
+
+        const imageHtml = product.image
+            ?
+            `
                 <img
-                    src="${escapeHtml(product.image)}"
-                    alt="${escapeHtml(product.image_alt)}"
+                    src="${escapeAttribute(product.image)}"
+                    alt="${escapeAttribute(
+                        product.image_alt || product.name || 'Food'
+                    )}"
                     loading="lazy"
                 >
             `
-
-                    :
-                    `
+            :
+            `
                 <div class="food-product-placeholder">
                     <i class="bi bi-image"></i>
                 </div>
             `;
 
 
-                const description =
-                    product.short_description || 'Delicious food made for you.';
+        const description =
+            product.short_description ||
+            'Delicious food made for you.';
 
 
-                return `
+        const productPrice =
+            Number(product.price || 0).toFixed(2);
 
+
+        return `
             <div class="col-lg-4 col-md-6 food-new-product">
 
                 <div class="food-product-card">
-
 
                     <div class="food-product-image">
 
@@ -723,17 +775,20 @@ INFINITE SCROLL JAVASCRIPT
 
                     <div class="food-product-info">
 
-
                         <span class="food-product-category">
 
-                            ${escapeHtml(product.category)}
+                            ${escapeHtml(
+                                product.category || 'Food'
+                            )}
 
                         </span>
 
 
                         <h5>
 
-                            ${escapeHtml(product.name)}
+                            ${escapeHtml(
+                                product.name || ''
+                            )}
 
                         </h5>
 
@@ -741,7 +796,7 @@ INFINITE SCROLL JAVASCRIPT
                         <p>
 
                             ${escapeHtml(
-                                description.substring(0, 100)
+                                String(description).substring(0, 100)
                             )}
 
                         </p>
@@ -749,265 +804,573 @@ INFINITE SCROLL JAVASCRIPT
 
                         <div class="food-product-bottom">
 
-
                             <span class="food-product-price">
 
-                                ₹${escapeHtml(product.price)}
+                                ₹${productPrice}
 
                             </span>
 
 
-                            <a
-                                href="${escapeHtml(product.url)}"
-                                class="food-product-button"
-                            >
+                            <div class="food-product-actions">
 
-                                View Details
+                                <a
+                                    href="${escapeAttribute(
+                                        product.url || '#'
+                                    )}"
+                                    class="food-product-button"
+                                >
 
-                                <i class="bi bi-arrow-right ms-1"></i>
+                                    View Details
 
-                            </a>
+                                    <i class="bi bi-arrow-right ms-1"></i>
 
+                                </a>
+
+                            </div>
 
                         </div>
+
+
+                        {{-- Add To Cart --}}
+
+                        <button
+                            type="button"
+                            class="food-add-cart-button"
+                            data-id="${escapeAttribute(product.id)}"
+                            data-name="${escapeAttribute(
+                                product.name || ''
+                            )}"
+                            data-price="${productPrice}"
+                            data-image="${escapeAttribute(
+                                product.image || ''
+                            )}"
+                        >
+
+                            <i class="bi bi-cart-plus"></i>
+
+                            Add to Cart
+
+                        </button>
 
                     </div>
 
                 </div>
 
             </div>
-
         `;
+    }
+
+
+    /* ============================================================
+       LOAD MORE PRODUCTS
+    ============================================================ */
+
+    async function loadMoreProducts() {
+
+        /* Already loading */
+        if (loading) {
+            return;
+        }
+
+
+        /* No more pages */
+        if (currentPage >= lastPage) {
+
+            hideLoader();
+
+            if (noMoreProducts) {
+                noMoreProducts.style.display = 'block';
+            }
+
+            return;
+        }
+
+
+        loading = true;
+
+        showLoader();
+
+
+        const nextPage =
+            currentPage + 1;
+
+
+        try {
+
+            /* ====================================================
+               BUILD URL
+            ==================================================== */
+
+            const url = new URL(
+                "{{ route('site.products') }}",
+                window.location.origin
+            );
+
+
+            url.searchParams.set(
+                'page',
+                nextPage
+            );
+
+
+            /* Category filter */
+
+            if (
+                categoryId !== null &&
+                categoryId !== undefined &&
+                categoryId !== ''
+            ) {
+
+                url.searchParams.set(
+                    'category_id',
+                    categoryId
+                );
 
             }
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | Load More Products
-            |--------------------------------------------------------------------------
-            */
+            /* Search filter */
 
-            async function loadMoreProducts() {
+            if (
+                searchValue !== null &&
+                searchValue !== undefined &&
+                searchValue !== ''
+            ) {
 
-
-                // Already loading
-                if (loading) {
-
-                    return;
-
-                }
-
-
-                // No more pages
-                if (currentPage >= lastPage) {
-
-                    hideLoader();
-
-                    return;
-
-                }
-
-
-                loading = true;
-
-
-                showLoader();
-
-
-                const nextPage = currentPage + 1;
-
-
-                try {
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Build URL
-                    |--------------------------------------------------------------------------
-                    */
-
-                    const url = new URL(
-                        "{{ route('site.products') }}",
-                        window.location.origin
-                    );
-
-
-                    url.searchParams.set(
-                        'page',
-                        nextPage
-                    );
-
-
-                    if (categoryId) {
-
-                        url.searchParams.set(
-                            'category_id',
-                            categoryId
-                        );
-
-                    }
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | AJAX Request
-                    |--------------------------------------------------------------------------
-                    */
-
-                    const response = await fetch(
-                        url.toString(), {
-                            method: 'GET',
-
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest',
-
-                                'Accept': 'application/json'
-                            }
-                        }
-                    );
-
-
-                    if (!response.ok) {
-
-                        throw new Error(
-                            'Failed to load products.'
-                        );
-
-                    }
-
-
-                    const data = await response.json();
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Add Products
-                    |--------------------------------------------------------------------------
-                    */
-
-                    if (data.products && data.products.length) {
-
-                        data.products.forEach(function(product) {
-
-                            productsContainer.insertAdjacentHTML(
-                                'beforeend',
-                                createProductCard(product)
-                            );
-
-                        });
-
-                    }
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Update Page
-                    |--------------------------------------------------------------------------
-                    */
-
-                    currentPage = data.current_page;
-
-                    lastPage = data.last_page;
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | No More Products
-                    |--------------------------------------------------------------------------
-                    */
-
-                    if (!data.has_more) {
-
-                        if (noMoreProducts) {
-
-                            noMoreProducts.style.display = 'block';
-
-                        }
-
-                    }
-
-
-                } catch (error) {
-
-                    console.error(
-                        'Infinite Scroll Error:',
-                        error
-                    );
-
-                } finally {
-
-                    loading = false;
-
-                    hideLoader();
-
-                }
+                url.searchParams.set(
+                    'search',
+                    searchValue
+                );
 
             }
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | Scroll Detection
-            |--------------------------------------------------------------------------
-            */
+            /* ====================================================
+               AJAX REQUEST
+            ==================================================== */
 
-            window.addEventListener(
-                'scroll',
-                function() {
+            const response = await fetch(
+                url.toString(),
+                {
+                    method: 'GET',
 
+                    headers: {
+                        'X-Requested-With':
+                            'XMLHttpRequest',
 
-                    if (loading) {
-
-                        return;
-
+                        'Accept':
+                            'application/json'
                     }
-
-
-                    if (currentPage >= lastPage) {
-
-                        return;
-
-                    }
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | User bottom ke paas pahunch gaya
-                    |--------------------------------------------------------------------------
-                    */
-
-                    const scrollPosition =
-                        window.innerHeight +
-                        window.scrollY;
-
-
-                    const pageHeight =
-                        document.documentElement.scrollHeight;
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | 500px before bottom
-                    |--------------------------------------------------------------------------
-                    */
-
-                    if (
-                        scrollPosition >=
-                        pageHeight - 500
-                    ) {
-
-                        loadMoreProducts();
-
-                    }
-
-                }, {
-                    passive: true
                 }
             );
 
 
-        });
-    </script>
+            if (!response.ok) {
+
+                throw new Error(
+                    'Failed to load products.'
+                );
+
+            }
+
+
+            const data =
+                await response.json();
+
+
+            console.log(
+                'Infinite Scroll Response:',
+                data
+            );
+
+
+            /* ====================================================
+               ADD PRODUCTS
+            ==================================================== */
+
+            if (
+                Array.isArray(data.products) &&
+                data.products.length > 0
+            ) {
+
+                data.products.forEach(function (product) {
+
+                    productsContainer.insertAdjacentHTML(
+                        'beforeend',
+                        createProductCard(product)
+                    );
+
+                });
+
+            }
+
+
+            /* ====================================================
+               UPDATE PAGINATION
+            ==================================================== */
+
+            if (
+                data.current_page !== undefined
+            ) {
+
+                currentPage =
+                    Number(data.current_page);
+
+            } else {
+
+                currentPage =
+                    nextPage;
+
+            }
+
+
+            if (
+                data.last_page !== undefined
+            ) {
+
+                lastPage =
+                    Number(data.last_page);
+
+            }
+
+
+            /* ====================================================
+               NO MORE PRODUCTS
+            ==================================================== */
+
+            const hasMore =
+                Boolean(data.has_more);
+
+
+            if (!hasMore || currentPage >= lastPage) {
+
+                if (noMoreProducts) {
+
+                    noMoreProducts.style.display =
+                        'block';
+
+                }
+
+            } else {
+
+                if (noMoreProducts) {
+
+                    noMoreProducts.style.display =
+                        'none';
+
+                }
+
+            }
+
+
+        } catch (error) {
+
+            console.error(
+                'Infinite Scroll Error:',
+                error
+            );
+
+        } finally {
+
+            loading = false;
+
+            hideLoader();
+
+        }
+
+    }
+
+
+    /* ============================================================
+       SCROLL DETECTION
+    ============================================================ */
+
+    function checkScrollPosition() {
+
+        if (loading) {
+            return;
+        }
+
+
+        if (currentPage >= lastPage) {
+            return;
+        }
+
+
+        const scrollPosition =
+            window.innerHeight +
+            window.scrollY;
+
+
+        const pageHeight =
+            document.documentElement.scrollHeight;
+
+
+        /*
+         * Load next page 700px before bottom.
+         */
+
+        if (
+            scrollPosition >=
+            pageHeight - 700
+        ) {
+
+            loadMoreProducts();
+
+        }
+
+    }
+
+
+    /* ============================================================
+       SCROLL EVENT
+    ============================================================ */
+
+    window.addEventListener(
+        'scroll',
+        checkScrollPosition,
+        {
+            passive: true
+        }
+    );
+
+
+    /* ============================================================
+       BACKEND ADD TO CART
+       GUEST  -> SESSION
+       LOGIN  -> DATABASE
+    ============================================================ */
+
+    document.addEventListener(
+        'click',
+        async function (event) {
+
+            const button =
+                event.target.closest(
+                    '.food-add-cart-button'
+                );
+
+
+            if (!button) {
+                return;
+            }
+
+
+            /* Prevent double click */
+
+            if (button.disabled) {
+                return;
+            }
+
+
+            /* Product ID */
+
+            const productId =
+                Number(button.dataset.id);
+
+
+            if (!productId) {
+
+                alert(
+                    'Product ID not found.'
+                );
+
+                return;
+            }
+
+
+            /* Original button */
+
+            const originalHtml =
+                button.innerHTML;
+
+
+            /* Loading */
+
+            button.disabled = true;
+
+            button.innerHTML =
+                '<i class="bi bi-hourglass-split"></i> Adding...';
+
+
+            try {
+
+                /* =================================================
+                   SEND TO LARAVEL
+                ================================================= */
+
+                const response =
+                    await fetch(
+                        "{{ route('cart.add') }}",
+                        {
+                            method: 'POST',
+
+                            headers: {
+
+                                'Content-Type':
+                                    'application/json',
+
+                                'Accept':
+                                    'application/json',
+
+                                'X-CSRF-TOKEN':
+                                    document
+                                        .querySelector(
+                                            'meta[name="csrf-token"]'
+                                        )
+                                        ?.getAttribute(
+                                            'content'
+                                        ),
+
+                                'X-Requested-With':
+                                    'XMLHttpRequest'
+                            },
+
+                            body:
+                                JSON.stringify({
+                                    product_id:
+                                        productId,
+
+                                    quantity:
+                                        1
+                                })
+                        }
+                    );
+
+
+                /* =================================================
+                   RESPONSE
+                ================================================= */
+
+                const data =
+                    await response.json();
+
+
+                if (
+                    !response.ok ||
+                    !data.success
+                ) {
+
+                    throw new Error(
+                        data.message ||
+                        'Unable to add product to cart.'
+                    );
+
+                }
+
+
+                /* =================================================
+                   UPDATE HEADER CART COUNT
+                ================================================= */
+
+                const headerCartCount =
+                    document.getElementById(
+                        'headerCartCount'
+                    );
+
+
+                if (headerCartCount) {
+
+                    const count =
+                        Number(
+                            data.cart_count || 0
+                        );
+
+
+                    headerCartCount.textContent =
+                        count;
+
+
+                    headerCartCount.style.display =
+                        count > 0
+                            ? 'inline-flex'
+                            : 'none';
+
+                }
+
+
+                /* =================================================
+                   SUCCESS
+                ================================================= */
+
+                button.innerHTML =
+                    '<i class="bi bi-check-lg"></i> Added';
+
+
+                button.classList.add(
+                    'added'
+                );
+
+
+                /* =================================================
+                   RESTORE BUTTON
+                ================================================= */
+
+                setTimeout(
+                    function () {
+
+                        button.innerHTML =
+                            originalHtml;
+
+                        button.classList.remove(
+                            'added'
+                        );
+
+                        button.disabled =
+                            false;
+
+                    },
+                    1000
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    'Add To Cart Error:',
+                    error
+                );
+
+
+                /* Restore */
+
+                button.innerHTML =
+                    originalHtml;
+
+                button.classList.remove(
+                    'added'
+                );
+
+                button.disabled =
+                    false;
+
+
+                alert(
+                    error.message ||
+                    'Something went wrong while adding the product.'
+                );
+
+            }
+
+        }
+    );
+
+
+    /* ============================================================
+       INITIAL CHECK
+       Useful when page content is shorter than viewport.
+    ============================================================ */
+
+    setTimeout(
+        function () {
+
+            checkScrollPosition();
+
+        },
+        300
+    );
+
+});
+</script>
 
 @endsection
