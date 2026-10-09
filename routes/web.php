@@ -9,7 +9,8 @@ use App\Http\Controllers\HomeController;
 use App\Models\Product;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
-
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AddressController;
 
 // ================== Website Pages ==================
 
@@ -60,6 +61,34 @@ Route::post('/register', [AuthController::class, 'register'])
 
 Route::post('/logout', [AuthController::class, 'logout'])
     ->name('logout');
+
+
+// ================== User Profile & Addresses ==================
+
+Route::middleware('auth')->group(function () {
+
+    Route::get('/profile', [ProfileController::class, 'index'])
+        ->name('profile');
+
+    Route::put('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
+
+    Route::get('/my-addresses', [AddressController::class, 'index'])
+        ->name('addresses.index');
+
+    Route::post('/my-addresses', [AddressController::class, 'store'])
+        ->name('addresses.store');
+
+    Route::put('/my-addresses/{id}', [AddressController::class, 'update'])
+        ->name('addresses.update');
+
+    Route::delete('/my-addresses/{id}', [AddressController::class, 'destroy'])
+        ->name('addresses.destroy');
+
+    Route::post('/my-addresses/{id}/default', [AddressController::class, 'makeDefault'])
+        ->name('addresses.default');
+});
+
 
 // ================== Admin Dashboard ==================
 

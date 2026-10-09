@@ -63,10 +63,10 @@
                                             <h2>₹149</h2>
 
                                         </div> --}}
-
+                     
                                         <div class="hero-button">
 
-                                            <a href="{{ url('/products') }}" class="theme-btn" data-animation="fadeInUp"
+                                            <a href="{{ route('site.products')}}" class="theme-btn" data-animation="fadeInUp"
                                                 data-delay="1.9s">
 
                                                 <span class="button-content-wrapper d-flex align-items-center">
@@ -176,7 +176,7 @@
 
                                         <div class="hero-button">
 
-                                            <a href="{{ url('/products') }}" class="theme-btn" data-animation="fadeInUp"
+                                            <a href="{{ route('site.products') }}" class="theme-btn" data-animation="fadeInUp"
                                                 data-delay="1.9s">
 
                                                 <span class="button-content-wrapper d-flex align-items-center">
@@ -289,7 +289,7 @@
 
                                         <div class="hero-button">
 
-                                            <a href="{{ url('/products') }}" class="theme-btn" data-animation="fadeInUp"
+                                            <a href="{{ route('site.products')}}" class="theme-btn" data-animation="fadeInUp"
                                                 data-delay="1.9s">
 
                                                 <span class="button-content-wrapper d-flex align-items-center">
@@ -342,9 +342,7 @@
                     </div>
                 </div>
 
-                {{-- =========================
-            SLIDE 4
-            ========================== --}}
+                {{-- =========================          SLIDE 4            ========================== --}}
                 <div class="swiper-slide">
 
                     <div class="hero-2 bg-cover"
@@ -390,7 +388,7 @@
 
                                         <div class="hero-button">
 
-                                            <a href="{{ url('/products') }}" class="theme-btn" data-animation="fadeInUp"
+                                            <a href="{{ route('site.products')}}" class="theme-btn" data-animation="fadeInUp"
                                                 data-delay="1.9s">
 
                                                 <span class="button-content-wrapper d-flex align-items-center">
@@ -438,8 +436,7 @@
     </section>
     <!-- Hero Section End -->
 
-    {{-- ========================FOOD CATEGORY SECTION Popular food categories
-========================================================= --}}
+    {{-- ========================FOOD CATEGORY SECTION Popular food categories============== --}}
     <section class="food-category-section fix section-padding section-bg">
 
         {{-- Decorative Tomato Shape --}}
@@ -509,7 +506,7 @@
 
                             <div class="catagory-product-image text-center">
 
-                                <a href="{{ url('/products') }}">
+                                <a href="{{ route('site.products') }}">
 
                                     <img src="{{ asset('assets/img/food/pizza.png') }}" alt="Pizza">
 
@@ -535,7 +532,7 @@
                                 </div>
 
                                 <h3>
-                                    <a href="{{ url('/products') }}">Pizza </a>
+                                    <a href="{{ route('site.products') }}">Pizza </a>
                                 </h3>
 
                                 <p> Fresh & Cheesy Pizza </p>
@@ -557,7 +554,7 @@
                             <h5> 10+ Products </h5>
                             <div class="catagory-product-image text-center">
 
-                                <a href="{{ url('/products') }}">
+                                <a href="{{route('site.products')}}">
                                     <img src="{{ asset('assets/img/food/pasta.png') }}" alt="Pasta">
                                     <div class="decor-leaf">
                                         <img src="{{ asset('assets/img/shape/decor-leaf.svg') }}" alt="Decoration">
@@ -582,7 +579,7 @@
                                 </div>
 
                                 <h3>
-                                    <a href="{{ url('/products') }}">
+                                    <a href="{{ route('site.products')}}">
                                         Pasta
                                     </a>
                                 </h3>
@@ -610,7 +607,7 @@
 
                             <div class="catagory-product-image text-center">
 
-                                <a href="{{ url('/products') }}">
+                                <a href="{{ route('site.products') }}">
 
                                     <img src="{{ asset('assets/img/food/burger.png') }}" alt="Burger">
 
@@ -640,7 +637,7 @@
                                 </div>
 
                                 <h3>
-                                    <a href="{{ url('/products') }}">
+                                    <a href="{{ route('site.products') }}">
                                         Burgers
                                     </a>
                                 </h3>
@@ -668,7 +665,7 @@
 
                             <div class="catagory-product-image text-center">
 
-                                <a href="{{ url('/products') }}">
+                                <a href="{{ route('site.products') }}">
 
                                     <img src="{{ asset('assets/img/food/french-fry.png') }}" alt="French Fries">
 
@@ -698,7 +695,7 @@
                                 </div>
 
                                 <h3>
-                                    <a href="{{ url('/products') }}">
+                                    <a href="{{ route('site.products')}}">
                                         Snacks
                                     </a>
                                 </h3>
@@ -847,7 +844,7 @@
 
                             {{-- Order Button --}}
                             <div class="grilled-button wow fadeInUp" data-wow-delay=".7s">
-                                <a href="{{ url('/products') }}" class="theme-btn">
+                                <a href="{{ route('site.products')}}" class="theme-btn">
                                     <span class="button-content-wrapper d-flex align-items-center">
                                         <span class="button-icon">
                                             <i class="flaticon-delivery"></i>

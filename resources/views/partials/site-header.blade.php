@@ -312,6 +312,16 @@
                                         <li>
                                             <hr class="dropdown-divider">
                                         </li>
+                                        <li>
+                                            <a href="{{ url('/profile') }}" class="dropdown-item">
+                                                <i class="fa fa-user-circle me-2"></i>
+                                                <span>Profile</span>
+                                            </a>
+                                        </li>
+
+                                         <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
 
                                         <li>
                                             <a href="#" class="dropdown-item"
@@ -425,7 +435,8 @@
                         </li>
 
                     </ul>
-
+                 {{-- CONTACT --}}
+                        <li> <a href="{{ route('contact') }}"> Contact </a>    </li>
                 </li>
 
                 {{-- CART --}}

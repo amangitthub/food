@@ -1007,6 +1007,141 @@
 
                     </div>
 
+{{-- DELIVERY ADDRESS
+<div class="food-checkout-card">
+
+    <div class="food-checkout-card-header">
+        <div class="food-checkout-icon">
+            <i class="fa fa-map-marker-alt"></i>
+        </div>
+        <div>
+            <h3>Delivery Address</h3>
+            <p>Select a saved address or add a new one.</p>
+        </div>
+    </div>
+
+    @auth
+        <div class="mb-3">
+            <label for="savedAddressSelect" class="food-form-label">
+                Select Delivery Address
+            </label>
+
+            <select id="savedAddressSelect"
+                    class="food-form-input"
+                    style="padding-left:14px;">
+
+                <option value="">-- Select an Address --</option>
+
+                @foreach(($addresses ?? collect()) as $savedAddress)
+                    <option
+                        value="{{ $savedAddress->id }}"
+                        data-name="{{ $savedAddress->name }}"
+                        data-mobile="{{ $savedAddress->mobile }}"
+                        data-address="{{ $savedAddress->address }}"
+                        data-city="{{ $savedAddress->city }}"
+                        data-state="{{ $savedAddress->state }}"
+                        data-pincode="{{ $savedAddress->pincode }}"
+                        @selected($savedAddress->is_default === 'Yes')
+                    >
+                        {{ $savedAddress->name }} -
+                        {{ $savedAddress->address }},
+                        {{ $savedAddress->city }}
+                        @if($savedAddress->is_default === 'Yes')
+                            (Default)
+                        @endif
+                    </option>
+                @endforeach
+
+                <option value="new">+ Add New Address</option>
+            </select>
+
+            <a href="{{ route('addresses.index') }}"
+               class="d-inline-block mt-2"
+               style="color:#ff8c1a;font-weight:600;">
+                <i class="fa fa-plus-circle"></i>
+                Manage Saved Addresses
+            </a>
+        </div>
+    @endauth
+
+    <div id="newAddressForm">
+        <div class="row g-3">
+
+            <div class="col-12">
+                <label for="customerName" class="food-form-label">
+                    Full Name <span>*</span>
+                </label>
+                <input type="text"
+                       id="customerName"
+                       class="food-form-input"
+                       value="{{ auth()->user()->name ?? '' }}"
+                       placeholder="Enter full name">
+            </div>
+
+            <div class="col-12 col-md-6">
+                <label for="customerPhone" class="food-form-label">
+                    Mobile Number <span>*</span>
+                </label>
+                <input type="tel"
+                       id="customerPhone"
+                       class="food-form-input"
+                       value="{{ auth()->user()->mobile ?? '' }}"
+                       placeholder="Enter mobile number">
+            </div>
+
+            <div class="col-12">
+                <label for="customerAddress" class="food-form-label">
+                    Full Address <span>*</span>
+                </label>
+                <textarea id="customerAddress"
+                          class="food-form-input"
+                          rows="2"
+                          placeholder="House / Flat No., Street, Area"></textarea>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <label for="customerCity" class="food-form-label">
+                    City <span>*</span>
+                </label>
+                <input type="text"
+                       id="customerCity"
+                       class="food-form-input"
+                       placeholder="Enter city">
+            </div>
+
+            <div class="col-12 col-md-6">
+                <label for="customerState" class="food-form-label">
+                    State <span>*</span>
+                </label>
+                <input type="text"
+                       id="customerState"
+                       class="food-form-input"
+                       placeholder="Enter state">
+            </div>
+
+            <div class="col-12 col-md-6">
+                <label for="customerPincode" class="food-form-label">
+                    Pincode <span>*</span>
+                </label>
+                <input type="text"
+                       id="customerPincode"
+                       class="food-form-input"
+                       maxlength="6"
+                       placeholder="Enter pincode">
+            </div>
+
+            @auth
+                <div class="col-12">
+                    <label style="display:flex;align-items:center;gap:8px;">
+                        <input type="checkbox" id="saveNewAddress" checked>
+                        Save this address to my account
+                    </label>
+                </div>
+            @endauth
+
+        </div>
+    </div>
+</div> --}}
 
                     {{-- PAYMENT --}}
                     <div class="food-checkout-card">
@@ -1055,7 +1190,7 @@
                             </label>
 
 
-                            <label class="food-payment-option">
+                            {{-- <label class="food-payment-option">
 
                                 <input type="radio" name="payment_method" value="online">
 
@@ -1075,7 +1210,7 @@
 
                                 <i class="fa fa-credit-card"></i>
 
-                            </label>
+                            </label> --}}
 
                         </div>
 

@@ -3,7 +3,6 @@
 <div class="modal fade food-login-modal" id="loginModal" tabindex="-1"
     aria-labelledby="loginModalLabel" aria-hidden="true">
 
-```
 <div class="modal-dialog modal-dialog-centered">
 
     <div class="modal-content food-login-content">
@@ -41,10 +40,9 @@
                         </p>
 
                         <div class="login-food-line"></div>
-
-                        <span>
+                        {{-- <span>
                             Fresh • Tasty • Made With Love
-                        </span>
+                        </span> --}}
 
                     </div>
 
@@ -158,13 +156,13 @@
 
                             <label class="food-remember">
 
-                                <input
+                                {{-- <input
                                     type="checkbox"
                                     name="remember"
                                     value="1"
                                 >
 
-                                <span>Remember me</span>
+                                <span>Remember me</span> --}}
 
                             </label>
 

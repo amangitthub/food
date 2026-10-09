@@ -9,14 +9,10 @@
 @section('content')
 
 <style>
-    /* ================= MAIN SECTION ================= */
-
     .food-product-details-section {
         padding: 70px 0;
         background: #f8f9fa;
     }
-
-    /* ================= BACK ================= */
 
     .food-product-back {
         margin-bottom: 25px;
@@ -35,8 +31,6 @@
     .food-product-back a:hover {
         color: #e63946;
     }
-
-    /* ================= GALLERY ================= */
 
     .food-gallery {
         position: relative;
@@ -86,13 +80,8 @@
         color: #fff;
     }
 
-    .gallery-prev {
-        left: 15px;
-    }
-
-    .gallery-next {
-        right: 15px;
-    }
+    .gallery-prev { left: 15px; }
+    .gallery-next { right: 15px; }
 
     .gallery-counter {
         text-align: center;
@@ -131,18 +120,12 @@
         border-radius: 6px;
     }
 
-    .gallery-thumbnail:hover {
-        border-color: #999;
-    }
-
-    .gallery-thumbnail.active {
-        border-color: #e63946;
-    }
-
-    /* ================= DETAILS ================= */
+    .gallery-thumbnail:hover { border-color: #999; }
+    .gallery-thumbnail.active { border-color: #e63946; }
 
     .food-detail-content {
         padding: 10px 0;
+        min-width: 0;
     }
 
     .food-detail-category {
@@ -161,11 +144,13 @@
         font-weight: 700;
         color: #222;
         margin-bottom: 15px;
+        overflow-wrap: anywhere;
     }
 
     .food-product-meta {
         display: flex;
-        gap: 50px;
+        flex-wrap: wrap;
+        gap: 30px;
         padding: 20px 0;
         border-top: 1px solid #eee;
         border-bottom: 1px solid #eee;
@@ -195,11 +180,7 @@
         margin: 25px 0;
     }
 
-    /* ================= DESCRIPTION ================= */
-
-    .food-description-block {
-        margin-top: 25px;
-    }
+    .food-description-block { margin-top: 25px; }
 
     .food-description-block h5 {
         font-size: 18px;
@@ -212,13 +193,13 @@
         color: #666;
         line-height: 1.8;
         margin: 0;
+        overflow-wrap: anywhere;
     }
-
-    /* ================= ADD TO CART ================= */
 
     .food-add-cart-box {
         display: flex;
         align-items: center;
+        flex-wrap: wrap;
         gap: 15px;
         margin: 25px 0 10px;
     }
@@ -226,6 +207,7 @@
     .food-quantity-box {
         display: flex;
         align-items: center;
+        flex-shrink: 0;
         height: 52px;
         border: 1px solid #e2e2e2;
         border-radius: 6px;
@@ -250,8 +232,13 @@
         color: #fff;
     }
 
+    .food-qty-btn:disabled {
+        opacity: .5;
+        cursor: not-allowed;
+    }
+
     #productQuantity {
-        width: 45px;
+        width: 50px;
         height: 52px;
         border: 0;
         border-left: 1px solid #eee;
@@ -266,7 +253,7 @@
 
     .food-add-cart-btn {
         min-height: 52px;
-        padding: 0 28px;
+        padding: 0 22px;
         border: 0;
         border-radius: 6px;
         background: linear-gradient(135deg, #e63946, #ff7a00);
@@ -289,8 +276,8 @@
     }
 
     .food-add-cart-btn:disabled {
-        cursor: default;
-        opacity: .95;
+        cursor: not-allowed;
+        opacity: .75;
         transform: none;
     }
 
@@ -304,79 +291,77 @@
         font-weight: 600;
     }
 
-    .food-cart-success-message.show {
-        display: flex;
-    }
-
-    /* ================= COMBO ================= */
+    .food-cart-success-message.show { display: flex; }
 
     .combo-items-section {
-        margin-top: 65px;
-        padding: 55px 0 10px;
+        width: 100%;
+        margin-top: 28px;
+        padding: 25px 0 5px;
         border-top: 1px solid #e5e5e5;
     }
 
     .combo-items-heading {
-        text-align: center;
-        margin-bottom: 38px;
+        text-align: left;
+        margin-bottom: 20px;
     }
 
     .combo-items-label {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 7px 15px;
+        padding: 6px 12px;
         background: #fff0f1;
         color: #e63946;
         border-radius: 50px;
-        font-size: 11px;
+        font-size: 10px;
         font-weight: 800;
-        letter-spacing: 1.2px;
-        margin-bottom: 13px;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
     }
 
     .combo-items-heading h2 {
         margin: 0;
         color: #222;
-        font-size: 30px;
-        line-height: 1.3;
+        font-size: 24px;
+        line-height: 1.35;
         font-weight: 700;
     }
 
     .combo-heading-line {
-        width: 45px;
+        width: 42px;
         height: 3px;
         background: #e63946;
         border-radius: 5px;
-        margin: 14px auto;
+        margin: 10px 0;
     }
 
     .combo-items-heading p {
         margin: 0;
         color: #888;
-        font-size: 14px;
+        font-size: 13px;
+        line-height: 1.6;
     }
 
     .combo-item-card {
         position: relative;
+        width: 100%;
         height: 100%;
         overflow: hidden;
         background: #fff;
         border: 1px solid #ededed;
-        border-radius: 18px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, .035);
-        transition: transform .3s ease, box-shadow .3s ease;
+        border-radius: 12px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, .04);
+        transition: box-shadow .25s ease;
     }
 
     .combo-item-card:hover {
-        transform: translateY(-7px);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, .09);
+        box-shadow: 0 8px 22px rgba(0, 0, 0, .09);
     }
 
     .combo-item-image {
         position: relative;
         width: 100%;
-        height: 210px;
+        height: 145px;
         overflow: hidden;
         background: #f4f4f4;
     }
@@ -390,13 +375,13 @@
 
     .combo-item-badge {
         position: absolute;
-        top: 13px;
-        right: 13px;
-        padding: 6px 11px;
-        background: rgba(255, 255, 255, .94);
+        top: 8px;
+        right: 8px;
+        padding: 5px 9px;
+        background: rgba(255, 255, 255, .95);
         color: #e63946;
         border-radius: 50px;
-        font-size: 11px;
+        font-size: 10px;
         font-weight: 700;
     }
 
@@ -407,28 +392,27 @@
         align-items: center;
         justify-content: center;
         color: #aaa;
-        font-size: 42px;
+        font-size: 32px;
     }
 
     .combo-item-content {
-        padding: 18px 20px 20px;
+        padding: 12px 8px;
         text-align: center;
     }
 
     .combo-item-content h4 {
         margin: 0;
         color: #222;
-        font-size: 18px;
-        line-height: 1.4;
+        font-size: 14px;
+        line-height: 1.45;
         font-weight: 700;
+        overflow-wrap: anywhere;
     }
 
-    /* ================= PRODUCT TYPE ================= */
-
     .food-product-type-section {
-        margin-top: 50px;
+        margin-top: 35px;
         background: #fff;
-        padding: 30px;
+        padding: 25px;
         border-radius: 18px;
         border: 1px solid #eee;
     }
@@ -443,20 +427,14 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        gap: 15px;
         padding: 15px 20px;
         background: #f8f9fa;
         border-radius: 10px;
     }
 
-    .food-type-box span {
-        color: #777;
-    }
-
-    .food-type-box strong {
-        text-transform: capitalize;
-    }
-
-    /* ================= PLACEHOLDER ================= */
+    .food-type-box span { color: #777; }
+    .food-type-box strong { text-transform: capitalize; }
 
     .food-detail-placeholder {
         width: 100%;
@@ -476,49 +454,27 @@
         margin-bottom: 10px;
     }
 
-    /* ================= RESPONSIVE ================= */
+    @media (max-width: 1199px) {
+        .food-add-cart-box { gap: 10px; }
+        .food-add-cart-btn { padding: 0 16px; }
+        .food-qty-btn { width: 38px; }
+        #productQuantity { width: 38px; }
+        .combo-item-image { height: 130px; }
+    }
 
     @media (max-width: 991px) {
-        .food-gallery {
-            height: 400px;
-        }
-
-        .food-detail-title {
-            font-size: 36px;
-        }
-
-        .combo-items-section {
-            margin-top: 50px;
-            padding-top: 45px;
-        }
+        .food-gallery { height: 400px; }
+        .food-detail-title { font-size: 36px; }
+        .combo-item-image { height: 165px; }
     }
 
     @media (max-width: 575px) {
-        .food-product-details-section {
-            padding: 40px 0;
-        }
-
-        .food-gallery {
-            height: 320px;
-            border-radius: 15px;
-        }
-
-        .gallery-main-image {
-            padding: 15px;
-        }
-
-        .gallery-arrow {
-            width: 40px;
-            height: 40px;
-        }
-
-        .gallery-prev {
-            left: 8px;
-        }
-
-        .gallery-next {
-            right: 8px;
-        }
+        .food-product-details-section { padding: 40px 0; }
+        .food-gallery { height: 320px; border-radius: 15px; }
+        .gallery-main-image { padding: 15px; }
+        .gallery-arrow { width: 40px; height: 40px; }
+        .gallery-prev { left: 8px; }
+        .gallery-next { right: 8px; }
 
         .gallery-thumbnail {
             flex-basis: 70px;
@@ -526,17 +482,9 @@
             height: 70px;
         }
 
-        .food-detail-title {
-            font-size: 30px;
-        }
-
-        .food-product-meta {
-            gap: 25px;
-        }
-
-        .food-detail-price {
-            font-size: 28px;
-        }
+        .food-detail-title { font-size: 30px; }
+        .food-product-meta { gap: 25px; }
+        .food-detail-price { font-size: 28px; }
 
         .food-add-cart-box {
             flex-direction: column;
@@ -548,868 +496,489 @@
             justify-content: center;
         }
 
-        .food-add-cart-btn {
-            width: 100%;
-        }
+        .food-add-cart-btn { width: 100%; }
 
         .combo-items-section {
-            margin-top: 40px;
-            padding-top: 35px;
+            margin-top: 24px;
+            padding-top: 20px;
         }
 
-        .combo-items-heading {
-            margin-bottom: 28px;
-        }
+        .combo-items-heading { margin-bottom: 18px; }
+        .combo-items-heading h2 { font-size: 21px; }
+        .combo-item-image { height: 115px; }
 
-        .combo-items-heading h2 {
-            font-size: 24px;
-        }
+        .combo-item-content { padding: 10px 6px; }
+        .combo-item-content h4 { font-size: 12px; }
 
-        .combo-item-image {
-            height: 200px;
-        }
+        .food-product-type-section { padding: 20px 15px; }
+        .food-product-type-section h3 { font-size: 21px; }
     }
 </style>
 
-
 <section class="food-product-details-section">
-
     <div class="container">
-
-        {{-- BACK --}}
 
         <div class="food-product-back">
             <a href="{{ route('site.products') }}">
-                <span>←</span>
-                Back to Products
+                <span>←</span> Back to Products
             </a>
         </div>
 
-
         <div class="row g-5">
 
-            {{-- ================= PRODUCT GALLERY ================= --}}
-
+            {{-- PRODUCT GALLERY --}}
             <div class="col-lg-6">
-
                 @if ($product->images->count() > 0)
+                    <div class="food-gallery" id="foodGallery">
 
-                <div class="food-gallery" id="foodGallery">
+                        @if ($product->images->count() > 1)
+                            <button type="button" class="gallery-arrow gallery-prev"
+                                    id="galleryPrev" aria-label="Previous image">
+                                &#10094;
+                            </button>
+                        @endif
+
+                        <img id="galleryMainImage"
+                             class="gallery-main-image"
+                             src="{{ asset($product->images->first()->image_path) }}"
+                             alt="{{ $product->images->first()->alt_text ?: $product->name }}">
+
+                        @if ($product->images->count() > 1)
+                            <button type="button" class="gallery-arrow gallery-next"
+                                    id="galleryNext" aria-label="Next image">
+                                &#10095;
+                            </button>
+                        @endif
+                    </div>
 
                     @if ($product->images->count() > 1)
-                    <button type="button" class="gallery-arrow gallery-prev" id="galleryPrev"
-                        aria-label="Previous image">
-                        &#10094;
-                    </button>
+                        <div class="gallery-counter">
+                            <span id="galleryCurrent">1</span> /
+                            <span>{{ $product->images->count() }}</span>
+                        </div>
+
+                        <div class="gallery-thumbnails">
+                            @foreach ($product->images as $index => $image)
+                                <button type="button"
+                                        class="gallery-thumbnail {{ $index === 0 ? 'active' : '' }}"
+                                        data-index="{{ $index }}"
+                                        aria-label="View image {{ $index + 1 }}">
+                                    <img src="{{ asset($image->image_path) }}"
+                                         alt="{{ $image->alt_text ?: $product->name }}">
+                                </button>
+                            @endforeach
+                        </div>
                     @endif
-
-                    <img id="galleryMainImage" class="gallery-main-image"
-                        src="{{ asset($product->images->first()->image_path) }}"
-                        alt="{{ $product->images->first()->alt_text ?: $product->name }}">
-
-                    @if ($product->images->count() > 1)
-                    <button type="button" class="gallery-arrow gallery-next" id="galleryNext" aria-label="Next image">
-                        &#10095;
-                    </button>
-                    @endif
-
-                </div>
-
-
-                @if ($product->images->count() > 1)
-
-                <div class="gallery-counter">
-                    <span id="galleryCurrent">1</span>
-                    /
-                    <span>{{ $product->images->count() }}</span>
-                </div>
-
-                <div class="gallery-thumbnails">
-
-                    @foreach ($product->images as $index => $image)
-
-                    <button type="button" class="gallery-thumbnail {{ $index === 0 ? 'active' : '' }}"
-                        data-index="{{ $index }}" aria-label="View image {{ $index + 1 }}">
-
-                        <img src="{{ asset($image->image_path) }}" alt="{{ $image->alt_text ?: $product->name }}">
-
-                    </button>
-
-                    @endforeach
-
-                </div>
-
-                @endif
-
                 @else
-
-                <div class="food-detail-placeholder">
-                    <div class="placeholder-icon">🖼</div>
-                    <span>No Image Available</span>
-                </div>
-
+                    <div class="food-detail-placeholder">
+                        <div class="placeholder-icon">🖼</div>
+                        <span>No Image Available</span>
+                    </div>
                 @endif
-
             </div>
 
-
-            {{-- ================= PRODUCT DETAILS ================= --}}
-
+            {{-- PRODUCT DETAILS --}}
             <div class="col-lg-6">
-
                 <div class="food-detail-content">
 
                     <div class="food-detail-category">
                         {{ $product->category->name ?? 'Food' }}
                     </div>
 
-
-                    <h1 class="food-detail-title">
-                        {{ $product->name }}
-                    </h1>
-
+                    <h1 class="food-detail-title">{{ $product->name }}</h1>
 
                     <div class="food-product-meta">
-
                         <div class="food-meta-item">
                             <span>Category</span>
-
-                            <strong>
-                                {{ $product->category->name ?? 'N/A' }}
-                            </strong>
+                            <strong>{{ $product->category->name ?? 'N/A' }}</strong>
                         </div>
 
                         <div class="food-meta-item">
                             <span>Product Type</span>
-
-                            <strong>
-                                {{ $product->product_type ?? 'Single' }}
-                            </strong>
+                            <strong>{{ $product->product_type ?? 'Single' }}</strong>
                         </div>
-
                     </div>
-
 
                     <div class="food-detail-price">
                         ₹{{ number_format((float) $product->price, 2) }}
                     </div>
 
-
-                    {{-- ================= ADD TO CART ================= --}}
-
+                    {{-- ADD TO CART --}}
                     <div class="food-add-cart-box">
 
                         <div class="food-quantity-box">
+                            <button type="button" class="food-qty-btn" id="qtyMinus"
+                                    aria-label="Decrease quantity">−</button>
 
-                            <button type="button" class="food-qty-btn" id="qtyMinus">
-                                −
-                            </button>
+                            <input type="text" id="productQuantity" value="1"
+                                   readonly aria-label="Quantity">
 
-                            <input type="text" id="productQuantity" value="1" readonly>
-
-                            <button type="button" class="food-qty-btn" id="qtyPlus">
-                                +
-                            </button>
-
+                            <button type="button" class="food-qty-btn" id="qtyPlus"
+                                    aria-label="Increase quantity">+</button>
                         </div>
 
-
-                        <button type="button" class="food-add-cart-btn" id="addToCartBtn" data-id="{{ $product->id }}"
-                            data-name="{{ $product->name }}" data-price="{{ (float) $product->price }}"
-                            data-image="{{ $product->images->count() > 0 ? asset($product->images->first()->image_path) : '' }}">
-
+                        <button type="button"
+                                class="food-add-cart-btn"
+                                id="addToCartBtn"
+                                data-id="{{ $product->id }}">
                             <i class="fa fa-shopping-cart"></i>
-
                             <span>Add To Cart</span>
-
                         </button>
-
                     </div>
-
-
-                    {{-- ONLY ONE SUCCESS MESSAGE --}}
 
                     <div id="cartSuccessMessage" class="food-cart-success-message">
-
                         <i class="fa fa-check-circle"></i>
-
-                        <span>
-                            Product added to cart successfully!
-                        </span>
-
+                        <span>Product added to cart successfully!</span>
                     </div>
 
-
-                    {{-- ================= SHORT DESCRIPTION ================= --}}
-
-                    @if (!empty($product->short_description))
-
-                    <div class="food-description-block">
-
-                        <h5>Short Description</h5>
-
-                        <p>
-                            {{ $product->short_description }}
-                        </p>
-
-                    </div>
-
-                    @endif
-
-
-                    {{-- ================= DESCRIPTION ================= --}}
-
-                    @if (!empty($product->description))
-
-                    <div class="food-description-block">
-
-                        <h5>Description</h5>
-
-                        <p>
-                            {!! nl2br(e($product->description)) !!}
-                        </p>
-
-                    </div>
-
-                    @endif
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        {{-- ================= COMBO ITEMS ================= --}}
-
-        @if (
-        $product->product_type === 'combo' &&
-        isset($comboProducts) &&
-        $comboProducts->count() > 0
-        )
-
-        <div class="combo-items-section">
-
-            <div class="combo-items-heading">
-
-                <span class="combo-items-label">
-                    COMBO ITEMS
-                </span>
-
-                <h2>
-                    What's Inside This Combo?
-                </h2>
-
-                <div class="combo-heading-line"></div>
-
-                <p>
-                    Delicious items included in this combo
-                </p>
-
-            </div>
-
-
-            <div class="row g-4 justify-content-center">
-
-                @foreach ($comboProducts as $comboItem)
-
-                <div class="col-xl-3 col-lg-4 col-md-6">
-
-                    <div class="combo-item-card">
-
-                        <div class="combo-item-image">
-
-                            @if (
-                            $comboItem->images->count() > 0 &&
-                            $comboItem->images->first()->image_path
-                            )
-
-                            <img src="{{ asset($comboItem->images->first()->image_path) }}"
-                                alt="{{ $comboItem->images->first()->alt_text ?: $comboItem->name }}" loading="lazy">
-
-                            @else
-
-                            <div class="combo-item-placeholder">
-                                <i class="bi bi-image"></i>
+                    {{-- COMBO ITEMS --}}
+                    @if (
+                        $product->product_type === 'combo' &&
+                        isset($comboProducts) &&
+                        $comboProducts->count() > 0
+                    )
+                        <div class="combo-items-section">
+                            <div class="combo-items-heading">
+                                <span class="combo-items-label">COMBO COLLECTION</span>
+                                <h2>What's Inside This Combo?</h2>
+                                <div class="combo-heading-line"></div>
+                                <p>Discover the delicious items included in this combo.</p>
                             </div>
 
-                            @endif
+                            <div class="row g-3">
+                                @foreach ($comboProducts as $comboItem)
+                                    <div class="col-xl-6 col-md-6 col-6">
+                                        <div class="combo-item-card">
+                                            <div class="combo-item-image">
+                                                @if (
+                                                    $comboItem->images->count() > 0 &&
+                                                    $comboItem->images->first()->image_path
+                                                )
+                                                    <img
+                                                        src="{{ asset($comboItem->images->first()->image_path) }}"
+                                                        alt="{{ $comboItem->images->first()->alt_text ?: $comboItem->name }}"
+                                                        loading="lazy">
+                                                @else
+                                                    <div class="combo-item-placeholder">
+                                                        <i class="fa fa-picture-o"></i>
+                                                    </div>
+                                                @endif
 
-                            <span class="combo-item-badge">
-                                Included
-                            </span>
+                                                <span class="combo-item-badge">Included</span>
+                                            </div>
 
+                                            <div class="combo-item-content">
+                                                <h4>{{ $comboItem->name }}</h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
+                    @endif
 
-
-                        <div class="combo-item-content">
-
-                            <h4>
-                                {{ $comboItem->name }}
-                            </h4>
-
+                    {{-- SHORT DESCRIPTION --}}
+                    @if (!empty($product->short_description))
+                        <div class="food-description-block">
+                            <h5>Short Description</h5>
+                            <p>{{ $product->short_description }}</p>
                         </div>
+                    @endif
 
-                    </div>
+                    {{-- DESCRIPTION --}}
+                    @if (!empty($product->description))
+                        <div class="food-description-block">
+                            <h5>Description</h5>
+                            <p>{!! nl2br(e($product->description)) !!}</p>
+                        </div>
+                    @endif
+
+                    {{-- PRODUCT INFORMATION --}}
+                    @if (!empty($product->product_type))
+                        <div class="food-product-type-section">
+                            <h3>Product Information</h3>
+                            <div class="food-type-box">
+                                <span>Product Type</span>
+                                <strong>{{ $product->product_type }}</strong>
+                            </div>
+                        </div>
+                    @endif
 
                 </div>
-
-                @endforeach
-
             </div>
-
         </div>
-
-        @endif
-
-
-        {{-- ================= PRODUCT TYPE ================= --}}
-
-        @if (!empty($product->product_type))
-
-        <div class="food-product-type-section">
-
-            <h3>
-                Product Information
-            </h3>
-
-            <div class="food-type-box">
-
-                <span>
-                    Product Type
-                </span>
-
-                <strong>
-                    {{ $product->product_type }}
-                </strong>
-
-            </div>
-
-        </div>
-
-        @endif
-
     </div>
-
 </section>
 
-
-{{-- =========================================================
-JAVASCRIPT
-GALLERY + QUANTITY + ADD TO CART
-========================================================= --}}
-
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
 
-        console.log('FOOD PRODUCT PAGE JS LOADED');
+    /* =========================================================
+       PRODUCT GALLERY
+    ========================================================= */
 
+    const productImages = [
+        @foreach ($product->images as $image)
+            {
+                src: @json(asset($image->image_path)),
+                alt: @json($image->alt_text ?: $product->name)
+            }@if (!$loop->last),@endif
+        @endforeach
+    ];
 
-        /* =========================================================
-           PRODUCT GALLERY
-        ========================================================= */
+    const mainImage = document.getElementById('galleryMainImage');
+    const previousButton = document.getElementById('galleryPrev');
+    const nextButton = document.getElementById('galleryNext');
+    const currentNumber = document.getElementById('galleryCurrent');
+    const thumbnails = document.querySelectorAll('.gallery-thumbnail');
+    const gallery = document.getElementById('foodGallery');
 
-        const productImages = [
-            @foreach($product -> images as $image) {
-                src: @json(asset($image -> image_path))
-                , alt: @json($image -> alt_text ? : $product -> name)
-            }
-            @if(!$loop -> last), @endif
-            @endforeach
-        ];
+    let currentIndex = 0;
 
-        const mainImage = document.getElementById('galleryMainImage');
-        const previousButton = document.getElementById('galleryPrev');
-        const nextButton = document.getElementById('galleryNext');
-        const currentNumber = document.getElementById('galleryCurrent');
-        const thumbnails = document.querySelectorAll('.gallery-thumbnail');
-        const gallery = document.getElementById('foodGallery');
+    function showImage(index) {
+        if (!productImages.length || !mainImage) return;
 
-        let currentIndex = 0;
+        if (index < 0) index = productImages.length - 1;
+        if (index >= productImages.length) index = 0;
 
+        currentIndex = index;
+        mainImage.src = productImages[index].src;
+        mainImage.alt = productImages[index].alt;
 
-        function showImage(index) {
+        if (currentNumber) currentNumber.textContent = index + 1;
 
-            if (!productImages.length || !mainImage) {
-                return;
-            }
-
-            if (index < 0) {
-                index = productImages.length - 1;
-            }
-
-            if (index >= productImages.length) {
-                index = 0;
-            }
-
-            currentIndex = index;
-
-            mainImage.src = productImages[index].src;
-            mainImage.alt = productImages[index].alt;
-
-            if (currentNumber) {
-                currentNumber.textContent = index + 1;
-            }
-
-            thumbnails.forEach(function(thumbnail, thumbnailIndex) {
-
-                thumbnail.classList.toggle(
-                    'active'
-                    , thumbnailIndex === index
-                );
-
-            });
-
-        }
-
-
-        if (previousButton) {
-
-            previousButton.addEventListener('click', function(event) {
-
-                event.preventDefault();
-                event.stopPropagation();
-
-                showImage(currentIndex - 1);
-
-            });
-
-        }
-
-
-        if (nextButton) {
-
-            nextButton.addEventListener('click', function(event) {
-
-                event.preventDefault();
-                event.stopPropagation();
-
-                showImage(currentIndex + 1);
-
-            });
-
-        }
-
-
-        thumbnails.forEach(function(thumbnail, index) {
-
-            thumbnail.addEventListener('click', function(event) {
-
-                event.preventDefault();
-                event.stopPropagation();
-
-                showImage(index);
-
-            });
-
+        thumbnails.forEach(function (thumbnail, thumbnailIndex) {
+            thumbnail.classList.toggle('active', thumbnailIndex === index);
         });
+    }
 
+    if (previousButton) {
+        previousButton.addEventListener('click', function () {
+            showImage(currentIndex - 1);
+        });
+    }
 
-        if (gallery) {
+    if (nextButton) {
+        nextButton.addEventListener('click', function () {
+            showImage(currentIndex + 1);
+        });
+    }
 
-            let touchStartX = 0;
+    thumbnails.forEach(function (thumbnail, index) {
+        thumbnail.addEventListener('click', function () {
+            showImage(index);
+        });
+    });
 
-            gallery.addEventListener('touchstart', function(event) {
+    if (gallery) {
+        let touchStartX = 0;
 
-                touchStartX = event.changedTouches[0].screenX;
+        gallery.addEventListener('touchstart', function (event) {
+            touchStartX = event.changedTouches[0].screenX;
+        }, { passive: true });
 
-            }, {
-                passive: true
-            });
+        gallery.addEventListener('touchend', function (event) {
+            const touchEndX = event.changedTouches[0].screenX;
+            const distance = touchStartX - touchEndX;
 
+            if (Math.abs(distance) < 50) return;
 
-            gallery.addEventListener('touchend', function(event) {
+            showImage(distance > 0 ? currentIndex + 1 : currentIndex - 1);
+        }, { passive: true });
+    }
 
-                const touchEndX =
-                    event.changedTouches[0].screenX;
+    if (productImages.length) showImage(0);
 
-                const distance =
-                    touchStartX - touchEndX;
+    /* =========================================================
+       QUANTITY
+    ========================================================= */
 
-                if (Math.abs(distance) < 50) {
-                    return;
-                }
+    const minusBtn = document.getElementById('qtyMinus');
+    const plusBtn = document.getElementById('qtyPlus');
+    const quantityInput = document.getElementById('productQuantity');
+    const addToCartBtn = document.getElementById('addToCartBtn');
+    const successMessage = document.getElementById('cartSuccessMessage');
 
-                if (distance > 0) {
-                    showImage(currentIndex + 1);
-                } else {
-                    showImage(currentIndex - 1);
-                }
+    let quantity = 1;
 
-            }, {
-                passive: true
-            });
+    function setQuantity(value) {
+        quantity = Math.max(1, Math.min(99, parseInt(value, 10) || 1));
 
+        if (quantityInput) {
+            quantityInput.value = quantity;
+        }
+    }
+
+    if (minusBtn) {
+        minusBtn.addEventListener('click', function () {
+            setQuantity(quantity - 1);
+        });
+    }
+
+    if (plusBtn) {
+        plusBtn.addEventListener('click', function () {
+            setQuantity(quantity + 1);
+        });
+    }
+
+    /* =========================================================
+       HEADER CART COUNT
+    ========================================================= */
+
+    function updateHeaderCartCount(count) {
+        if (count === undefined || count === null) return;
+
+        count = Number(count) || 0;
+
+        document.querySelectorAll(
+            '#headerCartCount, .header-cart-count'
+        ).forEach(function (element) {
+            element.textContent = count;
+            element.style.display = count > 0 ? 'inline-flex' : 'none';
+        });
+    }
+
+    window.updateHeaderCartCount = updateHeaderCartCount;
+
+    /* =========================================================
+       SWEETALERT HELPER
+    ========================================================= */
+
+    function showCartAlert(options) {
+        if (typeof Swal !== 'undefined') {
+            return Swal.fire(options);
         }
 
+        alert(
+            (options.title ? options.title + '\n' : '') +
+            (options.text || '')
+        );
 
-        if (productImages.length > 0) {
-            showImage(0);
-        }
+        return Promise.resolve();
+    }
 
+    /* =========================================================
+       ADD TO CART
+    ========================================================= */
 
-        /* =========================================================
-           QUANTITY
-        ========================================================= */
-
-        const minusBtn = document.getElementById('qtyMinus');
-        const plusBtn = document.getElementById('qtyPlus');
-        const quantityInput = document.getElementById('productQuantity');
-
-        let quantity = 1;
-
-
-        if (minusBtn) {
-
-            minusBtn.addEventListener('click', function(event) {
-
-                event.preventDefault();
-                event.stopPropagation();
-
-                if (quantity > 1) {
-                    quantity--;
-                }
-
-                if (quantityInput) {
-                    quantityInput.value = quantity;
-                }
-
-            });
-
-        }
-
-
-        if (plusBtn) {
-
-            plusBtn.addEventListener('click', function(event) {
-
-                event.preventDefault();
-                event.stopPropagation();
-
-                quantity++;
-
-                if (quantityInput) {
-                    quantityInput.value = quantity;
-                }
-
-            });
-
-        }
-
-
-        /* =========================================================
-           HEADER CART COUNT
-        ========================================================= */
-
-        function updateHeaderCartCount() {
-
-            const cartCount =
-                document.getElementById('headerCartCount');
-
-            if (!cartCount) {
-                return;
-            }
-
-            let cart = [];
-
-            try {
-
-                const storedCart =
-                    localStorage.getItem('food_cart');
-
-                if (storedCart) {
-
-                    const parsedCart =
-                        JSON.parse(storedCart);
-
-                    if (Array.isArray(parsedCart)) {
-                        cart = parsedCart;
-                    }
-
-                }
-
-            } catch (error) {
-
-                console.error('Cart read error:', error);
-
-                cart = [];
-
-            }
-
-
-            let totalItems = 0;
-
-            cart.forEach(function(item) {
-
-                totalItems +=
-                    parseInt(item.quantity, 10) || 0;
-
-            });
-
-
-            cartCount.textContent = totalItems;
-
-            if (totalItems > 0) {
-
-                cartCount.style.display = 'flex';
-
-            } else {
-
-                cartCount.style.display = 'none';
-
-            }
-
-        }
-
-
-        /* =========================================================
-           ADD TO CART
-        ========================================================= */
-
-        const addToCartBtn =
-            document.getElementById('addToCartBtn');
-
-        const successMessage =
-            document.getElementById('cartSuccessMessage');
-
-
-        if (!addToCartBtn) {
-
-            console.error(
-                'ERROR: #addToCartBtn not found'
-            );
-
-            return;
-
-        }
-
-
-        addToCartBtn.addEventListener('click', function(event) {
-
+    if (addToCartBtn) {
+        addToCartBtn.addEventListener('click', async function (event) {
             event.preventDefault();
-            event.stopPropagation();
-
 
             const button = this;
 
+            if (button.disabled) return;
 
-            const productId =
-                String(button.dataset.id || '');
-
-            const productName =
-                button.dataset.name || '';
-
-            const productPrice =
-                parseFloat(button.dataset.price) || 0;
-
-            const productImage =
-                button.dataset.image || '';
-
-
-            if (!productId) {
-
-                alert('Product ID is missing.');
-
-                return;
-
-            }
-
-
-            let addQuantity = 1;
-
-
-            if (quantityInput) {
-
-                addQuantity =
-                    parseInt(quantityInput.value, 10) || 1;
-
-            }
-
-
-            if (addQuantity < 1) {
-                addQuantity = 1;
-            }
-
-
-            /* GET OLD CART */
-
-            let cart = [];
-
-
-            try {
-
-                const storedCart =
-                    localStorage.getItem('food_cart');
-
-                if (storedCart) {
-
-                    const parsedCart =
-                        JSON.parse(storedCart);
-
-                    if (Array.isArray(parsedCart)) {
-                        cart = parsedCart;
-                    }
-
-                }
-
-            } catch (error) {
-
-                console.error(
-                    'Existing cart read error:'
-                    , error
-                );
-
-                cart = [];
-
-            }
-
-
-            /* FIND PRODUCT */
-
-            const existingProduct =
-                cart.find(function(item) {
-
-                    return String(item.id) === productId;
-
-                });
-
-
-            /* UPDATE OR ADD */
-
-            if (existingProduct) {
-
-                existingProduct.quantity =
-                    (parseInt(existingProduct.quantity, 10) || 0) +
-                    addQuantity;
-
-                existingProduct.name =
-                    productName;
-
-                existingProduct.price =
-                    productPrice;
-
-                existingProduct.image =
-                    productImage;
-
-            } else {
-
-                cart.push({
-
-                    id: productId,
-
-                    name: productName,
-
-                    price: productPrice,
-
-                    image: productImage,
-
-                    quantity: addQuantity
-
-                });
-
-            }
-
-
-            /* SAVE CART */
-
-            try {
-
-                localStorage.setItem(
-                    'food_cart'
-                    , JSON.stringify(cart)
-                );
-
-            } catch (error) {
-
-                console.error(
-                    'Cart save error:'
-                    , error
-                );
-
-                alert(
-                    'Unable to save product to cart.'
-                );
-
-                return;
-
-            }
-
-
-            console.log(
-                'FOOD CART SAVED:'
-                , cart
+            const productId = Number(button.dataset.id);
+            const addQuantity = Math.max(
+                1,
+                parseInt(quantityInput ? quantityInput.value : '1', 10) || 1
             );
 
-
-            /* UPDATE HEADER */
-
-            updateHeaderCartCount();
-
-
-            /* SUCCESS MESSAGE */
-
-            if (successMessage) {
-
-                successMessage.classList.add('show');
-
-                setTimeout(function() {
-
-                    successMessage.classList.remove('show');
-
-                }, 2500);
-
+            if (!productId) {
+                showCartAlert({
+                    icon: 'error',
+                    title: 'Product Not Found',
+                    text: 'Product ID is missing. Please refresh the page.',
+                    confirmButtonColor: '#e63946'
+                });
+                return;
             }
 
-
-            /* BUTTON */
-
-            const originalHTML =
-                button.innerHTML;
-
-            button.innerHTML =
-                '<i class="fa fa-check"></i><span>Added To Cart</span>';
+            const originalHTML = button.innerHTML;
 
             button.disabled = true;
+            button.innerHTML =
+                '<i class="fa fa-spinner fa-spin"></i><span>Adding...</span>';
 
+            try {
+                const response = await fetch(@json(route('cart.add')), {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN':
+                            document.querySelector('meta[name="csrf-token"]')
+                                ?.getAttribute('content') || @json(csrf_token()),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        product_id: productId,
+                        quantity: addQuantity
+                    })
+                });
 
-            setTimeout(function() {
+                let result;
+
+                try {
+                    result = await response.json();
+                } catch (jsonError) {
+                    throw new Error(
+                        response.status === 419
+                            ? 'Your session expired. Refresh the page and try again.'
+                            : 'The server returned an unexpected response.'
+                    );
+                }
+
+                if (
+                    !response.ok ||
+                    result.success === false ||
+                    result.error
+                ) {
+                    throw new Error(
+                        result.message || 'Unable to add product to cart.'
+                    );
+                }
+
+                if (result.cart_count !== undefined) {
+                    updateHeaderCartCount(result.cart_count);
+                }
+
+                if (successMessage) {
+                    const messageText = successMessage.querySelector('span');
+
+                    if (messageText) {
+                        messageText.textContent =
+                            result.message || 'Product added to cart successfully!';
+                    }
+
+                    successMessage.classList.add('show');
+                }
 
                 button.innerHTML =
-                    originalHTML;
+                    '<i class="fa fa-check"></i><span>Added To Cart</span>';
 
+                setQuantity(1);
+
+                await showCartAlert({
+                    icon: 'success',
+                    title: 'Added to Cart!',
+                    text: result.message || 'Product added to cart successfully.',
+                    confirmButtonText: 'Continue Shopping',
+                    confirmButtonColor: '#e63946',
+                    timer: 2200,
+                    timerProgressBar: true
+                });
+
+            } catch (error) {
+                console.error('Add to Cart Error:', error);
+
+                showCartAlert({
+                    icon: 'error',
+                    title: 'Could Not Add to Cart',
+                    text: error.message || 'Something went wrong. Please try again.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#e63946'
+                });
+            } finally {
+                button.innerHTML = originalHTML;
                 button.disabled = false;
-
-            }, 1800);
-
-
-            /* RESET QUANTITY */
-
-            quantity = 1;
-
-            if (quantityInput) {
-                quantityInput.value = '1';
             }
-
         });
+    }
 
-
-        /* INITIAL CART COUNT */
-
-        updateHeaderCartCount();
-
-
-        /* CART CHANGE FROM OTHER TAB */
-
-        window.addEventListener('storage', function(event) {
-
-            if (event.key === 'food_cart') {
-                updateHeaderCartCount();
-            }
-
-        });
-
-    });
-
+});
 </script>
 
 @endsection

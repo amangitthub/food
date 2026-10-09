@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Address;
 use App\Models\Cart;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -10,9 +11,7 @@ use Illuminate\Support\Facades\Auth;
 class CartController extends Controller
 {
     /**
-     * ============================================================
      * ADD PRODUCT TO CART
-     * ============================================================
      */
     public function add(Request $request)
     {
@@ -22,13 +21,7 @@ class CartController extends Controller
         ]);
 
         $productId = (int) $validated['product_id'];
-        $quantity  = (int) ($validated['quantity'] ?? 1);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Check Product
-        |--------------------------------------------------------------------------
-        */
+        $quantity = (int) ($validated['quantity'] ?? 1);
 
         $product = Product::where('id', $productId)
             ->where('status', 'Active')
@@ -41,39 +34,18 @@ class CartController extends Controller
             ], 404);
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | LOGGED-IN USER
-        |--------------------------------------------------------------------------
-        */
-
+        // Logged-in user
         if (Auth::check()) {
-
-            /*
-            |--------------------------------------------------------------------------
-            | First merge existing guest cart
-            |--------------------------------------------------------------------------
-            */
-
             $this->mergeGuestCartIntoDatabase();
-
-            /*
-            |--------------------------------------------------------------------------
-            | Now add current product
-            |--------------------------------------------------------------------------
-            */
 
             $cartItem = Cart::where('user_id', Auth::id())
                 ->where('product_id', $productId)
                 ->first();
 
             if ($cartItem) {
-
                 $cartItem->quantity += $quantity;
                 $cartItem->save();
-
             } else {
-
                 Cart::create([
                     'user_id'    => Auth::id(),
                     'product_id' => $productId,
@@ -88,39 +60,21 @@ class CartController extends Controller
             ]);
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | GUEST USER
-        |--------------------------------------------------------------------------
-        */
-
+        // Guest user
         $cart = session()->get('food_cart', []);
-
         $found = false;
 
         foreach ($cart as &$item) {
-
             if ((int) ($item['product_id'] ?? 0) === $productId) {
-
-                $item['quantity'] =
-                    (int) ($item['quantity'] ?? 0) + $quantity;
-
+                $item['quantity'] = (int) ($item['quantity'] ?? 0) + $quantity;
                 $found = true;
-
                 break;
             }
         }
 
         unset($item);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Add New Guest Cart Item
-        |--------------------------------------------------------------------------
-        */
-
         if (!$found) {
-
             $cart[] = [
                 'product_id' => $productId,
                 'quantity'   => $quantity,
@@ -136,69 +90,77 @@ class CartController extends Controller
         ]);
     }
 
-
     /**
-     * ============================================================
      * CART PAGE
-     * ============================================================
      */
     public function index()
-{
-    if (Auth::check()) {
+    {
+        if (Auth::check()) {
+            $this->mergeGuestCartIntoDatabase();
 
-        $this->mergeGuestCartIntoDatabase();
+            $cartItems = Cart::where('user_id', Auth::id())
+                ->with('product.images')
+                ->get();
 
-        $cartItems = Cart::where('user_id', Auth::id())
-            ->with('product.images')
-            ->get();
+            $user = Auth::user();
 
-        $user = Auth::user();
+            // Load only the logged-in user's saved addresses.
+            $addresses = Address::where('user_id', Auth::id())
+                ->orderByDesc('is_default')
+                ->latest()
+                ->get();
 
-        return view('pages.cart', compact('cartItems', 'user'));
+            return view('pages.cart', compact(
+                'cartItems',
+                'user',
+                'addresses'
+            ));
+        }
+
+        // Guest cart
+        $guestCart = session()->get('food_cart', []);
+
+        $productIds = collect($guestCart)
+            ->pluck('product_id')
+            ->filter()
+            ->values();
+
+        $products = Product::with('images')
+            ->where('status', 'Active')
+            ->whereIn('id', $productIds)
+            ->get()
+            ->keyBy('id');
+
+        $cartItems = collect($guestCart)
+            ->map(function ($item) use ($products) {
+                $product = $products->get($item['product_id'] ?? null);
+
+                if (!$product) {
+                    return null;
+                }
+
+                return [
+                    'id'         => null,
+                    'product_id' => $product->id,
+                    'quantity'   => (int) ($item['quantity'] ?? 1),
+                    'product'    => $product,
+                ];
+            })
+            ->filter()
+            ->values();
+
+        $user = null;
+        $addresses = collect();
+
+        return view('pages.cart', compact(
+            'cartItems',
+            'user',
+            'addresses'
+        ));
     }
 
-    $guestCart = session()->get('food_cart', []);
-
-    $productIds = collect($guestCart)
-        ->pluck('product_id')
-        ->filter()
-        ->values();
-
-    $products = Product::with('images')
-        ->where('status', 'Active')
-        ->whereIn('id', $productIds)
-        ->get()
-        ->keyBy('id');
-
-    $cartItems = collect($guestCart)
-        ->map(function ($item) use ($products) {
-
-            $product = $products->get($item['product_id']);
-
-            if (!$product) {
-                return null;
-            }
-
-            return [
-                'id' => null,
-                'product_id' => $product->id,
-                'quantity' => (int) $item['quantity'],
-                'product' => $product,
-            ];
-        })
-        ->filter()
-        ->values();
-
-    $user = null;
-
-    return view('pages.cart', compact('cartItems', 'user'));
-}
-
-
     /**
-     * ============================================================
      * UPDATE CART QUANTITY
-     * ============================================================
      */
     public function update(Request $request)
     {
@@ -208,22 +170,14 @@ class CartController extends Controller
         ]);
 
         $productId = (int) $validated['product_id'];
-        $quantity  = (int) $validated['quantity'];
-
-        /*
-        |--------------------------------------------------------------------------
-        | LOGGED-IN USER
-        |--------------------------------------------------------------------------
-        */
+        $quantity = (int) $validated['quantity'];
 
         if (Auth::check()) {
-
             $cartItem = Cart::where('user_id', Auth::id())
                 ->where('product_id', $productId)
                 ->first();
 
             if (!$cartItem) {
-
                 return response()->json([
                     'success' => false,
                     'message' => 'Cart item not found.',
@@ -240,24 +194,13 @@ class CartController extends Controller
             ]);
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | GUEST USER
-        |--------------------------------------------------------------------------
-        */
-
         $cart = session()->get('food_cart', []);
-
         $found = false;
 
         foreach ($cart as &$item) {
-
             if ((int) ($item['product_id'] ?? 0) === $productId) {
-
                 $item['quantity'] = $quantity;
-
                 $found = true;
-
                 break;
             }
         }
@@ -265,7 +208,6 @@ class CartController extends Controller
         unset($item);
 
         if (!$found) {
-
             return response()->json([
                 'success' => false,
                 'message' => 'Cart item not found.',
@@ -281,11 +223,8 @@ class CartController extends Controller
         ]);
     }
 
-
     /**
-     * ============================================================
      * REMOVE PRODUCT FROM CART
-     * ============================================================
      */
     public function remove(Request $request)
     {
@@ -295,14 +234,7 @@ class CartController extends Controller
 
         $productId = (int) $validated['product_id'];
 
-        /*
-        |--------------------------------------------------------------------------
-        | LOGGED-IN USER
-        |--------------------------------------------------------------------------
-        */
-
         if (Auth::check()) {
-
             Cart::where('user_id', Auth::id())
                 ->where('product_id', $productId)
                 ->delete();
@@ -314,20 +246,12 @@ class CartController extends Controller
             ]);
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | GUEST USER
-        |--------------------------------------------------------------------------
-        */
-
         $cart = session()->get('food_cart', []);
 
-        $cart = array_values(
-            array_filter($cart, function ($item) use ($productId) {
-
-                return (int) ($item['product_id'] ?? 0) !== $productId;
-            })
-        );
+        $cart = array_values(array_filter(
+            $cart,
+            fn ($item) => (int) ($item['product_id'] ?? 0) !== $productId
+        ));
 
         session()->put('food_cart', $cart);
 
@@ -338,30 +262,14 @@ class CartController extends Controller
         ]);
     }
 
-
     /**
-     * ============================================================
      * CLEAR CART
-     * ============================================================
      */
     public function clear()
     {
-        /*
-        |--------------------------------------------------------------------------
-        | LOGGED-IN USER
-        |--------------------------------------------------------------------------
-        */
-
         if (Auth::check()) {
-
             Cart::where('user_id', Auth::id())->delete();
         }
-
-        /*
-        |--------------------------------------------------------------------------
-        | GUEST SESSION
-        |--------------------------------------------------------------------------
-        */
 
         session()->forget('food_cart');
 
@@ -372,11 +280,8 @@ class CartController extends Controller
         ]);
     }
 
-
     /**
-     * ============================================================
      * MERGE GUEST CART INTO DATABASE
-     * ============================================================
      */
     private function mergeGuestCartIntoDatabase()
     {
@@ -391,19 +296,12 @@ class CartController extends Controller
         }
 
         foreach ($sessionCart as $item) {
-
             $productId = (int) ($item['product_id'] ?? 0);
-            $quantity  = (int) ($item['quantity'] ?? 0);
+            $quantity = (int) ($item['quantity'] ?? 0);
 
             if (!$productId || $quantity < 1) {
                 continue;
             }
-
-            /*
-            |--------------------------------------------------------------------------
-            | Make Sure Product Is Active
-            |--------------------------------------------------------------------------
-            */
 
             $productExists = Product::where('id', $productId)
                 ->where('status', 'Active')
@@ -413,36 +311,14 @@ class CartController extends Controller
                 continue;
             }
 
-            /*
-            |--------------------------------------------------------------------------
-            | Check Existing User Cart Item
-            |--------------------------------------------------------------------------
-            */
-
             $cartItem = Cart::where('user_id', Auth::id())
                 ->where('product_id', $productId)
                 ->first();
 
             if ($cartItem) {
-
-                /*
-                |--------------------------------------------------------------------------
-                | Same Product Already Exists
-                | Guest Quantity + Existing User Quantity
-                |--------------------------------------------------------------------------
-                */
-
                 $cartItem->quantity += $quantity;
                 $cartItem->save();
-
             } else {
-
-                /*
-                |--------------------------------------------------------------------------
-                | Create New User Cart Item
-                |--------------------------------------------------------------------------
-                */
-
                 Cart::create([
                     'user_id'    => Auth::id(),
                     'product_id' => $productId,
@@ -451,46 +327,24 @@ class CartController extends Controller
             }
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Guest Cart No Longer Needed
-        |--------------------------------------------------------------------------
-        */
-
         session()->forget('food_cart');
     }
 
-
     /**
-     * ============================================================
      * CART COUNT
-     * ============================================================
      */
     private function getCartCount()
     {
-        /*
-        |--------------------------------------------------------------------------
-        | LOGGED-IN USER
-        |--------------------------------------------------------------------------
-        */
-
         if (Auth::check()) {
-
             return (int) Cart::where('user_id', Auth::id())
                 ->sum('quantity');
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | GUEST USER
-        |--------------------------------------------------------------------------
-        */
-
         $cart = session()->get('food_cart', []);
 
-        return (int) collect($cart)->sum(function ($item) {
-
-            return (int) ($item['quantity'] ?? 0);
-        });
+        return (int) collect($cart)->sum(
+            fn ($item) => (int) ($item['quantity'] ?? 0)
+        );
     }
 }
+
