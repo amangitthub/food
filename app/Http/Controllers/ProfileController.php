@@ -20,19 +20,40 @@ class ProfileController extends Controller
         $user = Auth::user();
 
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
             'email' => [
                 'required',
                 'email',
                 'max:255',
                 Rule::unique('users', 'email')->ignore($user->id),
             ],
+
+            'mobile' => [
+                'nullable',
+                'string',
+                'max:20',
+            ],
         ]);
 
+        // Update profile details
         $user->name = $validated['name'];
         $user->email = $validated['email'];
+
+        // Save mobile only when the field is available in the request
+        if (array_key_exists('mobile', $validated)) {
+            $user->mobile = $validated['mobile'];
+        }
+
+        // Save changes in database
         $user->save();
 
-        return back()->with('success', 'Profile updated successfully.');
+        return redirect()
+            ->route('profile')
+            ->with('success', 'Profile updated successfully!');
     }
 }

@@ -28,23 +28,32 @@ class AddressController extends Controller
             'state' => ['nullable', 'string', 'max:100'],
             'country' => ['required', 'string', 'max:100'],
             'pincode' => ['nullable', 'string', 'max:20'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ]);
 
         $isFirstAddress = !Address::where('user_id', Auth::id())->exists();
-
         $makeDefault = $request->boolean('is_default') || $isFirstAddress;
 
-        DB::transaction(function () use ($validated, $makeDefault) {
+        $address = DB::transaction(function () use ($validated, $makeDefault) {
             if ($makeDefault) {
                 Address::where('user_id', Auth::id())
                     ->update(['is_default' => 'No']);
             }
 
-            Address::create(array_merge($validated, [
+            return Address::create(array_merge($validated, [
                 'user_id' => Auth::id(),
                 'is_default' => $makeDefault ? 'Yes' : 'No',
             ]));
         });
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Address saved successfully.',
+                'address' => $address,
+            ]);
+        }
 
         return redirect()->route('addresses.index')
             ->with('success', 'Address saved successfully.');
@@ -63,6 +72,8 @@ class AddressController extends Controller
             'state' => ['nullable', 'string', 'max:100'],
             'country' => ['required', 'string', 'max:100'],
             'pincode' => ['nullable', 'string', 'max:20'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ]);
 
         $makeDefault = $request->boolean('is_default');
@@ -92,7 +103,6 @@ class AddressController extends Controller
             ->findOrFail($id);
 
         $wasDefault = $address->is_default === 'Yes';
-
         $address->delete();
 
         if ($wasDefault) {
