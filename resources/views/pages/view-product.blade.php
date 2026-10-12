@@ -606,7 +606,7 @@
                     {{-- ADD TO CART --}}
                     <div class="food-add-cart-box">
 
-                        <div class="food-quantity-box">
+                        {{-- <div class="food-quantity-box">
                             <button type="button" class="food-qty-btn" id="qtyMinus"
                                     aria-label="Decrease quantity">−</button>
 
@@ -615,7 +615,7 @@
 
                             <button type="button" class="food-qty-btn" id="qtyPlus"
                                     aria-label="Increase quantity">+</button>
-                        </div>
+                        </div> --}}
 
                         <button type="button"
                                 class="food-add-cart-btn"

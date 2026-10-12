@@ -93,7 +93,7 @@
                             </li>
 
                             <li>
-                                <a href="{{ url('/products') }}">
+                                <a  href="{{ route('site.products') }}">
                                     <span class="text-effect">
                                         <span class="effect-1">Our Menu</span>
                                         <span class="effect-1">Our Menu</span>
@@ -111,7 +111,7 @@
                             </li>
 
                             <li>
-                                <a href="{{ url('/contact') }}">
+                                <a href="{{ route('contact') }}">
                                     <span class="text-effect">
                                         <span class="effect-1">Contact Us</span>
                                         <span class="effect-1">Contact Us</span>
@@ -119,14 +119,6 @@
                                 </a>
                             </li>
 
-                            <li>
-                                <a href="{{ url('/faq') }}">
-                                    <span class="text-effect">
-                                        <span class="effect-1">FAQ's</span>
-                                        <span class="effect-1">FAQ's</span>
-                                    </span>
-                                </a>
-                            </li>
 
                         </ul>
 
@@ -157,7 +149,7 @@
                             </li>
 
                             <li>
-                                <a href="{{ url('/orders') }}">
+                                <a  href="{{ route('orders.my') }}">
                                     <span class="text-effect">
                                         <span class="effect-1">My Orders</span>
                                         <span class="effect-1">My Orders</span>
@@ -175,16 +167,7 @@
                             </li>
 
                             <li>
-                                <a href="{{ url('/order-tracking') }}">
-                                    <span class="text-effect">
-                                        <span class="effect-1">Order Tracking</span>
-                                        <span class="effect-1">Order Tracking</span>
-                                    </span>
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="{{ url('/cart') }}">
+                                <a href="{{ route('cart') }}" >
                                     <span class="text-effect">
                                         <span class="effect-1">Shopping Cart</span>
                                         <span class="effect-1">Shopping Cart</span>

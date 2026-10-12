@@ -260,6 +260,8 @@
                                             </a>
 
                                         </li>
+                                        <li> <a href="{{ route('orders.my') }}">My Orders</a> </li>
+
 
                                     </ul>
 
@@ -291,66 +293,66 @@
                         {{-- Login / Logout --}}
                         <div class="header-button">
                             @auth
-                                {{-- Logged In User --}}
-                                <div class="dropdown">
+                            {{-- Logged In User --}}
+                            <div class="dropdown">
 
-                                    <a href="#" class="text-danger dropdown-toggle" data-bs-toggle="dropdown"
-                                        aria-expanded="false">
-
-                                        <i class="fa fa-user-circle fa-2x" aria-hidden="true"></i>
-
-                                    </a>
-
-                                    <ul class="dropdown-menu dropdown-menu-end">
-
-                                        <li>
-                                            <span class="dropdown-item-text">
-                                                Hi, {{ auth()->user()->name }}
-                                            </span>
-                                        </li>
-
-                                        <li>
-                                            <hr class="dropdown-divider">
-                                        </li>
-                                        <li>
-                                            <a href="{{ url('/profile') }}" class="dropdown-item">
-                                                <i class="fa fa-user-circle me-2"></i>
-                                                <span>Profile</span>
-                                            </a>
-                                        </li>
-
-                                         <li>
-                                            <hr class="dropdown-divider">
-                                        </li>
-
-                                        <li>
-                                            <a href="#" class="dropdown-item"
-                                                onclick="event.preventDefault(); document.getElementById('header-logout-form').submit();">
-
-                                                <i class="fa fa-sign-out-alt me-2"></i>
-                                                Logout
-                                            </a>
-                                        </li>
-
-                                    </ul>
-
-                                </div>
-
-                                {{-- Logout Form --}}
-                                <form id="header-logout-form" action="{{ route('logout') }}" method="POST"
-                                    style="display: none;">
-
-                                    @csrf
-
-                                </form>
-                            @else
-                                {{-- Login --}}
-                                <a href="javascript:void(0);" class="text-danger" data-bs-toggle="modal"
-                                    data-bs-target="#loginModal">
+                                <a href="#" class="text-danger dropdown-toggle" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
 
                                     <i class="fa fa-user-circle fa-2x" aria-hidden="true"></i>
 
                                 </a>
+
+                                <ul class="dropdown-menu dropdown-menu-end">
+
+                                    <li>
+                                        <span class="dropdown-item-text">
+                                            Hi, {{ auth()->user()->name }}
+                                        </span>
+                                    </li>
+
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <a href="{{ url('/profile') }}" class="dropdown-item">
+                                            <i class="fa fa-user-circle me-2"></i>
+                                            <span>Profile</span>
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+
+                                    <li>
+                                        <a href="#" class="dropdown-item"
+                                            onclick="event.preventDefault(); document.getElementById('header-logout-form').submit();">
+
+                                            <i class="fa fa-sign-out-alt me-2"></i>
+                                            Logout
+                                        </a>
+                                    </li>
+
+                                </ul>
+
+                            </div>
+
+                            {{-- Logout Form --}}
+                            <form id="header-logout-form" action="{{ route('logout') }}" method="POST"
+                                style="display: none;">
+
+                                @csrf
+
+                            </form>
+                            @else
+                            {{-- Login --}}
+                            <a href="javascript:void(0);" class="text-danger" data-bs-toggle="modal"
+                                data-bs-target="#loginModal">
+
+                                <i class="fa fa-user-circle fa-2x" aria-hidden="true"></i>
+
+                            </a>
 
                             @endauth
 
@@ -435,71 +437,66 @@
                         </li>
 
                     </ul>
-                 {{-- CONTACT --}}
-                        <li> <a href="{{ route('contact') }}"> Contact </a>    </li>
                 </li>
+               {{-- CONTACT --}}
+                <li> <a href="{{ route('contact') }}"> Contact </a> </li>
+
+                {{-- Orders--}}
+
+                <li> <a href="{{ route('orders.my') }}">My Orders</a> </li>
+
 
                 {{-- CART --}}
-                <div class="menu-cart">
+                <li>
                     <a href="{{ route('cart') }}" class="cart-icon" aria-label="Shopping Cart">
-                        <i class="far fa-shopping-basket"></i>
-                        <span>Cart</span>
+                        <i class="far fa-shopping-basket"> <span>Cart</span></i>
 
                         <span class="header-cart-count"
                             style="{{ ($headerCartCount ?? 0) > 0 ? 'display:inline-flex;' : 'display:none;' }}">
                             {{ $headerCartCount ?? 0 }}
                         </span>
                     </a>
-                </div>
-                {{-- POPULAR --}}
-                {{-- <li>
-                    <a href="{{ url('/popular') }}">
-                        Popular
+
+                </li>
+
+                {{-- PROFILE & LOGOUT --}}
+                @auth
+
+                {{-- PROFILE --}}
+                <li>
+                    <a href="{{ url('/profile') }}">
+                        <i class="fa fa-user-circle me-3"> Profile</i>
+                        <span></span>
                     </a>
-                </li> --}}
+                </li>
 
-                {{-- NEW ARRIVALS --}}
-                {{-- OFFERS --}}
-                {{-- <li class="food-mobile-dropdown">
+                {{-- LOGOUT --}}
+                <li>
+                    <a href="#"
+                        onclick="event.preventDefault(); document.getElementById('mobile-profile-logout-form').submit();">
 
-                    <a href="javascript:void(0);">
-                        <span>Offers</span>
-                        <span class="food-mobile-arrow">+</span>
+                        <i class="fa fa-sign-out-alt me-3"> Logout</i>
+                        <span></span>
                     </a>
 
-                    <ul>
+                    <form id="mobile-profile-logout-form" action="{{ route('logout') }}" method="POST"
+                        style="display: none;">
+                        @csrf
+                    </form>
+                </li>
 
-                        <li>
-                            <a href="{{ url('/offers') }}">
-                                All Offers
-                            </a>
-                        </li>
+                @else
 
-                        <li>
-                            <a href="{{ url('/offers/today') }}">
-                                Today's Deals
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="{{ url('/offers/discounts') }}">
-                                Discounts
-                            </a>
-                        </li>
-
-                    </ul>
-
-                </li> --}}
-
-
-                {{-- LOGIN / REGISTER --}}
-                <div class="header-button">
-                    <a href="javascript:void(0);" class="theme-btn bg-red-2 btn-sm px-3 py-2 rounded"
-                        data-bs-toggle="modal" data-bs-target="#loginModal">
-                        <i class="far fa-user"></i>
-                        Login
+                {{-- LOGIN --}}
+                <li>
+                    <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#loginModal">
+                        <i class="fa fa-user-circle me-3"> Login </i>
+                        <span></span>
                     </a>
-                </div>
+                </li>
+
+                @endauth
+
 
             </ul>
 

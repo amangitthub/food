@@ -1034,7 +1034,20 @@
 
                         <i class="fas fa-chevron-right side-link-arrow"></i>
                     </a>
+                    
+                    {{-- My Orders --}}
+                    <a href="{{ route('orders.my') }}" class="profile-side-link">
+                        <div class="side-link-icon">
+                            <i class="fas fa-receipt"></i>
+                        </div>
 
+                        <div class="side-link-text">
+                            <strong>My Orders</strong>
+                            <small>View previous orders and track order status</small>
+                        </div>
+
+                        <i class="fas fa-chevron-right side-link-arrow"></i>
+                    </a>
                     <div class="profile-help-box">
                         <i class="fas fa-lock"></i>
                         Your account details can be updated from the form on this page.

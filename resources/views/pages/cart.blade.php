@@ -872,70 +872,77 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-
     if (checkoutBtn) {
-        checkoutBtn.addEventListener('click', async function () {
-            if (!cart.length) {
-                alert('Your cart is empty.');
-                return;
-            }
+    checkoutBtn.addEventListener('click', async function () {
 
-            if (!isLoggedIn) {
-                alert('Please login before placing your order.');
-                window.location.href = "{{ route('login') }}";
-                return;
-            }
+        if (!cart.length) {
+            alert('Your cart is empty.');
+            return;
+        }
 
-            const name = customerName?.value?.trim() || '';
-            const email = customerEmail?.value?.trim() || '';
-            const phone = customerPhone?.value?.trim() || '';
-            const address = customerAddress?.value?.trim() || '';
-            const city = customerCity?.value?.trim() || '';
-            const state = customerState?.value?.trim() || '';
-            const pincode = customerPincode?.value?.trim() || '';
+        if (!isLoggedIn) {
+            alert('Please login before placing your order.');
+            window.location.href = "{{ route('login') }}";
+            return;
+        }
 
-            if (!name) {
-                alert('Please enter your name.');
-                customerName?.focus();
-                return;
-            }
+        const name = customerName?.value?.trim() || '';
+        const email = customerEmail?.value?.trim() || '';
+        const phone = customerPhone?.value?.trim() || '';
 
-            if (!email) {
-                alert('Please enter your email.');
-                customerEmail?.focus();
-                return;
-            }
+        if (!name) {
+            alert('Please enter your name.');
+            customerName?.focus();
+            return;
+        }
 
-            if (!phone) {
-                alert('Please enter your phone number.');
-                customerPhone?.focus();
-                return;
-            }
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            alert('Please enter a valid email address.');
+            customerEmail?.focus();
+            return;
+        }
 
-            if (!address) {
-                alert('Please select a saved address or enter your delivery address.');
-                if (newAddressForm) newAddressForm.hidden = false;
-                customerAddress?.focus();
-                return;
-            }
+        if (!phone) {
+            alert('Please enter your phone number.');
+            customerPhone?.focus();
+            return;
+        }
 
-            if (!city || !state || !pincode) {
-                alert('Please enter your city, state and pincode.');
-                if (newAddressForm) newAddressForm.hidden = false;
-                if (!city) customerCity?.focus();
-                else if (!state) customerState?.focus();
-                else customerPincode?.focus();
-                return;
-            }
+        let addressId = savedAddressSelect?.value || '';
 
-            const selectedAddressId = savedAddressSelect?.value || '';
-            const isAddingNewAddress = !selectedAddressId || selectedAddressId === 'new';
+        checkoutBtn.disabled = true;
+        const originalText = checkoutBtn.innerHTML;
+        checkoutBtn.innerHTML =
+            '<i class="fa fa-spinner fa-spin"></i> Processing Order...';
 
-            if (isAddingNewAddress && saveNewAddress?.checked) {
-                checkoutBtn.disabled = true;
+        try {
+            // Save a new address if no saved address is selected.
+            if (!addressId || addressId === 'new') {
 
-                try {
-                    const response = await fetch("{{ route('addresses.store') }}", {
+                const deliveryFullName =
+                    deliveryName?.value?.trim() || name;
+
+                const deliveryMobile =
+                    deliveryPhone?.value?.trim() || phone;
+
+                const address = customerAddress?.value?.trim() || '';
+                const city = customerCity?.value?.trim() || '';
+                const state = customerState?.value?.trim() || '';
+                const pincode = customerPincode?.value?.trim() || '';
+
+                if (!address || !city || !state || !pincode) {
+                    throw new Error(
+                        'Please enter your complete delivery address.'
+                    );
+                }
+
+                if (!/^\d{6}$/.test(pincode)) {
+                    throw new Error('Please enter a valid 6-digit pincode.');
+                }
+
+                const response = await fetch(
+                    "{{ route('addresses.store') }}",
+                    {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -944,57 +951,139 @@ document.addEventListener('DOMContentLoaded', function () {
                             'X-Requested-With': 'XMLHttpRequest'
                         },
                         body: JSON.stringify({
-                            name: deliveryName?.value?.trim() || name,
-                            mobile: deliveryPhone?.value?.trim() || phone,
+                            name: deliveryFullName,
+                            mobile: deliveryMobile,
                             address: address,
                             city: city,
                             state: state,
                             pincode: pincode,
                             country: 'India',
-                            is_default: false
+                            is_default: 'No'
                         })
-                    });
-
-                    let result = {};
-                    try {
-                        result = await response.json();
-                    } catch (error) {}
-
-                    if (!response.ok || !result.success || !result.address) {
-                        const errors = result.errors
-                            ? Object.values(result.errors).flat().join('\n')
-                            : (result.message || 'Unable to save address.');
-                        throw new Error(errors);
                     }
+                );
 
-                    const savedAddress = result.address;
-                    const option = addAddressToDropdown(savedAddress);
+                let addressResult = {};
 
-                    addSavedAddressCard(savedAddress);
-
-                    if (option && savedAddressSelect) {
-                        savedAddressSelect.value = String(savedAddress.id);
-                        fillSavedAddress(option);
-                    }
-
-                    if (saveNewAddress) saveNewAddress.checked = false;
-                    if (newAddressForm) newAddressForm.hidden = true;
-                    if (showNewAddressBtn) showNewAddressBtn.style.display = 'inline-flex';
-
-                    alert('Address saved successfully! It is now visible below.');
-
+                try {
+                    addressResult = await response.json();
                 } catch (error) {
-                    console.error('Save address error:', error);
-                    alert(error.message || 'Unable to save address.');
-                    return;
-                } finally {
-                    checkoutBtn.disabled = false;
+                    throw new Error('Unable to save your delivery address.');
+                }
+
+                if (
+                    !response.ok ||
+                    !addressResult.success ||
+                    !addressResult.address?.id
+                ) {
+                    const errors = addressResult.errors
+                        ? Object.values(addressResult.errors).flat().join('\n')
+                        : '';
+
+                    throw new Error(
+                        errors ||
+                        addressResult.message ||
+                        'Unable to save your delivery address.'
+                    );
+                }
+
+                const savedAddress = addressResult.address;
+                addressId = String(savedAddress.id);
+
+                const option = addAddressToDropdown(savedAddress);
+                addSavedAddressCard(savedAddress);
+
+                if (option && savedAddressSelect) {
+                    savedAddressSelect.value = addressId;
+                    fillSavedAddress(option);
+                }
+
+                if (newAddressForm) {
+                    newAddressForm.hidden = true;
+                }
+
+                if (showNewAddressBtn) {
+                    showNewAddressBtn.style.display = 'inline-flex';
+                }
+
+                if (saveNewAddress) {
+                    saveNewAddress.checked = false;
                 }
             }
 
-            alert('Address details validated. Order placement backend is not connected yet.');
-        });
-    }
+            if (!addressId || !/^\d+$/.test(String(addressId))) {
+                throw new Error('Please select a valid delivery address.');
+            }
+
+            // Place Cash on Delivery order.
+            const orderResponse = await fetch(
+                "{{ route('checkout.place-order') }}",
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        address_id: Number(addressId),
+                        payment_method: 'cash'
+                    })
+                }
+            );
+
+            let orderResult = {};
+
+            try {
+                orderResult = await orderResponse.json();
+            } catch (error) {
+                throw new Error(
+                    'Unexpected server response. Please check your order before retrying.'
+                );
+            }
+
+            if (!orderResponse.ok || orderResult.success === false) {
+                const errors = orderResult.errors
+                    ? Object.values(orderResult.errors).flat().join('\n')
+                    : '';
+
+                throw new Error(
+                    errors ||
+                    orderResult.message ||
+                    'Unable to place your order.'
+                );
+            }
+
+            if (orderResult.redirect_url) {
+                window.location.href = orderResult.redirect_url;
+                return;
+            }
+
+            const orderNo =
+                orderResult.order_no ||
+                orderResult.order?.order_no;
+
+            if (orderNo) {
+                window.location.href =
+                    "{{ url('/order-confirmation') }}/" +
+                    encodeURIComponent(orderNo);
+                return;
+            }
+
+            throw new Error(
+                'Order confirmation was not returned by the server. Please check your order before trying again.'
+            );
+
+        } catch (error) {
+            console.error('Checkout error:', error);
+            alert(error.message || 'Unable to place your order.');
+        } finally {
+            checkoutBtn.disabled = false;
+            checkoutBtn.innerHTML = originalText;
+        }
+    });
+}
 
     renderCart();
 });

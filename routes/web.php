@@ -11,6 +11,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\AdminOrderController;
 
 // ================== Website Pages ==================
 
@@ -62,6 +64,32 @@ Route::post('/register', [AuthController::class, 'register'])
 Route::post('/logout', [AuthController::class, 'logout'])
     ->name('logout');
 
+//=================== Checkout ====================
+Route::middleware('auth')->group(function () {
+
+    Route::post('/checkout/place-order', [
+        CartController::class,
+        'placeOrder'
+    ])->name('checkout.place-order');
+
+    Route::get('/order-confirmation/{orderNo}', function ($orderNo) {
+        $order = \App\Models\Order::with(['items', 'payment'])
+            ->where('order_no', $orderNo)
+            ->where('user_id', \Illuminate\Support\Facades\Auth::id())
+            ->firstOrFail();
+
+        return view('pages.order-confirmation', compact('order'));
+    })->name('checkout.confirmation');
+    
+// CUSTOMER ORDERS
+Route::get('/my-orders', [OrderController::class, 'index'])
+    ->name('orders.my');
+
+Route::get('/my-orders/{orderNo}', [OrderController::class, 'show'])
+    ->name('orders.show');
+
+
+});
 
 // ================== User Profile & Addresses ==================
 
@@ -109,8 +137,19 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
 
     // ================== Orders ==================
-    Route::view('/orders', 'dash.orders')
-        ->name('orders.index');
+    Route::get('/orders', [AdminOrderController::class, 'index'])
+    ->name('orders.index');
+
+Route::patch('/orders/{order}/status', [
+    AdminOrderController::class,
+    'updateStatus'
+])->name('orders.status.update');
+
+Route::get('/orders/{order}/details', [
+    AdminOrderController::class,
+    'show'
+])->name('admin.orders.show');
+
 
 
     // ================== Customers ==================

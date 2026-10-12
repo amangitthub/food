@@ -7,7 +7,11 @@ use App\Models\Cart;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Payment;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 class CartController extends Controller
 {
     /**
@@ -281,6 +285,172 @@ class CartController extends Controller
     }
 
     /**
+     * PLACE CASH ON DELIVERY ORDER
+     */
+    public function placeOrder(Request $request)
+    {
+        if (!Auth::check()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please login before placing your order.',
+            ], 401);
+        }
+
+        $validated = $request->validate([
+            'address_id' => ['required', 'integer'],
+            'payment_method' => ['required', 'in:cash'],
+            'notes' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        $userId = Auth::id();
+
+        // Verify that the selected address belongs to this user.
+        $address = Address::where('id', $validated['address_id'])
+            ->where('user_id', $userId)
+            ->first();
+
+        if (!$address) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please select a valid delivery address.',
+            ], 422);
+        }
+
+        try {
+            $order = DB::transaction(function () use (
+                $userId,
+                $address,
+                $validated
+            ) {
+                $cartItems = Cart::where('user_id', $userId)
+                    ->with('product')
+                    ->lockForUpdate()
+                    ->get();
+
+                if ($cartItems->isEmpty()) {
+                    throw new \RuntimeException(
+                        'Your cart is empty. Please add products first.'
+                    );
+                }
+
+                $subtotal = 0;
+                $itemsToSave = [];
+
+                foreach ($cartItems as $cartItem) {
+                    $product = $cartItem->product;
+                    $quantity = (int) $cartItem->quantity;
+
+                    if (
+                        !$product ||
+                        $product->status !== 'Active' ||
+                        $quantity < 1
+                    ) {
+                        throw new \RuntimeException(
+                            'A product in your cart is no longer available. Please review your cart.'
+                        );
+                    }
+
+                    // Always calculate the price using the database.
+                    $price = round((float) $product->price, 2);
+                    $lineTotal = round($price * $quantity, 2);
+
+                    $subtotal += $lineTotal;
+
+                    $itemsToSave[] = [
+                        'product_id' => $product->id,
+                        'product_name' => $product->name,
+                        'original_price' => $price,
+                        'discount' => 0,
+                        'price' => $price,
+                        'quantity' => $quantity,
+                        'subtotal' => $lineTotal,
+                    ];
+                }
+
+                $subtotal = round($subtotal, 2);
+                $discount = 0;
+                $shipping = 0;
+                $total = round($subtotal - $discount + $shipping, 2);
+
+                $order = Order::create([
+                    'order_no' => 'ORD-' . strtoupper(Str::random(12)),
+                    'user_id' => $userId,
+                    'address_id' => $address->id,
+                    'subtotal' => $subtotal,
+                    'discount' => $discount,
+                    'shipping' => $shipping,
+                    'total' => $total,
+                    'notes' => $validated['notes'] ?? null,
+                    'discount_percentage' => 0,
+                    'cgst_percentage' => 0,
+                    'cgst' => 0,
+                    'sgst_percentage' => 0,
+                    'sgst' => 0,
+                    'igst_percentage' => 0,
+                    'igst' => 0,
+                ]);
+
+                foreach ($itemsToSave as $item) {
+                    $item['order_id'] = $order->id;
+
+                    OrderItem::create($item);
+                }
+
+                Payment::create([
+                    'order_id' => $order->id,
+                    'user_id' => $userId,
+                    'method' => 'cash',
+                    'amount' => $total,
+                    'status' => 'Pending',
+                ]);
+
+                DB::table('order_status_history')->insert([
+                    'order_id' => $order->id,
+                    'status' => 'pending',
+                    'title' => 'Order placed',
+                    'description' =>
+                        'Order placed successfully. Payment method: Cash on Delivery.',
+                    'created_by' => $userId,
+                    'created_at' => now(),
+                ]);
+
+                // Clear the database cart only after order records are saved.
+                Cart::where('user_id', $userId)->delete();
+
+                return $order;
+            });
+
+            session()->forget('food_cart');
+
+            // Return JSON in the format expected by the checkout JavaScript.
+            return response()->json([
+                'success' => true,
+                'message' => 'Your order has been placed successfully.',
+                'order_no' => $order->order_no,
+                'redirect_url' => route(
+                    'checkout.confirmation',
+                    ['orderNo' => $order->order_no]
+                ),
+            ]);
+
+        } catch (\RuntimeException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+
+        } catch (\Throwable $e) {
+            report($e);
+
+            return response()->json([
+                'success' => false,
+                'message' =>
+                    'Unable to place your order right now. Please try again.',
+            ], 500);
+        }
+    }
+
+    /**
      * MERGE GUEST CART INTO DATABASE
      */
     private function mergeGuestCartIntoDatabase()
@@ -320,9 +490,9 @@ class CartController extends Controller
                 $cartItem->save();
             } else {
                 Cart::create([
-                    'user_id'    => Auth::id(),
+                    'user_id' => Auth::id(),
                     'product_id' => $productId,
-                    'quantity'   => $quantity,
+                    'quantity' => $quantity,
                 ]);
             }
         }
