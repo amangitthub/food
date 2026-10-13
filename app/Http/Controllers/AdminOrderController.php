@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\User;
 use App\Models\Address;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -24,12 +25,20 @@ class AdminOrderController extends Controller
         'failed',
     ];
 
+    // Must match the enum values of payments.status in the database
+    private array $paymentStatuses = [
+        'Pending',
+        'Success',
+        'Failed',
+        'Refunded',
+    ];
+
     /**
      * Display all orders in admin panel.
      */
     public function index(Request $request)
     {
-        $query = Order::with('items')->latest();
+        $query = Order::with(['items', 'payment'])->latest();
 
         // Search by order number or ID
         if ($request->filled('search')) {
@@ -114,6 +123,7 @@ class AdminOrderController extends Controller
             'orders' => $orders,
             'stats' => $stats,
             'statuses' => $this->statuses,
+            'paymentStatuses' => $this->paymentStatuses,
         ]);
     }
 
@@ -238,5 +248,34 @@ class AdminOrderController extends Controller
         return redirect()
             ->route('orders.index')
             ->with('success', 'Order status updated successfully.');
+    }
+
+    /**
+     * Update the payment status (payments table).
+     */
+    public function updatePayment(Request $request, $id)
+    {
+        $request->validate([
+            'payment_status' => ['required', 'string'],
+        ]);
+
+        // Match the value to the DB enum, ignoring upper/lower case
+        $status = collect($this->paymentStatuses)->first(
+            fn ($s) => strcasecmp($s, $request->payment_status) === 0
+        );
+
+        if (! $status) {
+            return back()->withErrors(['payment_status' => 'Invalid payment status.']);
+        }
+
+        $payment = Payment::where('order_id', $id)->latest('id')->first();
+
+        if (! $payment) {
+            return back()->withErrors(['payment_status' => 'No payment record found for this order.']);
+        }
+
+        $payment->update(['status' => $status]);
+
+        return back()->with('success', 'Payment status updated successfully.');
     }
 }

@@ -13,6 +13,9 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\AdminOrderController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ForgotPasswordController;
 
 // ================== Website Pages ==================
 
@@ -64,6 +67,24 @@ Route::post('/register', [AuthController::class, 'register'])
 Route::post('/logout', [AuthController::class, 'logout'])
     ->name('logout');
 
+
+// ================== Forgot Password ==================
+
+Route::get('/forgot-password', [ForgotPasswordController::class, 'showForgotForm'])
+    ->name('password.request');
+
+Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink'])
+    ->name('password.email');
+
+// ================== Reset Password ==================
+
+Route::get('/reset-password/{token}', [ForgotPasswordController::class, 'showResetForm'])
+    ->name('password.reset');
+
+Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])
+    ->name('password.update');
+
+
 //=================== Checkout ====================
 Route::middleware('auth')->group(function () {
 
@@ -80,14 +101,13 @@ Route::middleware('auth')->group(function () {
 
         return view('pages.order-confirmation', compact('order'));
     })->name('checkout.confirmation');
-    
-// CUSTOMER ORDERS
-Route::get('/my-orders', [OrderController::class, 'index'])
-    ->name('orders.my');
 
-Route::get('/my-orders/{orderNo}', [OrderController::class, 'show'])
-    ->name('orders.show');
+    // CUSTOMER ORDERS
+    Route::get('/my-orders', [OrderController::class, 'index'])
+        ->name('orders.my');
 
+    Route::get('/my-orders/{orderNo}', [OrderController::class, 'show'])
+        ->name('orders.show');
 
 });
 
@@ -121,43 +141,34 @@ Route::middleware('auth')->group(function () {
 // ================== Admin Dashboard ==================
 
 Route::middleware(['auth', 'admin'])->group(function () {
-
-    Route::get('/dashboard', function () {
-
-        $stats = [
-            'total_orders' => '862',
-            'pending' => '37',
-            'revenue' => '₹2.8L',
-            'customers' => '419',
-        ];
-
-        return view('dash.home', compact('stats'));
-
-    })->name('dashboard');
-
+    //=====================Main Dashboard================
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
 
     // ================== Orders ==================
     Route::get('/orders', [AdminOrderController::class, 'index'])
-    ->name('orders.index');
+        ->name('orders.index');
 
-Route::patch('/orders/{order}/status', [
-    AdminOrderController::class,
-    'updateStatus'
-])->name('orders.status.update');
+    //=================paytment======================
+    Route::patch('/orders/{order}/payment', [AdminOrderController::class, 'updatePayment'])
+        ->name('orders.payment.update');
 
-Route::get('/orders/{order}/details', [
-    AdminOrderController::class,
-    'show'
-])->name('admin.orders.show');
+
+    Route::patch('/orders/{order}/status', [
+        AdminOrderController::class,
+        'updateStatus'
+    ])->name('orders.status.update');
+
+    Route::get('/orders/{order}/details', [
+        AdminOrderController::class,
+        'show'
+    ])->name('admin.orders.show');
 
 
 
     // ================== Customers ==================
-    Route::get('/customers', function () {
-
-        return view('dash.customers');
-
-    })->name('customers.index');
+    Route::get('/customers', [CustomerController::class, 'index'])
+        ->name('customers.index');
 
 
     // ================== Settings ==================

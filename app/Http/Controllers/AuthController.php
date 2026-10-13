@@ -20,7 +20,6 @@ class AuthController extends Controller
         return redirect('/');
     }
 
-
     /*
     |--------------------------------------------------------------------------
     | Login
@@ -36,7 +35,6 @@ class AuthController extends Controller
         $remember = $request->boolean('remember');
 
         if (!Auth::attempt($credentials, $remember)) {
-
             return back()
                 ->withErrors([
                     'email' => 'The email or password is incorrect.',
@@ -44,9 +42,7 @@ class AuthController extends Controller
                 ->withInput($request->only('email'));
         }
 
-
         $user = Auth::user();
-
 
         /*
         |--------------------------------------------------------------------------
@@ -54,7 +50,6 @@ class AuthController extends Controller
         |--------------------------------------------------------------------------
         */
         if ($user->status !== 'active') {
-
             Auth::logout();
 
             return back()
@@ -64,7 +59,6 @@ class AuthController extends Controller
                 ->withInput($request->only('email'));
         }
 
-
         /*
         |--------------------------------------------------------------------------
         | Regenerate Session
@@ -72,21 +66,18 @@ class AuthController extends Controller
         */
         $request->session()->regenerate();
 
-
         /*
         |--------------------------------------------------------------------------
         | Admin Login
         |--------------------------------------------------------------------------
         */
         if ($user->role === 'admin') {
-
             return redirect('/dashboard')
                 ->with(
                     'login_success',
                     'Welcome to Admin Dashboard.'
                 );
         }
-
 
         /*
         |--------------------------------------------------------------------------
@@ -100,7 +91,6 @@ class AuthController extends Controller
             );
     }
 
-
     /*
     |--------------------------------------------------------------------------
     | Register Page
@@ -111,7 +101,6 @@ class AuthController extends Controller
         return redirect('/');
     }
 
-
     /*
     |--------------------------------------------------------------------------
     | Register
@@ -120,7 +109,6 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validated = $request->validateWithBag('register', [
-
             'name' => [
                 'required',
                 'string',
@@ -134,36 +122,36 @@ class AuthController extends Controller
                 'unique:users,email',
             ],
 
+            'mobile' => [
+                'required',
+                'string',
+                'regex:/^[0-9]{10,15}$/',
+                'unique:users,mobile',
+            ],
+
             'password' => [
                 'required',
                 'confirmed',
                 Password::min(8),
             ],
-
+        ], [
+            'mobile.required' => 'Please enter your mobile number.',
+            'mobile.regex' => 'Mobile number must contain 10 to 15 digits.',
+            'mobile.unique' => 'This mobile number is already registered.',
         ]);
-
 
         $user = User::create([
-
             'name' => $validated['name'],
-
             'email' => $validated['email'],
-
-            'password' => Hash::make(
-                $validated['password']
-            ),
-
+            'mobile' => $validated['mobile'],
+            'password' => Hash::make($validated['password']),
             'role' => 'user',
-
             'status' => 'active',
-
         ]);
-
 
         Auth::login($user);
 
         $request->session()->regenerate();
-
 
         return redirect('/')
             ->with(
@@ -171,7 +159,6 @@ class AuthController extends Controller
                 'Account created successfully.'
             );
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -185,7 +172,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
 
         $request->session()->regenerateToken();
-
 
         return redirect('/')
             ->with(

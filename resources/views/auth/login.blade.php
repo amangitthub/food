@@ -151,26 +151,18 @@
                         </div>
 
 
+                  
                         {{-- OPTIONS --}}
                         <div class="food-login-options">
 
-                            <label class="food-remember">
+                            {{-- <label class="food-remember"> </label> --}}
 
-                                {{-- <input
-                                    type="checkbox"
-                                    name="remember"
-                                    value="1"
-                                >
-
-                                <span>Remember me</span> --}}
-
-                            </label>
-
-                            <a href="javascript:void(0);">
+                            <a href="{{ url('/forgot-password') }}">
                                 Forgot Password?
                             </a>
 
                         </div>
+
 
 
                         {{-- BUTTON --}}

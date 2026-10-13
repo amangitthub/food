@@ -1,12 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap');
 
-/* =====================================================================
-   Little Pause restaurant admin - Black and rose gold
-   Dark sidebar, light content, fine serif type.
-   Fonts: Cormorant Garamond (headings, numbers) + Jost (body)
-   Replace your current CSS file with this one.
-   ===================================================================== */
-
 :root {
     /* Core palette */
     --lp-ink: #151515;

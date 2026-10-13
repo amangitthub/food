@@ -120,6 +120,34 @@
 
                     </div>
 
+                        {{-- MOBILE NUMBER --}}
+                        <div class="register-field">
+
+                            <label for="registerMobile">
+                                Mobile Number
+                            </label>
+
+                            <div class="register-input">
+
+                                <span class="register-input-icon">
+                                    <i class="far fa-phone"></i>
+                                </span>
+
+                                <input type="tel"
+                                    id="registerMobile"
+                                    name="mobile"
+                                    placeholder="Enter your mobile number"
+                                    value="{{ old('mobile') }}"
+                                    autocomplete="tel"
+                                    inputmode="numeric"
+                                    pattern="[0-9]{10,15}"
+                                    minlength="10"
+                                    maxlength="15"
+                                    required>
+
+                            </div>
+
+                        </div>
 
                     {{-- PASSWORD --}}
                     <div class="register-field">
