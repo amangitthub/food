@@ -395,11 +395,7 @@
                         <strong id="foodOrderNumber">{{ $order->order_no }}</strong>
                     </div>
 
-                    <button
-                        type="button"
-                        class="food-copy-btn"
-                        id="foodCopyOrder"
-                    >
+                    <button type="button" class="food-copy-btn" id="foodCopyOrder">
                         Copy Order ID
                     </button>
                 </div>
@@ -434,28 +430,28 @@
 
             <div class="food-ordered-items">
                 @forelse ($order->items as $item)
-                    <div class="food-ordered-item">
-                        <div class="food-item-info">
-                            <h4>{{ $item->product_name }}</h4>
+                <div class="food-ordered-item">
+                    <div class="food-item-info">
+                        <h4>{{ $item->product_name }}</h4>
 
-                            <p>
-                                Quantity: {{ $item->quantity }}
-                                &nbsp;·&nbsp;
-                                ₹{{ number_format((float) $item->price, 2) }} each
-                            </p>
-                        </div>
-
-                        <div class="food-item-price">
-                            ₹{{ number_format((float) $item->subtotal, 2) }}
-                        </div>
+                        <p>
+                            Quantity: {{ $item->quantity }}
+                            &nbsp;·&nbsp;
+                            ₹{{ number_format((float) $item->price, 2) }} each
+                        </p>
                     </div>
+
+                    <div class="food-item-price">
+                        ₹{{ number_format((float) $item->subtotal, 2) }}
+                    </div>
+                </div>
                 @empty
-                    <div class="food-ordered-item">
-                        <div class="food-item-info">
-                            <h4>Order details</h4>
-                            <p>Your order has been placed successfully.</p>
-                        </div>
+                <div class="food-ordered-item">
+                    <div class="food-item-info">
+                        <h4>Order details</h4>
+                        <p>Your order has been placed successfully.</p>
                     </div>
+                </div>
                 @endforelse
             </div>
 
@@ -470,17 +466,17 @@
 
             {{-- ACTION BUTTONS --}}
             <div class="food-success-actions">
-                <a
-                    href="{{ route('site.products') }}"
-                    class="food-action-btn food-btn-primary"
-                >
+                <a href="{{ route('site.products') }}" class="food-action-btn food-btn-primary">
                     Continue Shopping &rarr;
                 </a>
 
-                <a
-                    href="{{ route('orders.my') }}"
-                    class="food-action-btn food-btn-secondary"
-                >
+                <a href="{{ route('orders.receipt.download', $order->order_no) }}"
+                    class="food-action-btn food-btn-primary">
+                    <i class="fas fa-file-pdf" style="margin-right:8px;"></i>
+                    Download Receipt PDF
+                </a>
+
+                <a href="{{ route('orders.my') }}" class="food-action-btn food-btn-secondary">
                     My Orders
                 </a>
             </div>

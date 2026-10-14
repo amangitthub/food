@@ -3,557 +3,423 @@
 @section('title', 'Order Details | Food Website')
 
 @section('content')
+@php
+    $payment = $order->payment;
+    $paymentStatus = $payment->status ?? 'Pending';
+    $paymentMethod = $payment->method ?? 'cash';
+
+    // Payment badge (values come from payments.status enum)
+    $payRaw = strtolower((string) $paymentStatus);
+    $payLabel = [
+        'success' => 'Paid', 'paid' => 'Paid', 'pending' => 'Pending',
+        'failed' => 'Failed', 'refunded' => 'Refunded',
+    ][$payRaw] ?? ucfirst($payRaw);
+    $payTone = [
+        'success' => 'ok', 'paid' => 'ok', 'pending' => 'wait',
+        'failed' => 'bad', 'refunded' => 'gray',
+    ][$payRaw] ?? 'gray';
+
+    // Order status
+    $currentStatus = $statusHistory->last()->status ?? 'pending';
+
+    $statusLabels = [
+        'pending' => 'Pending',
+        'packed' => 'Packed',
+        'picked' => 'Picked Up',
+        'shipped' => 'Shipped',
+        'out_for_delivery' => 'Out for Delivery',
+        'complete' => 'Completed',
+        'cancelled' => 'Cancelled',
+        'return_requested' => 'Return Requested',
+        'returned' => 'Returned',
+        'failed' => 'Failed',
+    ];
+
+    $statusTones = [
+        'pending' => 'wait', 'packed' => 'info', 'picked' => 'info',
+        'shipped' => 'blue', 'out_for_delivery' => 'blue',
+        'complete' => 'ok', 'cancelled' => 'bad',
+        'return_requested' => 'wait', 'returned' => 'gray', 'failed' => 'bad',
+    ];
+
+    $currentStatusLabel = $statusLabels[$currentStatus]
+        ?? ucwords(str_replace('_', ' ', $currentStatus));
+    $currentTone = $statusTones[$currentStatus] ?? 'gray';
+
+    // Progress tracker (normal delivery flow only)
+    $flow = ['pending', 'packed', 'picked', 'shipped', 'out_for_delivery', 'complete'];
+    $flowIndex = array_search($currentStatus, $flow, true);
+    $onFlow = $flowIndex !== false;
+
+    // Latest update first
+    $history = $statusHistory->reverse()->values();
+@endphp
+
 <style>
-    .order-details-page {
-        padding: 60px 15px;
-        background: #f7f8fc;
+    /* Uses your website variables (--theme, --theme3, --bg ...) with safe fallbacks */
+    .ods {
+        --g: var(--theme, #00813d);
+        --y: var(--theme3, #ffb936);
+        --r: var(--theme2, #d12525);
+        --dark: var(--header, #212121);
+        --txt: var(--text, #5c5c5b);
+        --ln: var(--border, #d9d9d9);
+        --cream: var(--bg, #f4f1ea);
+        padding: 60px 15px 70px;
+        background: var(--cream);
         min-height: 70vh;
     }
+    .ods *, .ods *::before, .ods *::after { box-sizing: border-box; }
+    .ods-wrap { max-width: 1100px; margin: 0 auto; }
 
-    .order-details-wrap {
-        max-width: 1100px;
-        margin: auto;
-    }
-
-    .order-details-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 18px;
-        flex-wrap: wrap;
-        margin-bottom: 28px;
-    }
-
-    .order-details-header h1 {
-        margin: 0 0 8px;
-        color: #071b2c;
-        font-size: 31px;
-        font-weight: 800;
-    }
-
-    .order-details-header p {
-        margin: 0;
-        color: #788494;
-        overflow-wrap: anywhere;
-    }
-
-    .order-back-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 11px 17px;
-        border-radius: 8px;
-        background: #fff;
-        border: 1px solid #dce2e9;
-        color: #071b2c !important;
-        text-decoration: none !important;
-        font-size: 13px;
-        font-weight: 700;
-    }
-
-    .order-details-grid {
-        display: grid;
-        grid-template-columns: minmax(0, 1.6fr) minmax(270px, 1fr);
-        gap: 22px;
-        align-items: start;
-    }
-
-    .order-details-card {
-        background: #fff;
-        border: 1px solid #e9edf3;
-        border-radius: 15px;
-        padding: 25px;
+    /* ---------- Header ---------- */
+    .ods-head {
+        display: flex; flex-wrap: wrap; gap: 18px; justify-content: space-between; align-items: flex-end;
         margin-bottom: 22px;
-        box-shadow: 0 5px 22px rgba(7, 27, 44, .035);
-        min-width: 0;
+    }
+    .ods-eyebrow { color: var(--g); font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; }
+    .ods-head h1 { margin: 0 0 8px; color: var(--dark); font-size: clamp(28px, 5vw, 38px); font-weight: 800; line-height: 1.15; }
+    .ods-sub { margin: 0; color: var(--txt); overflow-wrap: anywhere; }
+    .ods-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+    .ods-btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        padding: 12px 20px; border-radius: 10px; font-size: 14px; font-weight: 700; line-height: 1.2;
+        text-decoration: none !important; border: 2px solid var(--g);
+        background: var(--g); color: #fff !important; transition: background .2s, color .2s, border-color .2s;
+    }
+    .ods-btn:hover { background: var(--dark); border-color: var(--dark); color: #fff !important; }
+    .ods-btn.ghost { background: #fff; color: var(--dark) !important; border-color: var(--ln); }
+    .ods-btn.ghost:hover { background: #fff; border-color: var(--g); color: var(--g) !important; }
+
+    /* ---------- Status pill ---------- */
+    .ods-pill {
+        display: inline-flex; align-items: center; gap: 7px; padding: 6px 14px; border-radius: 999px;
+        font-size: 12.5px; font-weight: 700; white-space: nowrap;
+    }
+    .ods-pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+    .tone-ok   { background: #dff3e8; color: #00642f; }
+    .tone-wait { background: #fff0cc; color: #8a5a00; }
+    .tone-info { background: #d9f1f6; color: #0b5566; }
+    .tone-blue { background: #dde8fd; color: #1d4ed8; }
+    .tone-bad  { background: #f9dada; color: #b01c1c; }
+    .tone-gray { background: #ececec; color: #444; }
+
+    /* ---------- Cards ---------- */
+    .ods-card {
+        background: #fff; border: 1px solid #ebe6da; border-radius: 16px;
+        padding: 26px; margin-bottom: 22px; min-width: 0;
+        box-shadow: 0 6px 24px rgba(33, 33, 33, .04);
+    }
+    .ods-card h3 {
+        display: flex; align-items: center; gap: 10px;
+        margin: 0 0 20px; color: var(--dark); font-size: 19px; font-weight: 800;
+    }
+    .ods-card h3 i {
+        width: 32px; height: 32px; border-radius: 50%; background: #e8f4ed; color: var(--g);
+        display: inline-flex; align-items: center; justify-content: center; font-size: 13px;
     }
 
-    .order-details-card h3 {
-        color: #071b2c;
-        font-size: 19px;
-        font-weight: 800;
-        margin: 0 0 22px;
+    /* ---------- Progress ---------- */
+    .ods-track { overflow-x: auto; padding-bottom: 4px; }
+    .ods-steps { display: flex; min-width: 560px; list-style: none; margin: 0; padding: 0; }
+    .ods-step { flex: 1; text-align: center; position: relative; color: #9a9a96; font-size: 12.5px; font-weight: 600; }
+    .ods-step::before { content: ""; position: absolute; top: 13px; left: -50%; width: 100%; height: 3px; background: #e6e2d8; }
+    .ods-step:first-child::before { display: none; }
+    .ods-dot {
+        width: 28px; height: 28px; border-radius: 50%; margin: 0 auto 9px; position: relative; z-index: 1;
+        background: #fff; border: 3px solid #e6e2d8; color: #fff; font-size: 11px;
+        display: flex; align-items: center; justify-content: center;
     }
+    .ods-step.done { color: var(--dark); }
+    .ods-step.done::before { background: var(--g); }
+    .ods-step.done .ods-dot { background: var(--g); border-color: var(--g); }
+    .ods-step.now { color: var(--g); }
+    .ods-step.now::before { background: var(--g); }
+    .ods-step.now .ods-dot { background: var(--y); border-color: var(--y); box-shadow: 0 0 0 5px rgba(255, 185, 54, .3); }
+    .ods-alert { padding: 14px 16px; border-radius: 12px; font-size: 14px; font-weight: 600; }
 
-    .order-detail-product {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 18px;
-        padding: 18px 0;
-        border-bottom: 1px solid #edf0f5;
-    }
+    /* ---------- Layout ---------- */
+    .ods-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr); gap: 22px; align-items: start; }
+    .ods-col { min-width: 0; }
 
-    .order-detail-product:first-of-type {
-        padding-top: 0;
-    }
+    /* ---------- Products ---------- */
+    .ods-item { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 16px 0; border-bottom: 1px dashed var(--ln); }
+    .ods-item:first-of-type { padding-top: 0; }
+    .ods-item:last-child { border-bottom: 0; padding-bottom: 0; }
+    .ods-item h4 { margin: 0 0 6px; color: var(--dark); font-size: 15.5px; font-weight: 700; line-height: 1.4; overflow-wrap: anywhere; }
+    .ods-item p { margin: 0; color: var(--txt); font-size: 13.5px; }
+    .ods-qty { display: inline-block; background: var(--cream); border-radius: 6px; padding: 1px 9px; font-weight: 700; color: var(--dark); margin-left: 4px; }
+    .ods-amt { color: var(--dark); font-size: 16px; font-weight: 800; white-space: nowrap; }
 
-    .order-detail-product:last-child {
-        border-bottom: 0;
-        padding-bottom: 0;
+    /* ---------- Summary ---------- */
+    .ods-line { display: flex; justify-content: space-between; gap: 14px; padding: 8px 0; color: var(--txt); font-size: 14.5px; }
+    .ods-line strong { color: var(--dark); font-weight: 700; text-align: right; }
+    .ods-line .minus { color: var(--r); }
+    .ods-total {
+        display: flex; justify-content: space-between; align-items: center; gap: 14px;
+        margin-top: 12px; padding: 16px 18px; border-radius: 12px;
+        background: var(--g); color: #fff; border-bottom: 4px solid var(--y);
     }
+    .ods-total span { font-size: 15px; font-weight: 700; }
+    .ods-total strong { font-size: 26px; font-weight: 800; color: #fff; }
 
-    .order-detail-product h4 {
-        color: #071b2c;
-        font-size: 15px;
-        line-height: 1.5;
-        font-weight: 700;
-        margin: 0 0 7px;
-        overflow-wrap: anywhere;
+    /* ---------- Timeline ---------- */
+    .ods-tl { position: relative; padding: 0 0 24px 28px; border-left: 3px solid #e6e2d8; margin-left: 7px; }
+    .ods-tl:last-child { padding-bottom: 0; border-left-color: transparent; }
+    .ods-tl::before {
+        content: ""; position: absolute; left: -10px; top: 1px; width: 17px; height: 17px; border-radius: 50%;
+        background: #fff; border: 3px solid #cfcabd;
     }
+    .ods-tl.latest::before { background: var(--g); border-color: var(--g); box-shadow: 0 0 0 5px rgba(0, 129, 61, .16); }
+    .ods-tl strong { display: block; color: var(--dark); font-size: 15px; margin-bottom: 4px; text-transform: capitalize; }
+    .ods-tl p { margin: 0 0 2px; color: var(--txt); font-size: 13.5px; line-height: 1.7; }
+    .ods-tl small { display: block; color: #9a9a96; margin-top: 5px; font-size: 12.5px; }
 
-    .order-detail-product p {
-        color: #7a8594;
-        font-size: 13px;
-        margin: 0;
-        line-height: 1.8;
-    }
-
-    .order-detail-product-price {
-        color: #071b2c;
-        font-size: 15px;
-        font-weight: 800;
-        white-space: nowrap;
-    }
-
-    .order-total-line {
-        display: flex;
-        justify-content: space-between;
-        gap: 15px;
-        padding: 9px 0;
-        color: #667385;
-        font-size: 14px;
-    }
-
-    .order-total-line strong {
-        color: #071b2c;
-        font-weight: 700;
-        text-align: right;
-    }
-
-    .order-total-final {
-        border-top: 1px solid #e9edf3;
-        margin-top: 10px;
-        padding-top: 18px;
-        color: #071b2c;
-        font-size: 17px;
-        font-weight: 800;
-    }
-
-    .order-total-final strong {
-        color: #ff8c1a;
-        font-size: 23px;
-    }
-
-    .order-address-name {
-        color: #071b2c;
-        font-size: 16px;
-        font-weight: 800;
-        margin-bottom: 9px;
-    }
-
-    .order-address-text {
-        color: #667385;
-        font-size: 14px;
-        line-height: 1.9;
-        overflow-wrap: anywhere;
-    }
-
-    .order-payment-method {
-        display: inline-block;
-        background: #eef5ff;
-        color: #245ba8;
-        border-radius: 7px;
-        padding: 7px 11px;
-        font-size: 12px;
-        font-weight: 800;
-        margin-bottom: 16px;
-    }
-
-    .order-payment-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 12px;
-        margin-top: 10px;
-        font-size: 13px;
-        color: #778292;
-    }
-
-    .order-payment-row strong {
-        color: #071b2c;
-        text-align: right;
-        overflow-wrap: anywhere;
-    }
-
-    .order-payment-status {
-        display: inline-block;
-        padding: 6px 10px;
-        border-radius: 30px;
-        background: #fff3dc;
-        color: #99600a !important;
-        font-size: 12px;
-        font-weight: 800;
-        text-transform: capitalize;
-    }
-
-    .order-history-item {
-        position: relative;
-        padding: 0 0 22px 24px;
-        border-left: 2px solid #e8edf3;
-        margin-left: 5px;
-    }
-
-    .order-history-item:last-child {
-        padding-bottom: 0;
-        border-left-color: transparent;
-    }
-
-    .order-history-item:before {
-        content: '';
-        position: absolute;
-        left: -7px;
-        top: 2px;
-        width: 12px;
-        height: 12px;
-        background: #ff8c1a;
-        border-radius: 50%;
-        box-shadow: 0 0 0 4px #fff0df;
-    }
-
-    .order-history-item strong {
-        display: block;
-        color: #071b2c;
-        font-size: 14px;
-        margin-bottom: 5px;
-        text-transform: capitalize;
-    }
-
-    .order-history-item p {
-        margin: 0;
-        color: #788494;
-        font-size: 13px;
-        line-height: 1.7;
-    }
-
-    .order-history-item small {
-        display: block;
-        color: #98a1ad;
-        margin-top: 6px;
-    }
-
-    .order-details-empty {
-        color: #788494;
-        font-size: 14px;
-        line-height: 1.7;
-    }
+    /* ---------- Right column ---------- */
+    .ods-name { color: var(--dark); font-size: 17px; font-weight: 800; margin-bottom: 10px; }
+    .ods-addr { color: var(--txt); font-size: 14.5px; line-height: 1.85; overflow-wrap: anywhere; }
+    .ods-addr .ph { color: var(--dark); font-weight: 700; margin-bottom: 4px; }
+    .ods-addr .ph i { color: var(--g); margin-right: 6px; }
+    .ods-method { display: inline-block; background: #fff0cc; color: #8a5a00; border-radius: 8px; padding: 7px 12px; font-size: 12.5px; font-weight: 800; margin-bottom: 14px; }
+    .ods-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 9px 0; font-size: 14px; color: var(--txt); border-bottom: 1px dashed var(--ln); }
+    .ods-row:last-child { border-bottom: 0; }
+    .ods-row strong { color: var(--dark); text-align: right; overflow-wrap: anywhere; }
+    .ods-empty { margin: 0; color: var(--txt); font-size: 14px; line-height: 1.7; }
 
     @media (max-width: 767px) {
-        .order-details-page {
-            padding: 35px 12px;
-        }
-
-        .order-details-header h1 {
-            font-size: 26px;
-        }
-
-        .order-details-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .order-details-card {
-            padding: 19px 16px;
-        }
-
-        .order-detail-product {
-            gap: 10px;
-        }
-
-        .order-detail-product-price {
-            font-size: 14px;
-        }
+        .ods { padding: 35px 12px 50px; }
+        .ods-grid { grid-template-columns: 1fr; }
+        .ods-card { padding: 20px 16px; }
+        .ods-actions { width: 100%; }
+        .ods-actions .ods-btn { flex: 1 1 100%; }
+        .ods-total strong { font-size: 22px; }
     }
 </style>
 
-@php
-$payment = $order->payment;
-$paymentStatus = $payment->status ?? 'Pending';
-$paymentMethod = $payment->method ?? 'cash';
+<section class="ods">
+    <div class="ods-wrap">
 
-
-$currentStatus = $statusHistory->last()->status ?? 'pending';
-
-$statusLabels = [
-'pending' => 'Pending',
-'packed' => 'Packed',
-'picked' => 'Picked Up',
-'shipped' => 'Shipped',
-'out_for_delivery' => 'Out for Delivery',
-'complete' => 'Completed',
-'cancelled' => 'Cancelled',
-'return_requested' => 'Return Requested',
-'returned' => 'Returned',
-'failed' => 'Failed',
-];
-
-$currentStatusLabel = $statusLabels[$currentStatus]
-?? ucwords(str_replace('_', ' ', $currentStatus));
-
-@endphp
-
-<section class="order-details-page">
-    <div class="order-details-wrap">
-
-        <div class="order-details-header">
+        {{-- ================= HEADER ================= --}}
+        <div class="ods-head">
             <div>
+                <div class="ods-eyebrow">Your order</div>
                 <h1>Order Details</h1>
-                <p>
+                <p class="ods-sub">
                     Order #{{ $order->order_no }}
                     &nbsp;·&nbsp;
                     {{ $order->created_at
-                    ? \Illuminate\Support\Carbon::parse($order->created_at)->format('d M Y, h:i A')
-                    : 'Date unavailable'
-                    }}
+                        ? \Illuminate\Support\Carbon::parse($order->created_at)->format('d M Y, h:i A')
+                        : 'Date unavailable' }}
                 </p>
-
-                <div style="margin-top:15px;">
-                    <span style="color:#667385;font-size:13px;">
-                        Current Order Status:
-                    </span>
-
-                    <span
-                        style="display:inline-block;margin-left:6px;padding:7px 13px;border-radius:30px;background:#fff0df;color:#a95800;font-size:12px;font-weight:800;">
-                        {{ $currentStatusLabel }}
-                    </span>
+                <div style="margin-top:14px">
+                    <span class="ods-pill tone-{{ $currentTone }}">{{ $currentStatusLabel }}</span>
                 </div>
-
             </div>
 
-            <a href="{{ route('orders.my') }}" class="order-back-btn">
-                &larr; Back to My Orders
-            </a>
+            <div class="ods-actions">
+                <a href="{{ route('orders.receipt.download', $order->order_no) }}" class="ods-btn">
+                    <i class="fas fa-file-pdf"></i> Download Receipt PDF
+                </a>
+                <a href="{{ route('orders.my') }}" class="ods-btn ghost">
+                    &larr; Back to My Orders
+                </a>
+            </div>
         </div>
 
-        <div class="order-details-grid">
+        {{-- ================= PROGRESS ================= --}}
+        <div class="ods-card">
+            <h3><i class="fas fa-route"></i>Order Progress</h3>
 
-            {{-- LEFT COLUMN --}}
-            <div>
+            @if ($onFlow)
+                <div class="ods-track">
+                    <ol class="ods-steps">
+                        @foreach ($flow as $i => $step)
+                            <li class="ods-step {{ $i < $flowIndex ? 'done' : '' }} {{ $i === $flowIndex ? 'now' : '' }}">
+                                <div class="ods-dot">
+                                    @if ($i < $flowIndex)<i class="fas fa-check"></i>@endif
+                                </div>
+                                {{ $statusLabels[$step] }}
+                            </li>
+                        @endforeach
+                    </ol>
+                </div>
+            @else
+                <div class="ods-alert tone-{{ $currentTone }}">
+                    This order is {{ $currentStatusLabel }}.
+                </div>
+            @endif
+        </div>
+
+        <div class="ods-grid">
+
+            {{-- ================= LEFT COLUMN ================= --}}
+            <div class="ods-col">
 
                 {{-- PRODUCTS --}}
-                <div class="order-details-card">
-                    <h3>Products in Your Order</h3>
+                <div class="ods-card">
+                    <h3><i class="fas fa-shopping-bag"></i>Products in Your Order</h3>
 
                     @forelse ($order->items as $item)
-                    <div class="order-detail-product">
-                        <div>
-                            <h4>{{ $item->product_name }}</h4>
-
-                            <p>
-                                Quantity: {{ $item->quantity }}<br>
-                                Unit Price:
-                                ₹{{ number_format((float) $item->price, 2) }}
-                            </p>
+                        <div class="ods-item">
+                            <div>
+                                <h4>{{ $item->product_name }}</h4>
+                                <p>
+                                    ₹{{ number_format((float) $item->price, 2) }} each
+                                    <span class="ods-qty">× {{ $item->quantity }}</span>
+                                </p>
+                            </div>
+                            <div class="ods-amt">₹{{ number_format((float) $item->subtotal, 2) }}</div>
                         </div>
-
-                        <div class="order-detail-product-price">
-                            ₹{{ number_format((float) $item->subtotal, 2) }}
-                        </div>
-                    </div>
                     @empty
-                    <p class="order-details-empty">
-                        No product details are available for this order.
-                    </p>
+                        <p class="ods-empty">No product details are available for this order.</p>
                     @endforelse
                 </div>
 
-                {{-- ORDER TOTAL --}}
-                <div class="order-details-card">
-                    <h3>Price Summary</h3>
+                {{-- PRICE SUMMARY --}}
+                <div class="ods-card">
+                    <h3><i class="fas fa-receipt"></i>Price Summary</h3>
 
-                    <div class="order-total-line">
+                    <div class="ods-line">
                         <span>Subtotal</span>
-                        <strong>
-                            ₹{{ number_format((float) $order->subtotal, 2) }}
-                        </strong>
+                        <strong>₹{{ number_format((float) $order->subtotal, 2) }}</strong>
                     </div>
 
                     @if ((float) $order->discount > 0)
-                    <div class="order-total-line">
-                        <span>Discount</span>
-                        <strong>
-                            - ₹{{ number_format((float) $order->discount, 2) }}
-                        </strong>
-                    </div>
+                        <div class="ods-line">
+                            <span>Discount</span>
+                            <strong class="minus">- ₹{{ number_format((float) $order->discount, 2) }}</strong>
+                        </div>
                     @endif
 
                     @if ((float) $order->shipping > 0)
-                    <div class="order-total-line">
-                        <span>Shipping</span>
-                        <strong>
-                            ₹{{ number_format((float) $order->shipping, 2) }}
-                        </strong>
-                    </div>
+                        <div class="ods-line">
+                            <span>Shipping</span>
+                            <strong>₹{{ number_format((float) $order->shipping, 2) }}</strong>
+                        </div>
                     @endif
 
                     @if ((float) $order->cgst > 0)
-                    <div class="order-total-line">
-                        <span>CGST</span>
-                        <strong>
-                            ₹{{ number_format((float) $order->cgst, 2) }}
-                        </strong>
-                    </div>
+                        <div class="ods-line">
+                            <span>CGST</span>
+                            <strong>₹{{ number_format((float) $order->cgst, 2) }}</strong>
+                        </div>
                     @endif
 
                     @if ((float) $order->sgst > 0)
-                    <div class="order-total-line">
-                        <span>SGST</span>
-                        <strong>
-                            ₹{{ number_format((float) $order->sgst, 2) }}
-                        </strong>
-                    </div>
+                        <div class="ods-line">
+                            <span>SGST</span>
+                            <strong>₹{{ number_format((float) $order->sgst, 2) }}</strong>
+                        </div>
                     @endif
 
                     @if ((float) $order->igst > 0)
-                    <div class="order-total-line">
-                        <span>IGST</span>
-                        <strong>
-                            ₹{{ number_format((float) $order->igst, 2) }}
-                        </strong>
-                    </div>
+                        <div class="ods-line">
+                            <span>IGST</span>
+                            <strong>₹{{ number_format((float) $order->igst, 2) }}</strong>
+                        </div>
                     @endif
 
-                    <div class="order-total-line order-total-final">
+                    <div class="ods-total">
                         <span>Total Amount</span>
-                        <strong>
-                            ₹{{ number_format((float) $order->total, 2) }}
-                        </strong>
+                        <strong>₹{{ number_format((float) $order->total, 2) }}</strong>
                     </div>
                 </div>
 
-                {{-- ORDER HISTORY --}}
-                <div class="order-details-card">
-                    <h3>Order Updates</h3>
+                {{-- ORDER UPDATES --}}
+                <div class="ods-card">
+                    <h3><i class="fas fa-history"></i>Order Updates</h3>
 
-                    @forelse ($statusHistory as $history)
-                    <div class="order-history-item">
-                        <strong>
-                            {{ $history->title ?: ($statusLabels[$history->status] ?? ucwords(str_replace('_', ' ',
-                            $history->status))) }}
-                        </strong>
+                    @forelse ($history as $row)
+                        <div class="ods-tl {{ $loop->first ? 'latest' : '' }}">
+                            <strong>
+                                {{ $row->title ?: ($statusLabels[$row->status] ?? ucwords(str_replace('_', ' ', $row->status))) }}
+                            </strong>
 
-                        @if ($history->description)
-                        <p>{{ $history->description }}</p>
-                        @endif
+                            @if ($row->description)
+                                <p>{{ $row->description }}</p>
+                            @endif
 
-                        @if ($history->location)
-                        <p>Location: {{ $history->location }}</p>
-                        @endif
+                            @if ($row->location)
+                                <p>Location: {{ $row->location }}</p>
+                            @endif
 
-                        <small>
-                            {{ \Illuminate\Support\Carbon::parse($history->created_at)->format('d M Y, h:i A') }}
-                        </small>
-                    </div>
+                            <small>{{ \Illuminate\Support\Carbon::parse($row->created_at)->format('d M Y, h:i A') }}</small>
+                        </div>
                     @empty
-                    <p class="order-details-empty">
-                        Your order has been placed. Further updates will
-                        appear here when available.
-                    </p>
+                        <p class="ods-empty">
+                            Your order has been placed. Further updates will appear here when available.
+                        </p>
                     @endforelse
                 </div>
-
             </div>
 
-            {{-- RIGHT COLUMN --}}
-            <div>
+            {{-- ================= RIGHT COLUMN ================= --}}
+            <div class="ods-col">
 
                 {{-- DELIVERY ADDRESS --}}
-                <div class="order-details-card">
-                    <h3>Delivery Address</h3>
+                <div class="ods-card">
+                    <h3><i class="fas fa-map-marker-alt"></i>Delivery Address</h3>
 
                     @if ($address)
-                    <div class="order-address-name">
-                        {{ $address->name }}
-                    </div>
+                        <div class="ods-name">{{ $address->name }}</div>
 
-                    <div class="order-address-text">
-                        <div>
-                            <strong>Mobile:</strong>
-                            {{ $address->mobile }}
+                        <div class="ods-addr">
+                            <div class="ph"><i class="fas fa-phone"></i>{{ $address->mobile }}</div>
+                            <div>{{ $address->address }}</div>
+
+                            @if ($address->city)<div>{{ $address->city }}</div>@endif
+                            @if ($address->state)<div>{{ $address->state }}</div>@endif
+                            @if ($address->pincode)<div>PIN: {{ $address->pincode }}</div>@endif
+                            @if ($address->country)<div>{{ $address->country }}</div>@endif
                         </div>
-
-                        <div>
-                            {{ $address->address }}
-                        </div>
-
-                        @if ($address->city)
-                        <div>{{ $address->city }}</div>
-                        @endif
-
-                        @if ($address->state)
-                        <div>{{ $address->state }}</div>
-                        @endif
-
-                        @if ($address->pincode)
-                        <div>PIN: {{ $address->pincode }}</div>
-                        @endif
-
-                        @if ($address->country)
-                        <div>{{ $address->country }}</div>
-                        @endif
-                    </div>
                     @else
-                    <p class="order-details-empty">
-                        Delivery address is not available for this order.
-                    </p>
+                        <p class="ods-empty">Delivery address is not available for this order.</p>
                     @endif
                 </div>
 
                 {{-- PAYMENT DETAILS --}}
-                <div class="order-details-card">
-                    <h3>Payment Details</h3>
+                <div class="ods-card">
+                    <h3><i class="fas fa-credit-card"></i>Payment Details</h3>
 
-                    <div class="order-payment-method">
-                        {{ strtoupper(str_replace('_', ' ', $paymentMethod)) }}
-                    </div>
+                    <div class="ods-method">{{ strtoupper(str_replace('_', ' ', $paymentMethod)) }}</div>
 
-                    <div class="order-payment-row">
+                    <div class="ods-row">
                         <span>Payment Status</span>
-                        <strong>
-                            <span class="order-payment-status">
-                                {{ $paymentStatus }}
-                            </span>
-                        </strong>
+                        <strong><span class="ods-pill tone-{{ $payTone }}">{{ $payLabel }}</span></strong>
                     </div>
 
-                    <div class="order-payment-row">
+                    <div class="ods-row">
                         <span>Payment Amount</span>
-                        <strong>
-                            ₹{{ number_format((float) ($payment->amount ?? $order->total), 2) }}
-                        </strong>
+                        <strong>₹{{ number_format((float) ($payment->amount ?? $order->total), 2) }}</strong>
                     </div>
 
                     @if ($payment && $payment->gateway)
-                    <div class="order-payment-row">
-                        <span>Payment Gateway</span>
-                        <strong>{{ $payment->gateway }}</strong>
-                    </div>
+                        <div class="ods-row">
+                            <span>Payment Gateway</span>
+                            <strong>{{ ucfirst($payment->gateway) }}</strong>
+                        </div>
                     @endif
 
-                    <div class="order-payment-row">
+                    @if ($payment && $payment->gateway_payment_id)
+                        <div class="ods-row">
+                            <span>Payment ID</span>
+                            <strong>{{ $payment->gateway_payment_id }}</strong>
+                        </div>
+                    @endif
+
+                    <div class="ods-row">
                         <span>Order Number</span>
                         <strong>{{ $order->order_no }}</strong>
                     </div>
                 </div>
 
                 @if ($order->notes)
-                <div class="order-details-card">
-                    <h3>Order Notes</h3>
-                    <p class="order-details-empty">
-                        {{ $order->notes }}
-                    </p>
-                </div>
+                    <div class="ods-card">
+                        <h3><i class="fas fa-sticky-note"></i>Order Notes</h3>
+                        <p class="ods-empty">{{ $order->notes }}</p>
+                    </div>
                 @endif
-
             </div>
         </div>
     </div>

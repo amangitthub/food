@@ -7,6 +7,8 @@ use App\Models\Address;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
@@ -21,7 +23,6 @@ class OrderController extends Controller
             ->latest()
             ->paginate(10);
 
-        // History table available hai to latest statuses load karo.
         if (Schema::hasTable('order_status_history')) {
             $orderIds = $orders->getCollection()->pluck('id');
 
@@ -40,7 +41,6 @@ class OrderController extends Controller
                     $history->status ?? $order->status ?? 'pending';
             }
         } else {
-            // Purane orders ke liye fallback.
             foreach ($orders as $order) {
                 $order->current_status = $order->status ?? 'pending';
             }
@@ -59,7 +59,6 @@ class OrderController extends Controller
             ->where('user_id', Auth::id())
             ->firstOrFail();
 
-        // Sirf isi customer ka address fetch hoga.
         $address = Address::where('id', $order->address_id)
             ->where('user_id', Auth::id())
             ->first();
@@ -74,7 +73,6 @@ class OrderController extends Controller
                 ->get();
         }
 
-        // History ka last record latest status hota hai.
         $latestHistory = $statusHistory->last();
 
         $order->current_status =
@@ -85,5 +83,32 @@ class OrderController extends Controller
             'address',
             'statusHistory'
         ));
+    }
+
+    /**
+     * Sirf logged-in customer apni receipt download kar sakta hai.
+     */
+    public function downloadReceipt($orderNo)
+    {
+        $order = Order::with(['items', 'payment'])
+            ->where('order_no', $orderNo)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        $address = Address::where('id', $order->address_id)
+            ->where('user_id', Auth::id())
+            ->first();
+
+        $customer = Auth::user();
+
+       $pdf = Pdf::loadView('pages.receipt-pdf', [
+            'order' => $order,
+            'address' => $address,
+            'customer' => $customer,
+        ])->setPaper('a4', 'portrait');
+
+        $filename = 'receipt-' . Str::slug($order->order_no) . '.pdf';
+
+        return $pdf->download($filename);
     }
 }

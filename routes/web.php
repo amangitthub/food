@@ -109,6 +109,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/my-orders/{orderNo}', [OrderController::class, 'show'])
         ->name('orders.show');
 
+    Route::get('/my-orders/{orderNo}/receipt', [OrderController::class, 'downloadReceipt'])
+        ->name('orders.receipt.download');
+
 });
 
 // ================== User Profile & Addresses ==================
