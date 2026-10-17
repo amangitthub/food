@@ -11,7 +11,9 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+
 class CartController extends Controller
 {
     /**
@@ -21,7 +23,7 @@ class CartController extends Controller
     {
         $validated = $request->validate([
             'product_id' => ['required', 'integer', 'exists:products,id'],
-            'quantity'   => ['nullable', 'integer', 'min:1'],
+            'quantity' => ['nullable', 'integer', 'min:1'],
         ]);
 
         $productId = (int) $validated['product_id'];
@@ -38,7 +40,6 @@ class CartController extends Controller
             ], 404);
         }
 
-        // Logged-in user
         if (Auth::check()) {
             $this->mergeGuestCartIntoDatabase();
 
@@ -51,20 +52,19 @@ class CartController extends Controller
                 $cartItem->save();
             } else {
                 Cart::create([
-                    'user_id'    => Auth::id(),
+                    'user_id' => Auth::id(),
                     'product_id' => $productId,
-                    'quantity'   => $quantity,
+                    'quantity' => $quantity,
                 ]);
             }
 
             return response()->json([
-                'success'    => true,
-                'message'    => 'Product added to cart.',
+                'success' => true,
+                'message' => 'Product added to cart.',
                 'cart_count' => $this->getCartCount(),
             ]);
         }
 
-        // Guest user
         $cart = session()->get('food_cart', []);
         $found = false;
 
@@ -81,107 +81,102 @@ class CartController extends Controller
         if (!$found) {
             $cart[] = [
                 'product_id' => $productId,
-                'quantity'   => $quantity,
+                'quantity' => $quantity,
             ];
         }
 
         session()->put('food_cart', $cart);
 
         return response()->json([
-            'success'    => true,
-            'message'    => 'Product added to cart.',
+            'success' => true,
+            'message' => 'Product added to cart.',
             'cart_count' => $this->getCartCount(),
         ]);
     }
 
     /**
-     * CART PAGE
+     * CART PAGE + RANDOM PRODUCT RECOMMENDATIONS
      */
-    
-/**
- * CART PAGE + RANDOM PRODUCT RECOMMENDATIONS
- */
-public function index()
-{
-    if (Auth::check()) {
-        $this->mergeGuestCartIntoDatabase();
+    public function index()
+    {
+        if (Auth::check()) {
+            $this->mergeGuestCartIntoDatabase();
 
-        $cartItems = Cart::where('user_id', Auth::id())
-            ->with('product.images')
-            ->get();
+            $cartItems = Cart::where('user_id', Auth::id())
+                ->with('product.images')
+                ->get();
 
-        $user = Auth::user();
+            $user = Auth::user();
 
-        $addresses = Address::where('user_id', Auth::id())
-            ->orderByDesc('is_default')
-            ->latest()
-            ->get();
+            $addresses = Address::where('user_id', Auth::id())
+                ->orderByDesc('is_default')
+                ->latest()
+                ->get();
 
-        $cartProductIds = $cartItems
-            ->pluck('product_id')
-            ->filter()
-            ->map(fn ($id) => (int) $id)
-            ->all();
-    } else {
-        $guestCart = session()->get('food_cart', []);
+            $cartProductIds = $cartItems
+                ->pluck('product_id')
+                ->filter()
+                ->map(fn($id) => (int) $id)
+                ->all();
+        } else {
+            $guestCart = session()->get('food_cart', []);
 
-        $productIds = collect($guestCart)
-            ->pluck('product_id')
-            ->filter()
-            ->values();
+            $productIds = collect($guestCart)
+                ->pluck('product_id')
+                ->filter()
+                ->values();
 
-        $products = Product::with('images')
+            $products = Product::with('images')
+                ->where('status', 'Active')
+                ->whereIn('id', $productIds)
+                ->get()
+                ->keyBy('id');
+
+            $cartItems = collect($guestCart)
+                ->map(function ($item) use ($products) {
+                    $product = $products->get($item['product_id'] ?? null);
+
+                    if (!$product) {
+                        return null;
+                    }
+
+                    return [
+                        'id' => null,
+                        'product_id' => $product->id,
+                        'quantity' => (int) ($item['quantity'] ?? 1),
+                        'product' => $product,
+                    ];
+                })
+                ->filter()
+                ->values();
+
+            $user = null;
+            $addresses = collect();
+
+            $cartProductIds = $cartItems
+                ->pluck('product_id')
+                ->filter()
+                ->map(fn($id) => (int) $id)
+                ->all();
+        }
+
+        // Four random active products, excluding products already in cart.
+        $recommendedProducts = Product::with('images')
             ->where('status', 'Active')
-            ->whereIn('id', $productIds)
-            ->get()
-            ->keyBy('id');
-
-        $cartItems = collect($guestCart)
-            ->map(function ($item) use ($products) {
-                $product = $products->get($item['product_id'] ?? null);
-
-                if (!$product) {
-                    return null;
-                }
-
-                return [
-                    'id' => null,
-                    'product_id' => $product->id,
-                    'quantity' => (int) ($item['quantity'] ?? 1),
-                    'product' => $product,
-                ];
+            ->when(!empty($cartProductIds), function ($query) use ($cartProductIds) {
+                $query->whereNotIn('id', $cartProductIds);
             })
-            ->filter()
-            ->values();
+            ->inRandomOrder()
+            ->take(4)
+            ->get();
 
-        $user = null;
-        $addresses = collect();
-
-        $cartProductIds = $cartItems
-            ->pluck('product_id')
-            ->filter()
-            ->map(fn ($id) => (int) $id)
-            ->all();
+        return view('pages.cart', compact(
+            'cartItems',
+            'user',
+            'addresses',
+            'recommendedProducts'
+        ));
     }
-
-    // Four random active products, excluding products already in cart.
-    $recommendedProducts = Product::with('images')
-        ->where('status', 'Active')
-        ->when(!empty($cartProductIds), function ($query) use ($cartProductIds) {
-            $query->whereNotIn('id', $cartProductIds);
-        })
-        ->inRandomOrder()
-        ->take(4)
-        ->get();
-
-    return view('pages.cart', compact(
-        'cartItems',
-        'user',
-        'addresses',
-        'recommendedProducts'
-    ));
-}
-
 
     /**
      * UPDATE CART QUANTITY
@@ -190,7 +185,7 @@ public function index()
     {
         $validated = $request->validate([
             'product_id' => ['required', 'integer', 'exists:products,id'],
-            'quantity'   => ['required', 'integer', 'min:1'],
+            'quantity' => ['required', 'integer', 'min:1'],
         ]);
 
         $productId = (int) $validated['product_id'];
@@ -212,8 +207,8 @@ public function index()
             $cartItem->save();
 
             return response()->json([
-                'success'    => true,
-                'message'    => 'Cart updated.',
+                'success' => true,
+                'message' => 'Cart updated.',
                 'cart_count' => $this->getCartCount(),
             ]);
         }
@@ -241,8 +236,8 @@ public function index()
         session()->put('food_cart', $cart);
 
         return response()->json([
-            'success'    => true,
-            'message'    => 'Cart updated.',
+            'success' => true,
+            'message' => 'Cart updated.',
             'cart_count' => $this->getCartCount(),
         ]);
     }
@@ -264,8 +259,8 @@ public function index()
                 ->delete();
 
             return response()->json([
-                'success'    => true,
-                'message'    => 'Product removed from cart.',
+                'success' => true,
+                'message' => 'Product removed from cart.',
                 'cart_count' => $this->getCartCount(),
             ]);
         }
@@ -274,14 +269,14 @@ public function index()
 
         $cart = array_values(array_filter(
             $cart,
-            fn ($item) => (int) ($item['product_id'] ?? 0) !== $productId
+            fn($item) => (int) ($item['product_id'] ?? 0) !== $productId
         ));
 
         session()->put('food_cart', $cart);
 
         return response()->json([
-            'success'    => true,
-            'message'    => 'Product removed from cart.',
+            'success' => true,
+            'message' => 'Product removed from cart.',
             'cart_count' => $this->getCartCount(),
         ]);
     }
@@ -298,14 +293,14 @@ public function index()
         session()->forget('food_cart');
 
         return response()->json([
-            'success'    => true,
-            'message'    => 'Cart cleared.',
+            'success' => true,
+            'message' => 'Cart cleared.',
             'cart_count' => 0,
         ]);
     }
 
     /**
-     * PLACE CASH ON DELIVERY ORDER
+     * PLACE ORDER - CASH ON DELIVERY OR MANUAL UPI
      */
     public function placeOrder(Request $request)
     {
@@ -318,11 +313,20 @@ public function index()
 
         $validated = $request->validate([
             'address_id' => ['required', 'integer'],
-            'payment_method' => ['required', 'in:cash'],
+            'payment_method' => ['required', 'in:cash,online'],
             'notes' => ['nullable', 'string', 'max:2000'],
+
+            'payment_proof' => [
+                'required_if:payment_method,online',
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:4096',
+            ],
         ]);
 
         $userId = Auth::id();
+        $paymentMethod = $validated['payment_method'];
 
         // Verify that the selected address belongs to this user.
         $address = Address::where('id', $validated['address_id'])
@@ -336,12 +340,22 @@ public function index()
             ], 422);
         }
 
+        $proofPath = null;
+
         try {
-            $order = DB::transaction(function () use (
-                $userId,
-                $address,
-                $validated
-            ) {
+            // Save the proof only for online UPI payments.
+            if ($paymentMethod === 'online') {
+                $proofPath = $request->file('payment_proof')
+                    ->store('payment-proofs', 'public');
+
+                if (!$proofPath) {
+                    throw new \RuntimeException(
+                        'Unable to save the payment screenshot. Please try again.'
+                    );
+                }
+            }
+
+            $order = DB::transaction(function () use ($userId, $address, $validated, $paymentMethod, $proofPath) {
                 $cartItems = Cart::where('user_id', $userId)
                     ->with('product')
                     ->lockForUpdate()
@@ -370,7 +384,7 @@ public function index()
                         );
                     }
 
-                    // Always calculate the price using the database.
+                    // Always calculate prices from the database.
                     $price = round((float) $product->price, 2);
                     $lineTotal = round($price * $quantity, 2);
 
@@ -412,29 +426,36 @@ public function index()
 
                 foreach ($itemsToSave as $item) {
                     $item['order_id'] = $order->id;
-
                     OrderItem::create($item);
                 }
 
                 Payment::create([
                     'order_id' => $order->id,
                     'user_id' => $userId,
-                    'method' => 'cash',
+                    'method' => $paymentMethod,
+                    'gateway' => $paymentMethod === 'online'
+                        ? 'UPI_MANUAL'
+                        : null,
                     'amount' => $total,
+                    // Both methods remain pending until the relevant process is complete.
                     'status' => 'Pending',
+                    'proof_document' => $proofPath,
                 ]);
+
+                $paymentDescription = $paymentMethod === 'online'
+                    ? 'Online UPI payment screenshot submitted. Payment is pending admin verification.'
+                    : 'Order placed successfully. Payment method: Cash on Delivery.';
 
                 DB::table('order_status_history')->insert([
                     'order_id' => $order->id,
                     'status' => 'pending',
                     'title' => 'Order placed',
-                    'description' =>
-                        'Order placed successfully. Payment method: Cash on Delivery.',
+                    'description' => $paymentDescription,
                     'created_by' => $userId,
                     'created_at' => now(),
                 ]);
 
-                // Clear the database cart only after order records are saved.
+                // Clear database cart only after order records are saved.
                 Cart::where('user_id', $userId)->delete();
 
                 return $order;
@@ -442,30 +463,36 @@ public function index()
 
             session()->forget('food_cart');
 
-            // Return JSON in the format expected by the checkout JavaScript.
             return response()->json([
                 'success' => true,
-                'message' => 'Your order has been placed successfully.',
+                'message' => $paymentMethod === 'online'
+                    ? 'Order placed. Your UPI payment is pending verification.'
+                    : 'Your order has been placed successfully.',
                 'order_no' => $order->order_no,
                 'redirect_url' => route(
                     'checkout.confirmation',
                     ['orderNo' => $order->order_no]
                 ),
             ]);
-
         } catch (\RuntimeException $e) {
+            if ($proofPath) {
+                Storage::disk('public')->delete($proofPath);
+            }
+
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
             ], 422);
-
         } catch (\Throwable $e) {
+            if ($proofPath) {
+                Storage::disk('public')->delete($proofPath);
+            }
+
             report($e);
 
             return response()->json([
                 'success' => false,
-                'message' =>
-                    'Unable to place your order right now. Please try again.',
+                'message' => 'Unable to place your order right now. Please try again.',
             ], 500);
         }
     }
@@ -533,8 +560,7 @@ public function index()
         $cart = session()->get('food_cart', []);
 
         return (int) collect($cart)->sum(
-            fn ($item) => (int) ($item['quantity'] ?? 0)
+            fn($item) => (int) ($item['quantity'] ?? 0)
         );
     }
 }
-

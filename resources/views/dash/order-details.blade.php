@@ -334,7 +334,7 @@
             </section>
 
             {{-- Payment --}}
-            <section class="od-card">
+            {{-- <section class="od-card">
                 <h2 class="od-h od-serif"><i class="fas fa-credit-card"></i>Payment</h2>
                 @if($order->payment)
                     <div class="od-field">
@@ -352,7 +352,136 @@
                 @else
                     <div class="od-empty">No payment record found.</div>
                 @endif
-            </section>
+            </section> --}}
+            
+{{-- Payment --}}
+<section class="od-card">
+    <h2 class="od-h od-serif">
+        <i class="fas fa-credit-card"></i>Payment Details
+    </h2>
+
+    @if($order->payment)
+        @php
+            $payment = $order->payment;
+            $paymentStatus = $payment->status ?? 'Pending';
+
+            $paymentBadge = match (strtolower($paymentStatus)) {
+                'success' => 'st-success',
+                'failed' => 'st-danger',
+                'refunded' => 'st-secondary',
+                default => 'st-warning',
+            };
+
+            $proofPath = $payment->proof_document ?? null;
+        @endphp
+
+        <div class="od-field">
+            <div class="od-label">Payment Status</div>
+            <div class="od-value">
+                <span class="od-pill {{ $paymentBadge }}">
+                    {{ $paymentStatus }}
+                </span>
+            </div>
+        </div>
+
+        <div class="od-field">
+            <div class="od-label">Payment Method</div>
+            <div class="od-value">
+                {{ strtoupper($payment->method ?? $payment->payment_method ?? 'N/A') }}
+            </div>
+        </div>
+
+        <div class="od-field">
+            <div class="od-label">Amount</div>
+            <div class="od-value">
+                ₹{{ number_format((float) ($payment->amount ?? $order->total ?? 0), 2) }}
+            </div>
+        </div>
+
+        <div class="od-field">
+            <div class="od-label">Transaction ID</div>
+            <div class="od-value">
+                {{ $payment->transaction_id ?? 'Not available' }}
+            </div>
+        </div>
+
+        {{-- User uploaded payment screenshot --}}
+        @if(($payment->method ?? '') === 'online' && $proofPath)
+            <div class="od-field">
+                <div class="od-label">User Payment Screenshot</div>
+
+                @if(\Illuminate\Support\Facades\Storage::disk('public')->exists($proofPath))
+                    <a href="{{ asset('storage/' . $proofPath) }}"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       title="View full payment screenshot">
+
+                        <img
+                            src="{{ asset('storage/' . $proofPath) }}"
+                            alt="User uploaded payment screenshot"
+                            loading="lazy"
+                            style="display:block;width:100%;max-width:280px;max-height:350px;object-fit:contain;margin:12px 0;padding:8px;background:#fff;border:1px solid var(--line);border-radius:12px;"
+                        >
+                    </a>
+
+                    <a href="{{ asset('storage/' . $proofPath) }}"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="od-back"
+                       style="margin:8px 0 12px;">
+                        <i class="fas fa-up-right-from-square"></i>
+                        View Full Screenshot
+                    </a>
+                @else
+                    <div class="od-empty">
+                        Screenshot path database mein hai, lekin file public storage mein nahi mili.
+                        <br>
+                        <small>{{ $proofPath }}</small>
+                    </div>
+                @endif
+            </div>
+        @elseif(($payment->method ?? '') === 'online')
+            <div class="od-empty" style="margin-top:12px;">
+                User ne payment screenshot upload nahi kiya hai.
+            </div>
+        @endif
+
+        {{-- Update payment status --}}
+        <form action="{{ route('orders.payment.update', $order->id) }}"
+              method="POST"
+              style="margin-top:18px;">
+            @csrf
+            @method('PATCH')
+
+            <label for="payment_status" class="od-label"
+                   style="display:block;margin-bottom:8px;">
+                Update Payment Status
+            </label>
+
+            <select name="payment_status"
+                    id="payment_status"
+                    required
+                    class="form-select"
+                    style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:12px;">
+                @foreach(['Pending', 'Success', 'Failed', 'Refunded'] as $option)
+                    <option value="{{ $option }}"
+                        {{ strcasecmp($paymentStatus, $option) === 0 ? 'selected' : '' }}>
+                        {{ $option }}
+                    </option>
+                @endforeach
+            </select>
+
+            <button type="submit"
+                    class="btn"
+                    style="width:100%;background:var(--ink);color:#fff;border:1px solid var(--rose);border-radius:10px;padding:11px 16px;">
+                <i class="fas fa-save"></i> Update Payment Status
+            </button>
+        </form>
+    @else
+        <div class="od-empty">No payment record found.</div>
+    @endif
+</section>
+
         </div>
     </div>
 
