@@ -107,10 +107,34 @@ class DashboardController extends Controller
                 'qty' => (int) $row->qty,
             ])
             ->all();
+            /*
+|--------------------------------------------------------------------------
+| 4. Daily Sales: Last 7 Days
+|--------------------------------------------------------------------------
+*/
+
+// DAILY SALES FILTER: 7 OR 30 DAYS
+$dailySalesDays = (int) request()->query('daily_sales_days', 7);
+
+if (!in_array($dailySalesDays, [7, 30], true)) {
+    $dailySalesDays = 7;
+}
+
+$dailySales = Order::query()
+    ->selectRaw('DATE(created_at) as sale_date')
+    ->selectRaw('COUNT(*) as total_orders')
+    ->selectRaw('SUM(total) as total_sales')
+    ->whereBetween('created_at', [
+        now()->subDays($dailySalesDays - 1)->startOfDay(),
+        now()->endOfDay()
+    ])
+    ->groupByRaw('DATE(created_at)')
+    ->orderByDesc('sale_date')
+    ->get();
 
         /*
         |--------------------------------------------------------------------------
-        | 4. Recent Orders
+        | 5. Recent Orders
         |--------------------------------------------------------------------------
         */
 
@@ -174,12 +198,14 @@ class DashboardController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        return view('dash.home', compact(
-            'stats',
-            'chart',
-            'topItems',
-            'recentOrders'
-        ));
+       return view('dash.home', compact(
+    'stats',
+    'chart',
+    'topItems',
+    'recentOrders',
+    'dailySales'
+));
+        
     }
 
     /**

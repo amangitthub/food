@@ -207,6 +207,81 @@
         </section>
     </div>
 
+{{-- DAILY SALES --}}
+{{-- <section class="db-card" style="margin-bottom:20px;">
+
+    <div class="db-card-head" style="gap:15px; flex-wrap:wrap;">
+        <h2 class="db-serif">Daily Sales</h2>
+
+        <form method="GET"
+              action="{{ route('dashboard') }}"
+              style="display:flex; align-items:center; gap:10px;">
+
+            
+            <label for="daily_sales_days" class="db-muted">
+                Period:
+            </label>
+
+            <select
+                name="daily_sales_days"
+                id="daily_sales_days"
+                onchange="this.form.submit()"
+                style="padding:8px 12px; border:1px solid #ddd; border-radius:8px; background:#fff; color:#151515;">
+
+                <option value="7"
+                    {{ ($dailySalesDays ?? 7) == 7 ? 'selected' : '' }}>
+                    Last 7 Days
+                </option>
+
+                <option value="30"
+                    {{ ($dailySalesDays ?? 7) == 30 ? 'selected' : '' }}>
+                    Last 30 Days
+                </option>
+
+            </select>
+        </form>
+    </div>
+
+    @if(isset($dailySales) && $dailySales->isNotEmpty())
+
+        <div class="db-table-wrap">
+            <table class="db-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th class="r">Total Orders</th>
+                        <th class="r">Total Sales</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach($dailySales as $sale)
+                        <tr>
+                            <td data-label="Date">
+                                {{ \Carbon\Carbon::parse($sale->sale_date)->format('d M Y') }}
+                            </td>
+
+                            <td class="r" data-label="Total Orders">
+                                {{ $sale->total_orders }}
+                            </td>
+
+                            <td class="r" data-label="Total Sales">
+                                ₹{{ number_format((float) $sale->total_sales, 2) }}
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+
+    @else
+        <div class="db-empty">
+            No sales recorded in the last {{ $dailySalesDays ?? 7 }} days.
+        </div>
+    @endif
+
+</section> --}}
+
     {{-- Recent orders --}}
     <section class="db-card">
         <div class="db-card-head">

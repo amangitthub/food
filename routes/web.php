@@ -17,6 +17,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\ContactController;
 
 // ================== Website Pages ==================
 
@@ -33,9 +34,14 @@ Route::get('/menu', [SiteProductController::class, 'index'])
 
 Route::get('/combos', [SiteComboController::class, 'index'])
     ->name('site.combos');
-
+// Contact Us Page
 Route::view('/contact', 'pages.contact')
     ->name('contact');
+
+// Submit Contact Form
+Route::post('/contact', [ContactController::class, 'store'])
+    ->name('contact.store');
+
 Route::post('/cart/add', [CartController::class, 'add'])
     ->name('cart.add');
 
@@ -182,7 +188,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
         'show'
     ])->name('admin.orders.show');
 
-
+    Route::get('/admin/contacts', [ContactController::class, 'index'])
+        ->name('admin.contacts');
 
     // ================== Customers ==================
     Route::get('/customers', [CustomerController::class, 'index'])

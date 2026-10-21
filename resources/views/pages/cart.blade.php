@@ -521,35 +521,37 @@ Review your selected food items and manage your cart.
         display: grid;
         gap: 12px
     }
-        /* UPI Payment Visibility Fix */
-        #upiPaymentSection {
+
+    /* UPI Payment Visibility Fix */
+    #upiPaymentSection {
         width: 100%;
         margin-top: 15px;
         padding: 20px;
         border: 1px solid #d9d9d9;
         border-radius: 14px;
         background: #fff;
-        }
+    }
 
-        #upiPaymentSection img {
+    #upiPaymentSection img {
         display: block;
         width: 220px;
         max-width: 100%;
         height: auto;
         margin: 15px auto;
         object-fit: contain;
-        }
+    }
 
-        #upiPaymentSection h6 {
+    #upiPaymentSection h6 {
         text-align: center;
         font-weight: 700;
         color: #212121;
-        }
+    }
 
-        #upiPaymentSection p {
+    #upiPaymentSection p {
         text-align: center;
-        }
-        .food-payment-option {
+    }
+
+    .food-payment-option {
         display: flex;
         align-items: center;
         gap: 13px;
@@ -919,7 +921,6 @@ Review your selected food items and manage your cart.
             font-size: 15px
         }
     }
-    
 </style>
 
 <section class="food-cart-page">
@@ -1138,67 +1139,69 @@ Review your selected food items and manage your cart.
                         </div>
                     </div>
                 </div>
-{{-- PAYMENT --}}
-<div class="food-checkout-card">
-    <div class="food-checkout-card-header">
-        <div class="food-checkout-icon"><i class="fa fa-credit-card"></i></div>
-        <div>
-            <h3>Payment Method</h3>
-            <p>Select your preferred payment method.</p>
-        </div>
-    </div>
+                {{-- PAYMENT --}}
+                <div class="food-checkout-card">
+                    <div class="food-checkout-card-header">
+                        <div class="food-checkout-icon"><i class="fa fa-credit-card"></i></div>
+                        <div>
+                            <h3>Payment Method</h3>
+                            <p>Select your preferred payment method.</p>
+                        </div>
+                    </div>
 
-    <div class="food-payment-methods">
-        <label class="food-payment-option">
-            <input type="radio" name="payment_method" value="cash" checked>
-            <span class="food-payment-content">
-                <strong>Cash on Delivery</strong>
-                <small>Pay when your order arrives.</small>
-            </span>
-            <i class="fa fa-money-bill-wave"></i>
-        </label>
+                    <div class="food-payment-methods">
+                        <label class="food-payment-option">
+                            <input type="radio" name="payment_method" value="cash" checked>
+                            <span class="food-payment-content">
+                                <strong>Cash on Delivery</strong>
+                                <small>Pay when your order arrives.</small>
+                            </span>
+                            <i class="fa fa-money-bill-wave"></i>
+                        </label>
 
-        <label class="food-payment-option">
-            <input type="radio" name="payment_method" value="online">
-            <span class="food-payment-content">
-                <strong>Pay Online via UPI</strong>
-                <small>Scan the QR code and upload your payment screenshot.</small>
-            </span>
-            <i class="fa fa-qrcode"></i>
-        </label>
-    </div>
+                        <label class="food-payment-option">
+                            <input type="radio" name="payment_method" value="online">
+                            <span class="food-payment-content">
+                                <strong>Pay Online via UPI</strong>
+                                <small>Scan the QR code and upload your payment screenshot.</small>
+                            </span>
+                            <i class="fa fa-qrcode"></i>
+                        </label>
+                    </div>
 
-    {{-- UPI PAYMENT (shown by your existing JS when "Pay Online via UPI" is selected) --}}
-    <div id="upiPaymentSection" style="display:none">
-        <div class="food-upi-grid">
+                    {{-- UPI PAYMENT (shown by your existing JS when "Pay Online via UPI" is selected) --}}
+                    <div id="upiPaymentSection" style="display:none">
+                        <div class="food-upi-grid">
+                            <div class="food-upi-qr">
+                                <a href="https://pay.google.com/" target="_blank" rel="noopener noreferrer">
+                                    <img src="{{ asset('uploads/payment/upi-qr.png') }}" alt="Pay using Google Pay"
+                                        style="cursor:pointer;">
+                                </a>
+                                <span>Click QR to open Google Pay</span>
+                            </div>
 
-            <div class="food-upi-qr">
-                <img src="{{ asset('uploads/payment/upi-qr.png') }}" alt="UPI Payment QR Code">
-                <span>Scan to pay</span>
-            </div>
+                            <div class="food-upi-steps">
+                                <h6>Pay with any UPI app</h6>
 
-            <div class="food-upi-steps">
-                <h6>Pay with any UPI app</h6>
+                                <ol>
+                                    <li>Click the QR code to open Google Pay.</li>
+                                    <li>Pay the total amount shown in the Order Summary.</li>
+                                    <li>Upload the payment screenshot below.</li>
+                                </ol>
 
-                <ol>
-                    <li>Scan the QR code with Google Pay, PhonePe, Paytm or any UPI app.</li>
-                    <li>Pay the total amount shown in the Order Summary.</li>
-                    <li>Upload the payment screenshot below.</li>
-                </ol>
+                                <label for="payment_proof" class="food-form-label">
+                                    Upload Payment Screenshot <span>*</span>
+                                </label>
 
-                <label for="payment_proof" class="food-form-label">
-                    Upload Payment Screenshot <span>*</span>
-                </label>
+                                <input type="file" id="payment_proof" name="payment_proof" class="food-form-input"
+                                    accept="image/jpeg,image/png,image/webp">
 
-                <input type="file" id="payment_proof" name="payment_proof" class="food-form-input"
-                    accept="image/jpeg,image/png,image/webp">
+                                <small id="paymentProofError" class="food-upi-error"></small>
+                            </div>
 
-                <small id="paymentProofError" class="food-upi-error"></small>
-            </div>
-
-        </div>
-    </div>
-</div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {{-- ORDER SUMMARY --}}
@@ -1289,7 +1292,7 @@ Review your selected food items and manage your cart.
 @endif
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () {
     // ========================================
     // INITIAL DATA & ELEMENTS
     // ========================================

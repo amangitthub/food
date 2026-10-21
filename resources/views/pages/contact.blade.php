@@ -869,9 +869,24 @@
                                 get back to you shortly.
                             </p>
                         </div>
+                        @if(session('success'))
+                        <div class="alert alert-success">
+                            {{ session('success') }}
+                        </div>
+                        @endif
+                        
+                        @if($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        @endif
                         {{-- FRONTEND ONLY FORM --}}
-
-                        <form class="food-contact-form" onsubmit="return false;">
+                        <form class="food-contact-form" action="{{ route('contact.store') }}" method="POST">
+                            @csrf
                             <div class="row">
                                 {{-- NAME --}}
                                 <div class="col-md-6">
@@ -879,7 +894,8 @@
                                         <label for="contactName">
                                             Your Name
                                         </label>
-                                        <input type="text" id="contactName" class="form-control" placeholder="Enter your name">
+                                      <input type="text" id="contactName" name="name" class="form-control" placeholder="Enter your name"
+                                        value="{{ old('name') }}" required>
 
                                     </div>
 
@@ -890,7 +906,8 @@
                                         <label for="contactEmail">
                                             Email Address
                                         </label>
-                                        <input type="email" id="contactEmail" class="form-control" placeholder="Enter your email">
+                                    <input type="email" id="contactEmail" name="email" class="form-control" placeholder="Enter your email"
+                                        value="{{ old('email') }}" required>
                                     </div>
                                 </div>
 
@@ -900,7 +917,8 @@
                                         <label for="contactPhone">
                                             Phone Number
                                         </label>
-                                        <input type="text" id="contactPhone" class="form-control" placeholder="Enter your phone number">
+                                   <input type="text" id="contactPhone" name="phone" class="form-control" placeholder="Enter your phone number"
+                                            value="{{ old('phone') }}" required>
                                     </div>
                                 </div>
 
@@ -910,7 +928,8 @@
                                         <label for="contactSubject">
                                             Subject
                                         </label>
-                                        <input type="text" id="contactSubject" class="form-control" placeholder="Enter subject">
+                                      <input type="text" id="contactSubject" name="subject" class="form-control" placeholder="Enter subject"
+                                        value="{{ old('subject') }}" required>
                                     </div>
                                 </div>
 
@@ -920,14 +939,15 @@
                                         <label for="contactMessage">
                                             Your Message
                                         </label>
-                                        <textarea id="contactMessage" class="form-control" placeholder="Write your message here..."></textarea>
+                                      <textarea id="contactMessage" name="message" class="form-control" placeholder="Write your message here..."
+                                        required>{{ old('message') }}</textarea>
                                     </div>
 
                                 </div>
 
                                 {{-- BUTTON --}}
                                 <div class="col-12">
-                                    <button type="button" class="food-contact-submit">
+                                  <button type="submit" class="food-contact-submit">
                                         Send Message
                                         <i class="fa fa-paper-plane"></i>
                                     </button>
